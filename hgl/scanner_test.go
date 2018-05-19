@@ -7,88 +7,176 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestScan(t *testing.T) {
-	src := strings.TrimSpace(`
-	section_name:
-		key1 = value
-		key2 = one, "2", "셋"
-		key3 = "\""
-	`)
+var tok token
+var lit string
 
-	var tok token
-	var lit string
-
-	scanner := newScanner(strings.NewReader(src))
-
-	// call scanner.Scan() but skip Space and Newline tokens
-	scan := func() (token, string) {
-		for {
-			tok, lit := scanner.Scan()
-			if tok != Space && tok != Newline {
-				return tok, lit
-			}
+// call scanner.scan(s) but skip Space and Newline tokens
+func scan(s *Scanner) (token, string) {
+	for {
+		tok, lit := s.Scan()
+		if tok != Space && tok != Newline {
+			return tok, lit
 		}
 	}
+}
 
-	// section_name:
+func TestSingle(t *testing.T) {
+	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	single = foo_bar_123
+	`)))
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
-	assert.Equal(t, "section_name", lit)
+	assert.Equal(t, "single", lit)
 
-	tok, lit = scan()
-	assert.Equal(t, Colon, tok)
-
-	// key1 = value
-
-	tok, lit = scan()
-	assert.Equal(t, String, tok)
-	assert.Equal(t, "key1", lit)
-
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, Equal, tok)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
-	assert.Equal(t, "value", lit)
+	assert.Equal(t, "foo_bar_123", lit)
+}
 
-	// key2 = one, "2", "셋"
+func TestList(t *testing.T) {
+	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	list = one, "2", "셋"
+	`)))
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
-	assert.Equal(t, "key2", lit)
+	assert.Equal(t, "list", lit)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, Equal, tok)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
 	assert.Equal(t, "one", lit)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, Comma, tok)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
 	assert.Equal(t, "2", lit)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, Comma, tok)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
 	assert.Equal(t, "셋", lit)
+}
 
-	// key3 = "\""
+func TestEscapedQuote(t *testing.T) {
+	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	escaped = "\""
+	`)))
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
-	assert.Equal(t, "key3", lit)
+	assert.Equal(t, "escaped", lit)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, Equal, tok)
 
-	tok, lit = scan()
+	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
 	assert.Equal(t, `"`, lit)
+}
+
+func TestSimpleComplete(t *testing.T) {
+	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	section1:
+		hello = world
+		"foo" = "bar baz"
+	
+	section2:
+		a -> b
+		b -> a
+		a -> c
+	`)))
+
+	// seciton1:
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "section1", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Colon, tok)
+
+	// hello = world
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "hello", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Equal, tok)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "world", lit)
+
+	// "foo" = "bar baz"
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "foo", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Equal, tok)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "bar baz", lit)
+
+	// seciton2:
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "section2", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Colon, tok)
+
+	// a -> b
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "a", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Arrow, tok)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "b", lit)
+
+	// b -> a
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "b", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Arrow, tok)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "a", lit)
+
+	// a -> c
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "a", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Arrow, tok)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "c", lit)
 }
