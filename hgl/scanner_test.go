@@ -10,6 +10,10 @@ import (
 var tok Token
 var lit string
 
+func newScanner(src string) *Scanner {
+	return NewScanner(strings.NewReader(strings.TrimSpace(src)))
+}
+
 // call scanner.scan(s) but skip Space and Newline tokens
 func scan(s *Scanner) (Token, string) {
 	for {
@@ -21,9 +25,9 @@ func scan(s *Scanner) (Token, string) {
 }
 
 func TestSingle(t *testing.T) {
-	s := NewScanner(strings.NewReader(strings.TrimSpace(`
+	s := newScanner(`
 	single = foo_bar_123
-	`)))
+	`)
 
 	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
@@ -38,9 +42,9 @@ func TestSingle(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	s := NewScanner(strings.NewReader(strings.TrimSpace(`
+	s := newScanner(`
 	list = one, "2", "셋"
-	`)))
+	`)
 
 	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
@@ -69,9 +73,9 @@ func TestList(t *testing.T) {
 }
 
 func TestEscapedQuote(t *testing.T) {
-	s := NewScanner(strings.NewReader(strings.TrimSpace(`
+	s := newScanner(`
 	escaped = "\""
-	`)))
+	`)
 
 	tok, lit = scan(s)
 	assert.Equal(t, String, tok)
@@ -85,8 +89,52 @@ func TestEscapedQuote(t *testing.T) {
 	assert.Equal(t, `"`, lit)
 }
 
+func TestCommentSingleLine(t *testing.T) {
+	s := newScanner(`
+	# Hello, world!
+	`)
+	tok, lit = scan(s)
+	assert.Equal(t, Comment, tok)
+	assert.Equal(t, "Hello, world!", lit)
+}
+
+func TestCommentMultipleLines(t *testing.T) {
+	s := newScanner(`
+	# Hello,
+	# world!
+	`)
+	tok, lit = scan(s)
+	assert.Equal(t, Comment, tok)
+	assert.Equal(t, "Hello, world!", lit)
+}
+
+func TestCommentParagraphs(t *testing.T) {
+	s := newScanner(`
+	# Hello,
+	# world!
+	#
+	# It's the second paragraph.
+
+	# foo
+	# bar
+	#
+	# baz
+	#
+	#
+	# qux
+	`)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Comment, tok)
+	assert.Equal(t, "Hello, world!\n\nIt's the second paragraph.", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Comment, tok)
+	assert.Equal(t, "foo bar\n\nbaz\n\nqux", lit)
+}
+
 func TestSimpleComplete(t *testing.T) {
-	s := NewScanner(strings.NewReader(strings.TrimSpace(`
+	s := newScanner(`
 	section1:
 		hello = world
 		"foo" = "bar baz"
@@ -95,7 +143,7 @@ func TestSimpleComplete(t *testing.T) {
 		a -> b
 		b -> a
 		a -> c
-	`)))
+	`)
 
 	// seciton1:
 

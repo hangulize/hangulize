@@ -39,7 +39,7 @@ func (s *Scanner) unread() {
 func (s *Scanner) readWhile(test func(rune) bool) string {
 	var buf bytes.Buffer
 
-	for ch := s.read(); test(ch); ch = s.read() {
+	for ch := s.read(); ch != eof && test(ch); ch = s.read() {
 		buf.WriteRune(ch)
 	}
 	s.unread()
@@ -55,6 +55,57 @@ func isSpace(ch rune) bool {
 
 func (s *Scanner) scanSpace() (Token, string) {
 	return Space, s.readWhile(isSpace)
+}
+
+// comment
+
+func isCommentLetter(ch rune) bool {
+	return ch == '#'
+}
+
+func isInLine(ch rune) bool {
+	return ch != '\n' && ch != eof
+}
+
+func (s *Scanner) scanComment() (Token, string) {
+	var buf bytes.Buffer
+	nEmpty := 0
+
+	for i := 0; ; i++ {
+		// Read until visiting a sharp.
+		s.readWhile(isSpace)
+		ch := s.read()
+		if ch != '#' {
+			s.unread()
+			break
+		}
+
+		// Read a line without newline.
+		line := s.readWhile(isInLine)
+		s.read() // discard remaining newline
+
+		line = strings.TrimSpace(line)
+
+		if line == "" {
+			// empty line
+			nEmpty++
+			continue
+		}
+
+		if i > 0 {
+			if nEmpty > 0 {
+				buf.WriteString("\n\n")
+			} else {
+				buf.WriteRune(' ')
+			}
+		}
+
+		nEmpty = 0
+
+		buf.WriteString(line)
+	}
+
+	return Comment, buf.String()
 }
 
 // string
@@ -143,6 +194,10 @@ func (s *Scanner) Scan() (Token, string) {
 	if ch == '"' {
 		s.unread()
 		return s.scanQuotedString()
+	}
+	if isCommentLetter(ch) {
+		s.unread()
+		return s.scanComment()
 	}
 
 	if ch == ':' {
