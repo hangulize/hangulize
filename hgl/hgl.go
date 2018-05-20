@@ -6,6 +6,7 @@ The HGL format is a simple config language.  A HGL config has sections.  Each
 section contains string-strings pairs.  A section can be one of a dictionary or
 a pair list:
 
+	# dictionary section
 	lang:
 		id      = "ita"
 		code    = "it", "ita", "ita"
@@ -13,6 +14,7 @@ a pair list:
 		korean  = "이탈리아어"
 		script  = "roman"
 
+	# pair list section
 	rewrite:
 		"^gli$"    -> "li"
 		"^glia$"   -> "g.lia"
