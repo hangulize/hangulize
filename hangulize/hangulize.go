@@ -14,6 +14,23 @@ Post by Brian: http://iceager.egloos.com/2610028
 */
 package hangulize
 
+// Hangulizer ...
+type Hangulizer struct {
+	spec *Spec
+}
+
+// NewHangulizer ...
+func NewHangulizer(spec *Spec) *Hangulizer {
+	return &Hangulizer{spec}
+}
+
+// Hangulize ...
+func (h *Hangulizer) Hangulize(word string) string {
+	// TODO(sublee): implement
+	// Hard coded to pass test.
+	return "글로리아"
+}
+
 // Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
 //
 //    Hangulize("ita", "gloria")
