@@ -76,46 +76,42 @@ func (p *Parser) Parse() (HGL, error) {
 			continue
 		}
 
-		// If an equals sign found, the last string is a key in a dict section.
-		if token == Equal {
+		if token == Equal || token == Arrow {
+			if sectionName == "" {
+				return nil, errors.New("pair found not in section")
+			}
+
 			values, err := p.parseValues()
 			if err != nil {
 				return nil, err
 			}
 
-			var dict Dict
+			var section Section
+			var ok bool
 
-			section, ok := hgl[sectionName]
-			if ok {
-				dict = section.(Dict)
-			} else {
-				dict = make(Dict)
-				hgl[sectionName] = dict
+			// If an equals sign found, the last string is a key in a dict
+			// section.
+			if token == Equal {
+				section, ok = hgl[sectionName]
+
+				if !ok {
+					section = NewDictSection()
+					hgl[sectionName] = section
+				}
 			}
 
-			dict[lastString] = values
-			continue
-		}
+			// If an arrow sign found, the last string is a left value in a
+			// pairs section.
+			if token == Arrow {
+				section, ok = hgl[sectionName]
 
-		// If an arrow sign found, the last string is a left value in a pairs
-		// section.
-		if token == Arrow {
-			values, err := p.parseValues()
-			if err != nil {
-				return nil, err
+				if !ok {
+					section = NewListSection()
+					hgl[sectionName] = section
+				}
 			}
 
-			var pairs Pairs
-
-			section, ok := hgl[sectionName]
-			if ok {
-				pairs = section.(Pairs)
-			} else {
-				pairs = make(Pairs, 0)
-			}
-
-			pairs = append(pairs, Pair{L: lastString, R: values})
-			hgl[sectionName] = pairs
+			section.AddPair(lastString, values)
 			continue
 		}
 	}
