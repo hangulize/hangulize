@@ -10,14 +10,14 @@ import (
 var tok Token
 var lit string
 
-func newScanner(src string) *Scanner {
-	return NewScanner(strings.NewReader(strings.TrimSpace(src)))
+func newLexer(src string) *Lexer {
+	return NewLexer(strings.NewReader(strings.TrimSpace(src)))
 }
 
-// call scanner.scan(s) but skip Space and Newline tokens
-func scan(s *Scanner) (Token, string) {
+// scan calls Lexer.Scan() but ignores Space and Newline tokens
+func scan(l *Lexer) (Token, string) {
 	for {
-		tok, lit := s.Scan()
+		tok, lit := l.Scan()
 		if tok != Space && tok != Newline {
 			return tok, lit
 		}
@@ -25,7 +25,7 @@ func scan(s *Scanner) (Token, string) {
 }
 
 func TestSingle(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	single = foo_bar_123
 	`)
 
@@ -42,7 +42,7 @@ func TestSingle(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	list = one, "2", "셋"
 	`)
 
@@ -73,7 +73,7 @@ func TestList(t *testing.T) {
 }
 
 func TestEscapedQuote(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	escaped = "\""
 	`)
 
@@ -90,7 +90,7 @@ func TestEscapedQuote(t *testing.T) {
 }
 
 func TestCommentSingleLine(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	# Hello, world!
 	`)
 	tok, lit = scan(s)
@@ -99,7 +99,7 @@ func TestCommentSingleLine(t *testing.T) {
 }
 
 func TestCommentMultipleLines(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	# Hello,
 	# world!
 	`)
@@ -109,7 +109,7 @@ func TestCommentMultipleLines(t *testing.T) {
 }
 
 func TestCommentParagraphs(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	# Hello,
 	# world!
 	#
@@ -134,7 +134,7 @@ func TestCommentParagraphs(t *testing.T) {
 }
 
 func TestSimpleComplete(t *testing.T) {
-	s := newScanner(`
+	s := newLexer(`
 	section1:
 		hello = world
 		"foo" = "bar baz"
