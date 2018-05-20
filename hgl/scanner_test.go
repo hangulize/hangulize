@@ -7,11 +7,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var tok token
+var tok Token
 var lit string
 
 // call scanner.scan(s) but skip Space and Newline tokens
-func scan(s *Scanner) (token, string) {
+func scan(s *Scanner) (Token, string) {
 	for {
 		tok, lit := s.Scan()
 		if tok != Space && tok != Newline {
@@ -21,7 +21,7 @@ func scan(s *Scanner) (token, string) {
 }
 
 func TestSingle(t *testing.T) {
-	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	s := NewScanner(strings.NewReader(strings.TrimSpace(`
 	single = foo_bar_123
 	`)))
 
@@ -38,7 +38,7 @@ func TestSingle(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	s := NewScanner(strings.NewReader(strings.TrimSpace(`
 	list = one, "2", "셋"
 	`)))
 
@@ -69,7 +69,7 @@ func TestList(t *testing.T) {
 }
 
 func TestEscapedQuote(t *testing.T) {
-	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	s := NewScanner(strings.NewReader(strings.TrimSpace(`
 	escaped = "\""
 	`)))
 
@@ -86,7 +86,7 @@ func TestEscapedQuote(t *testing.T) {
 }
 
 func TestSimpleComplete(t *testing.T) {
-	s := newScanner(strings.NewReader(strings.TrimSpace(`
+	s := NewScanner(strings.NewReader(strings.TrimSpace(`
 	section1:
 		hello = world
 		"foo" = "bar baz"
