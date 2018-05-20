@@ -9,26 +9,46 @@ import (
 )
 import ()
 
-type token int
+// Token represents a meaningful string in HGL format.
+type Token int
 
 const (
-	Illegal token = iota
+	// Illegal represents any string not matched with legal tokens.
+	Illegal Token = iota
+
+	// EOF represents the end-of-file.
 	EOF
-	Space
+
+	// Newline means only "\n".  HGL is a line-sensitive format.
 	Newline
+
+	// Space represents any of whitespace characters except "\n".
+	Space
+
+	// String represents a text literal.
 	String
+
+	// Comment represents a comment literal including initial "#".
 	Comment
+
+	// Colon means only ":".
 	Colon
+
+	// Comma means only ",".
 	Comma
+
+	// Equal means only "=".
 	Equal
+
+	// Arrow means only "->".
 	Arrow
 )
 
-var tokenNames = map[token]string{
+var tokenNames = map[Token]string{
 	Illegal: `Illegal`,
 	EOF:     `EOF`,
-	Space:   `Space`,
 	Newline: `Newline`,
+	Space:   `Space`,
 	String:  `String`,
 	Comment: `Comment`,
 	Colon:   `Colon`,
@@ -37,21 +57,26 @@ var tokenNames = map[token]string{
 	Arrow:   `Arrow`,
 }
 
-func FormatTokenLiteral(token token, literal string) string {
+// FormatTokenLiteral formats return value (token, literal) from Scan() as a
+// human-readable string.
+func FormatTokenLiteral(token Token, literal string) string {
 	tokenName := tokenNames[token]
 	return fmt.Sprintf(`<%s: %#v>`, tokenName, literal)
 }
 
+// Scanner reads a bytes buffer and pops the peak token and literal.
 type Scanner struct {
 	r *bufio.Reader
 }
 
-func newScanner(r io.Reader) *Scanner {
+// NewScanner creates a Scanner.
+func NewScanner(r io.Reader) *Scanner {
 	return &Scanner{r: bufio.NewReader(r)}
 }
 
 const eof = rune(0)
 
+// read reads the rune on the buffer cursor.
 func (s *Scanner) read() rune {
 	ch, _, err := s.r.ReadRune()
 	if err != nil {
@@ -60,11 +85,14 @@ func (s *Scanner) read() rune {
 	return ch
 }
 
+// unread rewinds the buffer cursor once.
 func (s *Scanner) unread() {
 	_ = s.r.UnreadRune()
 }
 
-func (s *Scanner) scanWhile(test func(rune) bool) string {
+// readWhile reads runes as a string during
+// test function for each rune returns true.
+func (s *Scanner) readWhile(test func(rune) bool) string {
 	var buf bytes.Buffer
 
 	for ch := s.read(); test(ch); ch = s.read() {
@@ -77,8 +105,12 @@ func (s *Scanner) scanWhile(test func(rune) bool) string {
 
 // space
 
-func (s *Scanner) scanSpace() (token, string) {
-	return Space, s.scanWhile(unicode.IsSpace)
+func isSpace(ch rune) bool {
+	return ch != '\n' && unicode.IsSpace(ch)
+}
+
+func (s *Scanner) scanSpace() (Token, string) {
+	return Space, s.readWhile(isSpace)
 }
 
 // string
@@ -91,11 +123,11 @@ func isLetter(ch rune) bool {
 	return isInitialLetter(ch) || unicode.IsDigit(ch)
 }
 
-func (s *Scanner) scanString() (token, string) {
-	return String, s.scanWhile(isLetter)
+func (s *Scanner) scanString() (Token, string) {
+	return String, s.readWhile(isLetter)
 }
 
-func (s *Scanner) scanQuotedString() (token, string) {
+func (s *Scanner) scanQuotedString() (Token, string) {
 	var buf bytes.Buffer
 
 	// discard initial quote
@@ -133,7 +165,7 @@ func (s *Scanner) scanQuotedString() (token, string) {
 
 // delimiters
 
-func (s *Scanner) scanArrow() (token, string) {
+func (s *Scanner) scanArrow() (Token, string) {
 	first := s.read()
 	second := s.read()
 
@@ -144,7 +176,8 @@ func (s *Scanner) scanArrow() (token, string) {
 	return Arrow, "->"
 }
 
-func (s *Scanner) Scan() (token, string) {
+// Scan reads the buffer and returns the peak token and literal.
+func (s *Scanner) Scan() (Token, string) {
 	ch := s.read()
 
 	if ch == eof {
