@@ -72,6 +72,8 @@ func NewDictSection() *DictSection {
 	return &DictSection{make(map[string][]string)}
 }
 
+// common section methods
+
 // Pairs returns underlying pairs as an array.
 func (s *ListSection) Pairs() []Pair {
 	return s.pairs
@@ -108,12 +110,43 @@ func (s *DictSection) AddPair(l string, r []string) error {
 	return nil
 }
 
+// ListSection only methods
+
 // Array returns the underying pair array of a list section.
 func (s *ListSection) Array() []Pair {
 	return s.pairs
 }
 
+// DictSection only methods
+
 // Map returns the underying map of a dict section.
 func (s *DictSection) Map() map[string][]string {
 	return s.dict
+}
+
+// One assumes the given left (key) has only one right (values).  Then returns
+// the only right value.
+func (s *DictSection) One(left string) string {
+	right, ok := s.dict[left]
+
+	if !ok {
+		return ""
+	}
+
+	if len(right) == 0 {
+		return ""
+	}
+
+	return right[0]
+}
+
+// All returns the right values.
+func (s *DictSection) All(left string) []string {
+	right, ok := s.dict[left]
+
+	if !ok {
+		return make([]string, 0)
+	}
+
+	return right
 }
