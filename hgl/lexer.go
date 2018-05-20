@@ -8,21 +8,21 @@ import (
 	"unicode"
 )
 
-// Scanner reads a bytes buffer and pops the peak token and literal.
-type Scanner struct {
+// Lexer reads a bytes buffer and pops the peak token and literal.
+type Lexer struct {
 	r *bufio.Reader
 }
 
-// NewScanner creates a Scanner.
-func NewScanner(r io.Reader) *Scanner {
-	return &Scanner{r: bufio.NewReader(r)}
+// NewLexer creates a Lexer.
+func NewLexer(r io.Reader) *Lexer {
+	return &Lexer{r: bufio.NewReader(r)}
 }
 
 const eof = rune(0)
 
 // read reads the rune on the buffer cursor.
-func (s *Scanner) read() rune {
-	ch, _, err := s.r.ReadRune()
+func (l *Lexer) read() rune {
+	ch, _, err := l.r.ReadRune()
 	if err != nil {
 		return eof
 	}
@@ -30,19 +30,19 @@ func (s *Scanner) read() rune {
 }
 
 // unread rewinds the buffer cursor once.
-func (s *Scanner) unread() {
-	_ = s.r.UnreadRune()
+func (l *Lexer) unread() {
+	_ = l.r.UnreadRune()
 }
 
 // readWhile reads runes as a string during
 // test function for each rune returns true.
-func (s *Scanner) readWhile(test func(rune) bool) string {
+func (l *Lexer) readWhile(test func(rune) bool) string {
 	var buf bytes.Buffer
 
-	for ch := s.read(); ch != eof && test(ch); ch = s.read() {
+	for ch := l.read(); ch != eof && test(ch); ch = l.read() {
 		buf.WriteRune(ch)
 	}
-	s.unread()
+	l.unread()
 
 	return buf.String()
 }
@@ -53,8 +53,8 @@ func isSpace(ch rune) bool {
 	return ch != '\n' && unicode.IsSpace(ch)
 }
 
-func (s *Scanner) scanSpace() (Token, string) {
-	return Space, s.readWhile(isSpace)
+func (l *Lexer) scanSpace() (Token, string) {
+	return Space, l.readWhile(isSpace)
 }
 
 // comment
@@ -67,22 +67,22 @@ func isInLine(ch rune) bool {
 	return ch != '\n' && ch != eof
 }
 
-func (s *Scanner) scanComment() (Token, string) {
+func (l *Lexer) scanComment() (Token, string) {
 	var buf bytes.Buffer
 	nEmpty := 0
 
 	for i := 0; ; i++ {
 		// Read until visiting a sharp.
-		s.readWhile(isSpace)
-		ch := s.read()
+		l.readWhile(isSpace)
+		ch := l.read()
 		if ch != '#' {
-			s.unread()
+			l.unread()
 			break
 		}
 
 		// Read a line without newline.
-		line := s.readWhile(isInLine)
-		s.read() // discard remaining newline
+		line := l.readWhile(isInLine)
+		l.read() // discard remaining newline
 
 		line = strings.TrimSpace(line)
 
@@ -118,15 +118,15 @@ func isLetter(ch rune) bool {
 	return isInitialLetter(ch) || unicode.IsDigit(ch)
 }
 
-func (s *Scanner) scanString() (Token, string) {
-	return String, s.readWhile(isLetter)
+func (l *Lexer) scanString() (Token, string) {
+	return String, l.readWhile(isLetter)
 }
 
-func (s *Scanner) scanQuotedString() (Token, string) {
+func (l *Lexer) scanQuotedString() (Token, string) {
 	var buf bytes.Buffer
 
 	// discard initial quote
-	ch := s.read()
+	ch := l.read()
 	if ch != '"' {
 		panic("not a quote")
 	}
@@ -134,7 +134,7 @@ func (s *Scanner) scanQuotedString() (Token, string) {
 	escaped := false
 
 	for {
-		ch := s.read()
+		ch := l.read()
 
 		if ch == '"' {
 			if escaped {
@@ -160,9 +160,9 @@ func (s *Scanner) scanQuotedString() (Token, string) {
 
 // delimiters
 
-func (s *Scanner) scanArrow() (Token, string) {
-	first := s.read()
-	second := s.read()
+func (l *Lexer) scanArrow() (Token, string) {
+	first := l.read()
+	second := l.read()
 
 	if first != '-' || second != '>' {
 		panic("not ->")
@@ -172,8 +172,8 @@ func (s *Scanner) scanArrow() (Token, string) {
 }
 
 // Scan reads the buffer and returns the peak token and literal.
-func (s *Scanner) Scan() (Token, string) {
-	ch := s.read()
+func (l *Lexer) Scan() (Token, string) {
+	ch := l.read()
 
 	if ch == eof {
 		return EOF, string(eof)
@@ -183,21 +183,21 @@ func (s *Scanner) Scan() (Token, string) {
 	}
 
 	if unicode.IsSpace(ch) {
-		s.unread()
-		return s.scanSpace()
+		l.unread()
+		return l.scanSpace()
 	}
 
 	if isInitialLetter(ch) {
-		s.unread()
-		return s.scanString()
+		l.unread()
+		return l.scanString()
 	}
 	if ch == '"' {
-		s.unread()
-		return s.scanQuotedString()
+		l.unread()
+		return l.scanQuotedString()
 	}
 	if isCommentLetter(ch) {
-		s.unread()
-		return s.scanComment()
+		l.unread()
+		return l.scanComment()
 	}
 
 	if ch == ':' {
@@ -210,8 +210,8 @@ func (s *Scanner) Scan() (Token, string) {
 		return Equal, "="
 	}
 	if ch == '-' {
-		s.unread()
-		return s.scanArrow()
+		l.unread()
+		return l.scanArrow()
 	}
 
 	return Illegal, string(ch)
