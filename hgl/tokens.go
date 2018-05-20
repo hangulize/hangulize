@@ -58,3 +58,8 @@ func FormatTokenLiteral(token Token, literal string) string {
 	tokenName := tokenNames[token]
 	return fmt.Sprintf(`<%s: %#v>`, tokenName, literal)
 }
+
+// IllegalError makes an error for an illegal literal.
+func IllegalError(literal string) error {
+	return fmt.Errorf("unexpected token illegal: %#v", literal)
+}
