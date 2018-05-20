@@ -10,14 +10,16 @@ import (
 func TestParse(t *testing.T) {
 	src := strings.TrimSpace(`
 	foo:
+		# 코멘트
 		hello = "world"
 	`)
-	hgl, err := Parse(strings.NewReader(src))
+	p := NewParser(strings.NewReader(src))
+
+	hgl, err := p.Parse()
 	if err != nil {
-		t.Fail()
+		t.Error(err)
 	}
 
-	foo := hgl["foo"]
-	assert.Equal(t, foo.Name(), "foo")
-	assert.Equal(t, foo.Get("hello"), "world")
+	foo := hgl["foo"].(Dict)
+	assert.Equal(t, []string{"world"}, foo["hello"])
 }
