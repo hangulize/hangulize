@@ -27,3 +27,13 @@ order.  While a pair list section works in an inversed way.  A pair list
 section just keeps described pairs in therir order.
 */
 package hgl
+
+import (
+	"io"
+)
+
+// Parse parses an HGL formatted text.
+func Parse(r io.Reader) (HGL, error) {
+	p := NewParser(r)
+	return p.Parse()
+}
