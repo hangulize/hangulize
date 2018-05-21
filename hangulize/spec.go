@@ -15,7 +15,7 @@ type Spec struct {
 	Config Config
 
 	Vars      map[string][]string
-	Macros    map[string][]string
+	Macros    map[string]string
 	Rewrite   []hgl.Pair
 	Hangulize []hgl.Pair
 
@@ -62,13 +62,13 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 	// config (optional)
 	var config *Config
+
 	if sec, ok := h["config"]; ok {
 		config, err = newConfig(sec.(*hgl.DictSection))
+
 		if err != nil {
 			return nil, err
 		}
-	} else {
-		config = &Config{}
 	}
 
 	// vars (optional)
@@ -78,9 +78,14 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// macros (optional)
-	var macros map[string][]string
+	var macros map[string]string
+
 	if sec, ok := h["macros"]; ok {
-		macros = sec.(*hgl.DictSection).Map()
+		macros, err = newMacros(sec.(*hgl.DictSection))
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// rewrite
@@ -145,4 +150,18 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 		markers: markers,
 	}
 	return &config, nil
+}
+
+func newMacros(dict *hgl.DictSection) (map[string]string, error) {
+	_map := dict.Map()
+	macros := make(map[string]string, len(_map))
+
+	for src, dst := range _map {
+		if len(dst) != 1 {
+			err := fmt.Errorf("macro %#v must has single target", src)
+			return nil, err
+		}
+	}
+
+	return macros, nil
 }
