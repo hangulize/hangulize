@@ -12,7 +12,10 @@ config:
 
 vars:
     # 모음
-    "@" = "a", "e", "i", "o", "u"
+    "vowels" = "a", "e", "i", "o", "u"
+
+macros:
+    "@" = "<vowels>"
 
 rewrite:
     # 의도 의도
