@@ -1,6 +1,6 @@
 lang:
     id      = "ita"
-    code    = "it", "ita", "ita"
+    codes   = "it", "ita"
     english = "Italian"
     korean  = "이탈리아어"
     script  = "roman"

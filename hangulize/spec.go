@@ -23,61 +23,70 @@ type Spec struct {
 }
 
 func (s *Spec) String() string {
-	return fmt.Sprintf("<Spec lang=%s>", s.Lang.id)
+	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
 }
 
 // Language identifies a natural language.
 type Language struct {
-	id      string
-	code    []string
-	english string
-	korean  string
-	script  string
+	ID      string    // Arbitrary, but identifiable language ID.
+	Codes   [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
+	English string    // The langauge name in English.
+	Korean  string    // The langauge name in Korean.
+	Script  string
 }
 
 // Config keeps some configurations for a transactiption specification.
 type Config struct {
-	authors []string
-	stage   string
-	markers []rune
+	Authors []string
+	Stage   string
+	Markers []rune
 }
 
 // ParseSpec parses a Spec from an HGL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
+	var err error
+
 	h, err := hgl.Parse(r)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HGL source")
 	}
 
-	var sec hgl.Section
-	var ok bool
+	// Every sections are optional.  An empty HGL source is also valid spec.
 
 	// lang
-	sec, ok = h["lang"]
-	if !ok {
-		return nil, errors.New(`"lang" section required`)
-	}
-	lang := newLanguage(sec.(*hgl.DictSection))
+	var lang Language
 
-	// config (optional)
-	var config *Config
-
-	if sec, ok := h["config"]; ok {
-		config, err = newConfig(sec.(*hgl.DictSection))
+	if sec, ok := h["lang"]; ok {
+		_lang, err := newLanguage(sec.(*hgl.DictSection))
 
 		if err != nil {
 			return nil, err
 		}
+
+		lang = *_lang
 	}
 
-	// vars (optional)
+	// config
+	var config Config
+
+	if sec, ok := h["config"]; ok {
+		_config, err := newConfig(sec.(*hgl.DictSection))
+
+		if err != nil {
+			return nil, err
+		}
+
+		config = *_config
+	}
+
+	// vars
 	var vars map[string][]string
 	if sec, ok := h["vars"]; ok {
 		vars = sec.(*hgl.DictSection).Map()
 	}
 
-	// macros (optional)
+	// macros
 	var macros map[string]string
 
 	if sec, ok := h["macros"]; ok {
@@ -89,28 +98,26 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// rewrite
-	sec, ok = h["rewrite"]
-	if !ok {
-		return nil, errors.New(`"rewrite" section required`)
+	var rewrite []hgl.Pair
+	if sec, ok := h["rewrite"]; ok {
+		rewrite = sec.(*hgl.ListSection).Array()
 	}
-	rewrite := sec.(*hgl.ListSection).Array()
 
 	// hangulize
-	sec, ok = h["hangulize"]
-	if !ok {
-		return nil, errors.New(`"hangulize" section required`)
+	var hangulize []hgl.Pair
+	if sec, ok := h["hangulize"]; ok {
+		hangulize = sec.(*hgl.ListSection).Array()
 	}
-	hangulize := sec.(*hgl.ListSection).Array()
 
-	// test (optional)
+	// test
 	var test []hgl.Pair
 	if sec, ok := h["test"]; ok {
 		test = sec.(*hgl.ListSection).Array()
 	}
 
 	spec := Spec{
-		*lang,
-		*config,
+		lang,
+		config,
 		vars,
 		macros,
 		rewrite,
@@ -120,15 +127,25 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	return &spec, nil
 }
 
-func newLanguage(dict *hgl.DictSection) *Language {
-	lang := Language{
-		id:      dict.One("id"),
-		code:    dict.All("code"),
-		english: dict.One("english"),
-		korean:  dict.One("korean"),
-		script:  dict.One("script"),
+func newLanguage(dict *hgl.DictSection) (*Language, error) {
+	_codes := dict.All("codes")
+
+	if len(_codes) != 2 {
+		return nil, errors.New("codes must be 2; ISO 639-1 and 3")
 	}
-	return &lang
+
+	var codes [2]string
+	codes[0] = _codes[0]
+	codes[1] = _codes[1]
+
+	lang := Language{
+		ID:      dict.One("id"),
+		Codes:   codes,
+		English: dict.One("english"),
+		Korean:  dict.One("korean"),
+		Script:  dict.One("script"),
+	}
+	return &lang, nil
 }
 
 func newConfig(dict *hgl.DictSection) (*Config, error) {
@@ -145,9 +162,9 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 	}
 
 	config := Config{
-		authors: dict.All("authors"),
-		stage:   dict.One("stage"),
-		markers: markers,
+		Authors: dict.All("authors"),
+		Stage:   dict.One("stage"),
+		Markers: markers,
 	}
 	return &config, nil
 }
@@ -161,6 +178,8 @@ func newMacros(dict *hgl.DictSection) (map[string]string, error) {
 			err := fmt.Errorf("macro %#v must has single target", src)
 			return nil, err
 		}
+
+		macros[src] = dst[0]
 	}
 
 	return macros, nil
