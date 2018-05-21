@@ -133,6 +133,20 @@ func TestCommentParagraphs(t *testing.T) {
 	assert.Equal(t, "foo bar\n\nbaz\n\nqux", lit)
 }
 
+func TestSharpInString(t *testing.T) {
+	s := newLexer(`
+	"#sharp#" # comment
+	`)
+
+	tok, lit = scan(s)
+	assert.Equal(t, String, tok)
+	assert.Equal(t, "#sharp#", lit)
+
+	tok, lit = scan(s)
+	assert.Equal(t, Comment, tok)
+	assert.Equal(t, "comment", lit)
+}
+
 func TestSimpleComplete(t *testing.T) {
 	s := newLexer(`
 	section1:
