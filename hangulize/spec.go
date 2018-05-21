@@ -3,7 +3,6 @@ package hangulize
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -12,18 +11,19 @@ import (
 
 // Spec represents a transactiption specification for a language.
 type Spec struct {
-	lang   Language
-	config Config
+	Lang   Language
+	Config Config
 
-	vars      map[string][]string
-	rewrite   []hgl.Pair
-	hangulize []hgl.Pair
+	Vars      map[string][]string
+	Macros    map[string][]string
+	Rewrite   []hgl.Pair
+	Hangulize []hgl.Pair
 
-	test []hgl.Pair
+	Test []hgl.Pair
 }
 
 func (s *Spec) String() string {
-	return fmt.Sprintf("<Spec lang=%s>", s.lang.id)
+	return fmt.Sprintf("<Spec lang=%s>", s.Lang.id)
 }
 
 // Language identifies a natural language.
@@ -50,43 +50,64 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		return nil, errors.Wrap(err, "failed to parse HGL source")
 	}
 
+	var sec hgl.Section
+	var ok bool
+
 	// lang
-	lang, err := buildLanguage(&h)
-	if err != nil {
-		return nil, err
+	sec, ok = h["lang"]
+	if !ok {
+		return nil, errors.New(`"lang" section required`)
 	}
+	lang := newLanguage(sec.(*hgl.DictSection))
 
 	// config (optional)
-	config, err := buildConfig(&h)
-	if err != nil {
-		return nil, err
+	var config *Config
+	if sec, ok := h["config"]; ok {
+		config, err = newConfig(sec.(*hgl.DictSection))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		config = &Config{}
 	}
 
 	// vars (optional)
-	vars, err := buildVars(&h)
-	if err != nil {
-		return nil, err
+	var vars map[string][]string
+	if sec, ok := h["vars"]; ok {
+		vars = sec.(*hgl.DictSection).Map()
+	}
+
+	// macros (optional)
+	var macros map[string][]string
+	if sec, ok := h["macros"]; ok {
+		macros = sec.(*hgl.DictSection).Map()
 	}
 
 	// rewrite
-	rewrite, err := buildRewrite(&h)
-	if err != nil {
-		return nil, err
+	sec, ok = h["rewrite"]
+	if !ok {
+		return nil, errors.New(`"rewrite" section required`)
 	}
+	rewrite := sec.(*hgl.ListSection).Array()
 
 	// hangulize
-	hangulize, err := buildHangulize(&h)
-	if err != nil {
-		return nil, err
+	sec, ok = h["hangulize"]
+	if !ok {
+		return nil, errors.New(`"hangulize" section required`)
 	}
+	hangulize := sec.(*hgl.ListSection).Array()
 
 	// test (optional)
-	test := buildTest(&h)
+	var test []hgl.Pair
+	if sec, ok := h["test"]; ok {
+		test = sec.(*hgl.ListSection).Array()
+	}
 
 	spec := Spec{
 		*lang,
 		*config,
 		vars,
+		macros,
 		rewrite,
 		hangulize,
 		test,
@@ -94,13 +115,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	return &spec, nil
 }
 
-func buildLanguage(h *hgl.HGL) (*Language, error) {
-	sec, ok := (*h)["lang"]
-	if !ok {
-		return nil, errors.New("'lang' section required")
-	}
-	dict := sec.(*hgl.DictSection)
-
+func newLanguage(dict *hgl.DictSection) *Language {
 	lang := Language{
 		id:      dict.One("id"),
 		code:    dict.All("code"),
@@ -108,96 +123,26 @@ func buildLanguage(h *hgl.HGL) (*Language, error) {
 		korean:  dict.One("korean"),
 		script:  dict.One("script"),
 	}
-	return &lang, nil
+	return &lang
 }
 
-func buildConfig(h *hgl.HGL) (*Config, error) {
-	var config *Config
+func newConfig(dict *hgl.DictSection) (*Config, error) {
+	// A marker must be 1-character.
+	stringMarkers := dict.All("markers")
+	markers := make([]rune, len(stringMarkers))
 
-	sec, ok := (*h)["config"]
-	if ok {
-		dict := sec.(*hgl.DictSection)
-
-		// a marker must be 1-character
-		stringMarkers := dict.All("markers")
-		markers := make([]rune, len(stringMarkers))
-
-		for i, stringMarker := range stringMarkers {
-			if len(stringMarker) != 1 {
-				err := fmt.Errorf("marker %#v must be 1-character", stringMarker)
-				return nil, err
-			}
-			markers[i] = rune(stringMarker[0])
+	for i, stringMarker := range stringMarkers {
+		if len(stringMarker) != 1 {
+			err := fmt.Errorf("marker %#v must be 1-character", stringMarker)
+			return nil, err
 		}
-
-		config = &Config{
-			authors: dict.All("authors"),
-			stage:   dict.One("stage"),
-			markers: markers,
-		}
-	} else {
-		config = &Config{
-			authors: make([]string, 0),
-			stage:   "",
-			markers: make([]rune, 0),
-		}
+		markers[i] = rune(stringMarker[0])
 	}
 
-	return config, nil
-}
-
-func isVarName(varName string) bool {
-	if varName == "@" {
-		// Allow "@" exceptionally.  Usually it is used as <vowels> instead.
-		return true
+	config := Config{
+		authors: dict.All("authors"),
+		stage:   dict.One("stage"),
+		markers: markers,
 	}
-	// Except "@", every variables should be wrapped in "<...>".
-	return strings.HasPrefix(varName, "<") && strings.HasSuffix(varName, ">")
-}
-
-func buildVars(h *hgl.HGL) (map[string][]string, error) {
-	var vars map[string][]string
-	sec, ok := (*h)["vars"]
-	if ok {
-		dict := sec.(*hgl.DictSection)
-		vars = dict.Map()
-
-		for varName := range vars {
-			if !isVarName(varName) {
-				err := fmt.Errorf("%#v is not valid var name", varName)
-				return nil, err
-			}
-		}
-	}
-	return vars, nil
-}
-
-func buildRewrite(h *hgl.HGL) ([]hgl.Pair, error) {
-	sec, ok := (*h)["rewrite"]
-	if !ok {
-		return nil, errors.New("'rewrite' section required")
-	}
-	list := sec.(*hgl.ListSection)
-	rewrite := list.Array()
-	return rewrite, nil
-}
-
-func buildHangulize(h *hgl.HGL) ([]hgl.Pair, error) {
-	sec, ok := (*h)["hangulize"]
-	if !ok {
-		return nil, errors.New("'hangulize' section required")
-	}
-	list := sec.(*hgl.ListSection)
-	rewrite := list.Array()
-	return rewrite, nil
-}
-
-func buildTest(h *hgl.HGL) []hgl.Pair {
-	var test []hgl.Pair
-	sec, ok := (*h)["test"]
-	if ok {
-		list := sec.(*hgl.ListSection)
-		test = list.Array()
-	}
-	return test
+	return &config, nil
 }
