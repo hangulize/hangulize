@@ -17,6 +17,10 @@ type Pair struct {
 	r []string
 }
 
+func (p *Pair) String() string {
+	return fmt.Sprintf("Pair{%#v, %#v}", p.l, p.r)
+}
+
 // Left is a string.  It is used for as keys in dict:
 //
 //  english = "Italian"
