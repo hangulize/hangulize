@@ -62,28 +62,36 @@ func (p *Pattern) Match(text string) []int {
 }
 
 // CompilePattern compiles an Pattern pattern for the given language spec.
-func CompilePattern(expr string, spec *Spec) *Pattern {
+func CompilePattern(expr string, spec *Spec) (*Pattern, error) {
 	reExpr := expr
 
 	// spec dependent
 	reExpr = expandMacros(reExpr, spec)
 	reExpr = expandVars(reExpr, spec)
 
-	// zero-width matches
+	// lookaround
 	reExpr, negExpr := expandLookbehind(reExpr)
 	reExpr, negExpr = expandLookahead(reExpr, negExpr)
-	mustNoZeroWidth(reExpr)
 
-	if negExpr == `` {
-		negExpr = `$^` // It's a paradox.  Never matches with anything.
+	err := mustNoZeroWidth(reExpr)
+	if err != nil {
+		return nil, err
 	}
 
+	if negExpr == `` {
+		// This regexp has a paradox.  So it never matches with any text.
+		negExpr = `$^`
+	}
+
+	// edges
 	reExpr = expandEdges(reExpr)
 
 	// Compile regexp.
 	re := regexp.MustCompile(reExpr)
 	neg := regexp.MustCompile(negExpr)
-	return &Pattern{expr, re, neg}
+
+	p := &Pattern{expr, re, neg}
+	return p, nil
 }
 
 var (
@@ -233,10 +241,11 @@ func expandLookahead(reExpr string, negExpr string) (string, string) {
 	return posExpr, negExpr
 }
 
-func mustNoZeroWidth(reExpr string) {
+func mustNoZeroWidth(reExpr string) error {
 	if reZeroWidth.MatchString(reExpr) {
-		panic(fmt.Errorf("zero-width group found in middle: %#v", reExpr))
+		return fmt.Errorf("zero-width group found in middle: %#v", reExpr)
 	}
+	return nil
 }
 
 func expandEdges(reExpr string) string {

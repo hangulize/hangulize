@@ -32,7 +32,11 @@ macros:
 }
 
 func compile(expr string) *Pattern {
-	return CompilePattern(expr, spec)
+	p, err := CompilePattern(expr, spec)
+	if err != nil {
+		panic(err)
+	}
+	return p
 }
 
 const o = "MUST_MATCH"
