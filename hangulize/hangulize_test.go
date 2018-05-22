@@ -142,7 +142,7 @@ hangulize:
     "g"    -> "ㄱ"
     "G"    -> "ㅈ"
     "k,"   -> "-ㄱ"
-    "k"    -> "ㄱ"
+    "k"    -> "ㅋ"
     "^l"   -> "ㄹ"
     "{,}l" -> "ㄹ"
     "l,"   -> "-ㄹ"
@@ -185,7 +185,7 @@ test:
     "montagna" -> "몬타냐"
     "gneiss"   -> "녜이스"
     "gnocco"   -> "뇨코"
-    "gn"       -> "뉴"
+    "gnu"      -> "뉴"
     "ogni"     -> "오니"
 	`)
 	spec, err := ParseSpec(r)
@@ -195,6 +195,12 @@ test:
 
 	hangulizer := NewHangulizer(spec)
 
-	gloria := hangulizer.Hangulize("gloria")
-	assert.Equal(t, "글로리아", gloria)
+	for _, testCase := range spec.Test {
+		loanword := testCase.Left()
+		expected := testCase.Right()[0]
+
+		hangul := hangulizer.Hangulize(loanword)
+
+		assert.Equal(t, expected, hangul, loanword)
+	}
 }

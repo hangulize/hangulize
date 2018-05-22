@@ -43,8 +43,8 @@ func (p *Pattern) Match(word string) ([]int, bool) {
 
 		// p.re looks like (edge)(look)abc(look)(edge).
 		// Hold only non-zero-width matches.
-		start := offset + loc[5]
-		stop := offset + loc[len(loc)-4]
+		start := offset + loc[5]         // lookbehind's stop
+		stop := offset + loc[len(loc)-4] // lookahead's start
 
 		// Pick matched word.  Call it "highlight".
 		highlight := word[loc[0]:loc[1]]
@@ -174,7 +174,7 @@ func expandVars(reExpr string, vars map[string][]string) string {
 		for i, val := range varVals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
-		return `(` + strings.Join(escapedVals, `|`) + `)`
+		return `(?:` + strings.Join(escapedVals, `|`) + `)`
 	})
 }
 
