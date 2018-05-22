@@ -27,9 +27,11 @@ config:
     stage   = "beta"
     markers = ",", ";"
 
+macros:
+    "@" = "<vowels>"
+
 vars:
-    # 모음
-    "@" = "a", "e", "i", "o", "u"
+    "vowels" = "a", "e", "i", "o", "u"
 
 rewrite:
     # 의도 의도
@@ -132,9 +134,6 @@ rewrite:
     "l{mn}" -> "l,"
 
     ";" -> ""
-    
-    # 예시(원본에 없었음)
-    "a" -> "aa", "A" #  표기로 분기
 
 hangulize:
     "b"    -> "ㅂ"
