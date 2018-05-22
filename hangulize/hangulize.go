@@ -28,7 +28,8 @@ func NewHangulizer(spec *Spec) *Hangulizer {
 func (h *Hangulizer) Hangulize(word string) string {
 	// TODO(sublee): implement
 	// Hard coded to pass test.
-	return "글로리아"
+	return spec.Rewrite.Rewrite(word)
+	// return "글로리아"
 }
 
 // Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
