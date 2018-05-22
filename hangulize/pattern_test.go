@@ -55,39 +55,82 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		if mustMatch {
 			assert.NotEmptyf(t, matched, "%s must match with %#v", p, text)
 		} else {
-			assert.Emptyf(t, matched, "%s must not match with  %#v", p, text)
+			assert.Emptyf(t, matched, "%s must not match with %#v", p, text)
 		}
 	}
 }
 
 func TestMacro(t *testing.T) {
-	p = compile("@")
-	assert.Equal(t, "(a|e|i|o|u)", p.reExpr)
+	p = compile("@") // @ means (a|e|i|o|u)
+	assertMatch(t, p, []string{
+		o, "a",
+		o, "ee",
+		o, "iii",
+		o, "no",
+		o, "you",
+		x, "sns", // no any vowel
+	})
 
-	p = compile("sub@subl.ee")
-	assert.Equal(t, "sub(a|e|i|o|u)subl.ee", p.reExpr)
+	p = compile("_@_")
+	assertMatch(t, p, []string{
+		o, "_a_",
+		x, "a__",
+	})
 }
 
 func TestVars(t *testing.T) {
 	p = compile("<abc>")
-	assert.Equal(t, "(a|b|c)", p.reExpr)
+	assertMatch(t, p, []string{
+		o, "a",
+		o, "b",
+		o, "c",
+		x, "d",
+	})
 
 	p = compile("<abc><def>")
-	assert.Equal(t, "(a|b|c)(d|e|f)", p.reExpr)
+	assertMatch(t, p, []string{
+		o, "af",
+		o, "bd",
+		x, "db",
+		o, "fcf",
+	})
 }
 
-func TestMatch(t *testing.T) {
+func TestSimple(t *testing.T) {
 	p = compile("hello, world")
 	assertMatch(t, p, []string{
 		o, "hello, world",
 		o, "__hello, world__",
 		x, "bye, world",
 	})
+}
 
+func TestLookbehind(t *testing.T) {
+	p = compile("{han}gul")
+	assertMatch(t, p, []string{
+		o, "hangul",
+		o, "hangulize",
+		o, "__hangul",
+		x, "gul",
+		x, "ngul",
+		x, "mogul",
+	})
+
+	p = compile("^{han}gul")
+	assertMatch(t, p, []string{
+		o, "hangul",
+		o, "hangul__",
+		x, "__hangul",
+	})
+}
+
+func TestLookahead(t *testing.T) {
 	p = compile("han{gul}")
 	assertMatch(t, p, []string{
 		o, "hangul",
 		o, "hangulize",
+		x, "han",
+		x, "hang",
 		x, "hanja",
 	})
 
@@ -95,6 +138,6 @@ func TestMatch(t *testing.T) {
 	assertMatch(t, p, []string{
 		o, "hangul",
 		o, "__hangul",
-		x, "hangulize",
+		x, "hangul__",
 	})
 }
