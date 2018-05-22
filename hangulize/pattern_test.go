@@ -413,9 +413,8 @@ func TestMalformedPattern(t *testing.T) {
 }
 
 func TestRegression(t *testing.T) {
-	p = compile(`/;|-/`)
+	p = compile(`;|-`)
 	assertMatch(t, p, []string{
 		o, "калинин,град-",
-		"               ^",
 	})
 }
