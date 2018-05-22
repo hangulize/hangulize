@@ -6,7 +6,8 @@ import (
 	"strings"
 )
 
-// Pattern is a domain-specific regular expression dialect for Hangulize.
+// Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
+// It is used for the rewrite of Hangulize.
 type Pattern struct {
 	expr string
 
@@ -61,8 +62,8 @@ func (p *Pattern) Match(text string) []int {
 	}
 }
 
-// ExplainPattern shows the expression with underlying
-// positive and negative regular expressions.
+// ExplainPattern shows the HRE expression with
+// the underlying standard regexp patterns.
 func ExplainPattern(p *Pattern) string {
 	if p == nil {
 		return fmt.Sprintf("%#v", nil)
@@ -70,8 +71,8 @@ func ExplainPattern(p *Pattern) string {
 	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
 }
 
-// CompilePattern compiles a Hangulize-specific pattern for the given language
-// spec.
+// CompilePattern compiles an HRE pattern from an expression for the given
+// language specification.
 func CompilePattern(expr string, spec *Spec) (*Pattern, error) {
 	reExpr := expr
 
@@ -104,6 +105,7 @@ func CompilePattern(expr string, spec *Spec) (*Pattern, error) {
 	return p, nil
 }
 
+// Pre-compiled regexp patterns to compile HRE patterns.
 var (
 	reVar        *regexp.Regexp
 	reLookbehind *regexp.Regexp
