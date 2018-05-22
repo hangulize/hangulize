@@ -32,8 +32,6 @@ func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
 			break
 		}
 
-		// fmt.Println(r.from, loc)
-
 		start := loc[0] + offset
 		stop := loc[1] + offset
 
