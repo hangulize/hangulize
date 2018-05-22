@@ -122,9 +122,8 @@ func expandLookaround(reExpr string) (string, string) {
 	var loc []int
 
 	posExpr := reExpr
-	negExpr := ""
+	negExpr := "$^" // never match
 
-	// TODO(sublee): negative lookaround
 	// TODO(sublee): edge specialization
 
 	// Lookbehind: Find {...} on the left-side.
@@ -184,12 +183,5 @@ func expandLookaround(reExpr string) (string, string) {
 		panic(fmt.Errorf("zero-width group found in middle: %#v", reExpr))
 	}
 
-	if len(negExpr) == 0 {
-		negExpr = "$^" // never match
-	}
-
 	return posExpr, negExpr
 }
-
-// func CompileRewrite(reExpr string, replace func(string) string) Rewrite {
-// }
