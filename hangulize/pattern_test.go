@@ -283,15 +283,6 @@ func TestNegativeLookaround(t *testing.T) {
 	})
 }
 
-func TestComplexLookaround(t *testing.T) {
-	p = compile("{^^a|b}c")
-	assertMatch(t, p, []string{
-		o, "acxxx",
-		o, "xxbcx",
-		x, "xxacx",
-	})
-}
-
 func TestEdge(t *testing.T) {
 	p = compile("^foo")
 	assertMatch(t, p, []string{
@@ -331,5 +322,56 @@ func TestEdge(t *testing.T) {
 		o, "foo barfoo",
 		"          ^^^",
 		x, "foo foobar",
+	})
+}
+
+func TestEdgeInLookaround(t *testing.T) {
+	p = compile("{^}foo")
+	assertMatch(t, p, []string{
+		o, "foo",
+		"   ^^^",
+		o, "foobar",
+		"   ^^^   ",
+		o, "bar foobar",
+		"       ^^^   ",
+		x, "barfoobar",
+	})
+
+	p = compile("{^^}foo")
+	assertMatch(t, p, []string{
+		o, "foobar",
+		"   ^^^   ",
+		o, "foobar bar",
+		"   ^^^       ",
+		x, "bar foobar",
+	})
+
+	p = compile("foo{$}")
+	assertMatch(t, p, []string{
+		o, "foo",
+		"   ^^^",
+		o, "barfoo",
+		"      ^^^",
+		o, "barfoo foo",
+		"      ^^^    ",
+		x, "barfoobar",
+	})
+
+	p = compile("foo{$$}")
+	assertMatch(t, p, []string{
+		o, "barfoo",
+		"      ^^^",
+		o, "foo barfoo",
+		"          ^^^",
+		x, "foo foobar",
+	})
+}
+
+func TestComplexLookaround(t *testing.T) {
+	p = compile("{^^a|b}c")
+	assertMatch(t, p, []string{
+		o, "acxxx",
+		o, "xxbcx",
+		x, "xxacx",
 	})
 }
