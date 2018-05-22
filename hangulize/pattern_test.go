@@ -34,25 +34,25 @@ func compile(expr string) *Pattern {
 	return CompilePattern(expr, spec)
 }
 
-const ok = "ok"
-const no = ""
+const o = "MUST_MATCH"
+const x = ""
 
 // assertMatch is a helper to test a pattern with multiple examples:
 //
 //  p := compile("foo")
 //  assertMatch(t, p, []string{
-//    ok, "foo",
-//    ok, "foobar",
-//    no, "bar",
+//    o, "foo",
+//    o, "foobar",
+//    x, "bar",
 //  })
 //
 func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 	for i := 0; i < len(scenario); i += 2 {
-		shouldMatch := scenario[i] == ok
+		mustMatch := scenario[i] == o
 		text := scenario[i+1]
 
 		matched := p.Match(text)
-		if shouldMatch {
+		if mustMatch {
 			assert.NotEmptyf(t, matched, "%s must match with %#v", p, text)
 		} else {
 			assert.Emptyf(t, matched, "%s must not match with  %#v", p, text)
