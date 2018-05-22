@@ -10,11 +10,13 @@ import (
 // cached specs
 var specs map[string]*Spec
 
-var specBox packr.Box
+var bundle packr.Box
+
+const ext = `.hgl`
 
 func init() {
 	specs = make(map[string]*Spec)
-	specBox = packr.NewBox("./specs")
+	bundle = packr.NewBox("./bundle")
 }
 
 // LoadSpec finds a bundled spec by the given language name.
@@ -28,14 +30,14 @@ func LoadSpec(lang string) (*Spec, bool) {
 		return spec, true
 	}
 
-	filename := lang + `.hgl`
+	filename := lang + ext
 
-	if !specBox.Has(filename) {
+	if !bundle.Has(filename) {
 		// not found
 		return nil, false
 	}
 
-	hgl := specBox.String(filename)
+	hgl := bundle.String(filename)
 	spec, err := ParseSpec(strings.NewReader(hgl))
 
 	// Bundled spec must not have any error.
