@@ -411,3 +411,11 @@ func TestMalformedPattern(t *testing.T) {
 	p, err = CompilePattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, ExplainPattern(p))
 }
+
+func TestRegression(t *testing.T) {
+	p = compile(`/;|-/`)
+	assertMatch(t, p, []string{
+		o, "калинин,град-",
+		"               ^",
+	})
+}
