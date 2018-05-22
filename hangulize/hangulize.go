@@ -32,7 +32,9 @@ func (h *Hangulizer) Hangulize(word string) string {
 // HangulizeTrace transcribes a loanword into Hangul.  During
 // transcribing, it sends internal events to the given channel.
 func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Event) string {
-	defer close(ch)
+	if ch != nil {
+		defer close(ch)
+	}
 	event(ch, word, "", "input")
 
 	word = h.spec._Normalize(word, ch)
