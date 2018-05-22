@@ -17,7 +17,6 @@ vars:
     "vowels" = "a", "e", "i", "o", "u"
 
 rewrite:
-    # 의도 의도
     "'" -> ""
 
     "^gli$"     -> "li"
@@ -290,3 +289,5 @@ test:
 
     "Giro d'Italia"           -> "지로 디탈리아"
     "per l'avvenire d'Italia" -> "페르 라베니레 디탈리아"
+
+# vim: set ft=yaml
