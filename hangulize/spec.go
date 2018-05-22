@@ -213,9 +213,7 @@ func (s *Spec) Hangulize(word string) string {
 func (s *Spec) _Normalize(word string, ch chan<- Event) string {
 	// TODO(sublee): Language-specific normalizer
 	lower := strings.ToLower(word)
-	if lower != word {
-		event(ch, word, lower, "lower")
-	}
+	event(ch, word, lower, "lower")
 	return lower
 }
 

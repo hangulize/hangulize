@@ -15,6 +15,10 @@ type Rule struct {
 
 // Rewrite rewrites a word for a rule.
 func (r *Rule) Rewrite(word string) string {
+	return r._Rewrite(word, nil)
+}
+
+func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
 	var buf strings.Builder
 	offset := 0
 
@@ -84,7 +88,7 @@ func (r *Rewriter) Rewrite(word string) string {
 
 func (r *Rewriter) _Rewrite(word string, ch chan<- Event) string {
 	for _, rule := range r.rules {
-		word = rule.Rewrite(word)
+		word = rule._Rewrite(word, ch)
 	}
 	return word
 }
