@@ -1,7 +1,7 @@
 package hangulize
 
 import (
-	// "fmt"
+	"fmt"
 
 	"github.com/sublee/hangulize2/hgl"
 )
@@ -10,6 +10,19 @@ import (
 type Rule struct {
 	from *Pattern
 	to   []string
+}
+
+func (r *Rule) Rewrite(word string) string {
+	loc, ok := r.from.Match(word)
+	if !ok {
+		return word
+	}
+
+	start, stop := loc[0], loc[1]
+
+	fmt.Println(word, r.from, loc, r.to)
+
+	return word[:start] + r.to[0] + word[stop:]
 }
 
 // Rewriter ...
@@ -35,7 +48,7 @@ func NewRewriter(
 
 		rules[i] = Rule{
 			from: p,
-			to:   make([]string, 0),
+			to:   pair.Right(),
 		}
 	}
 
@@ -43,13 +56,8 @@ func NewRewriter(
 }
 
 func (r *Rewriter) Rewrite(word string) string {
-	// for i, rule := range r.rules {
-	// 	loc := rule.from.Match(word)
-	// 	o := " "
-	// 	if len(loc) > 0 {
-	// 		o = "o"
-	// 	}
-	// 	fmt.Println(i, o, rule.from)
-	// }
+	for _, rule := range r.rules {
+		word = rule.Rewrite(word)
+	}
 	return word
 }
