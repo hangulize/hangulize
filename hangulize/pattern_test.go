@@ -48,7 +48,7 @@ const x = ""
 //  })
 //
 func assertMatch(t *testing.T, p *Pattern, scenario []string) {
-	info := fmt.Sprintf("re: /%s/, neg: /%s/", p.re.String(), p.neg.String())
+	info := fmt.Sprintf("re: /%s/, neg: /%s/", p.re, p.neg)
 
 	for i := 0; i < len(scenario); i += 2 {
 		mustMatch := scenario[i] == o
@@ -160,6 +160,9 @@ func TestNegativeLookahead(t *testing.T) {
 
 	p = compile("han{~gul}$")
 	assertMatch(t, p, []string{
+		o, "han",
+		o, "hangu",
+		o, "han_gul",
 		x, "hangul",
 		x, "__hangul",
 		x, "hangul__",
