@@ -133,9 +133,7 @@ func expandVars(reExpr string, spec *Spec) string {
 
 func expandLookaround(reExpr string) (string, string) {
 	var loc []int
-
-	// /$^/ never matches with any text.
-	negExprs := [2]string{"$^", "$^"}
+	var negExprBuf strings.Builder
 
 	posExpr := reExpr
 
@@ -154,7 +152,9 @@ func expandLookaround(reExpr string) (string, string) {
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookbehind
-			negExprs[0] = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
+			negExpr := fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
+			negExprBuf.WriteString(negExpr)
+
 			lookExpr = ".*" // require greedy matching
 		}
 
@@ -167,6 +167,7 @@ func expandLookaround(reExpr string) (string, string) {
 	}
 
 	// Lookahead: Find {...} on the right-side.
+	// This block depends on the above Lookbehind block.
 	loc = reLookahead.FindStringSubmatchIndex(posExpr)
 	if len(loc) == 6 {
 		// lookahead found
@@ -179,9 +180,26 @@ func expandLookaround(reExpr string) (string, string) {
 		lookExpr := posExpr[loc[2]:loc[3]]
 		edgeExpr := posExpr[loc[4]:loc[5]]
 
+		// Lookahead can be remaining in the negative regexp
+		// the lookbehind determined.
+		if negExprBuf.Len() != 0 {
+			negExpr := negExprBuf.String()
+			negExprBuf.Reset()
+
+			lookaheadLen := len(posExpr) - loc[0]
+
+			negExpr = negExpr[:len(negExpr)-lookaheadLen]
+			negExprBuf.WriteString(negExpr)
+		}
+
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookahead
-			negExprs[1] = fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
+			if negExprBuf.Len() != 0 {
+				negExprBuf.WriteRune('|')
+			}
+			negExpr := fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
+			negExprBuf.WriteString(negExpr)
+
 			lookExpr = ".*" // require greedy matching
 		}
 
@@ -198,6 +216,10 @@ func expandLookaround(reExpr string) (string, string) {
 		panic(fmt.Errorf("zero-width group found in middle: %#v", reExpr))
 	}
 
-	negExpr := strings.Join(negExprs[:], "|")
+	if negExprBuf.Len() == 0 {
+		negExprBuf.WriteString("$^") // never match
+	}
+
+	negExpr := negExprBuf.String()
 	return posExpr, negExpr
 }

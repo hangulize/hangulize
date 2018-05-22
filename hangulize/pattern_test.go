@@ -254,3 +254,26 @@ func TestNegativeLookahead(t *testing.T) {
 		x, "hangul__",
 	})
 }
+
+func TestLookaround(t *testing.T) {
+	p = compile("{ha}ng{ul}")
+	assertMatch(t, p, []string{
+		o, "hangul",
+		o, "hangulize",
+		x, "ng",
+		x, "hang",
+		x, "ngul",
+		x, "angu",
+	})
+}
+
+func TestNegativeLookaround(t *testing.T) {
+	p = compile("{~ha}ng{~ul}")
+	assertMatch(t, p, []string{
+		x, "hangul",
+		x, "hangulize",
+		x, "hang__",
+		x, "__ngul",
+		o, "__ng__",
+	})
+}
