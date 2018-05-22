@@ -38,7 +38,12 @@ func (h *Hangulizer) Hangulize(word string) string {
 //    // Output: "글로리아"
 //
 func Hangulize(lang string, word string) string {
-	// TODO(sublee): implement
-	// Hard coded to pass test.
-	return "글로리아"
+	spec, ok := LoadSpec(lang)
+	if !ok {
+		// spec not found
+		return word
+	}
+
+	h := NewHangulizer(spec)
+	return h.Hangulize(word)
 }
