@@ -12,8 +12,6 @@ type Pattern struct {
 
 	re  *regexp.Regexp // positive regexp
 	neg *regexp.Regexp // negative regexp
-
-	// skip [2]int // [0]: left skip, [1]: right skip
 }
 
 func (p *Pattern) String() string {
@@ -90,11 +88,16 @@ func init() {
 
 	var (
 		zeroWidth = `\{(.*?)\}` // {...}
-		leftEdge  = `^(\^*)`    // "^", "^^", or empty start
-		rightEdge = `(\$*)$`    // "$", "$$", or empty end
+
+		leftEdge  = `^(\^*)` // "^", "^^", or empty start
+		rightEdge = `(\$*)$` // "$", "$$", or empty end
+
+		lookbehind = fmt.Sprintf("%s(?:%s)?", leftEdge, zeroWidth)
+		lookahead  = fmt.Sprintf("(?:%s)?%s", zeroWidth, rightEdge)
 	)
-	reLookbehind = regexp.MustCompile(leftEdge + zeroWidth)
-	reLookahead = regexp.MustCompile(zeroWidth + rightEdge)
+
+	reLookbehind = regexp.MustCompile(lookbehind)
+	reLookahead = regexp.MustCompile(lookahead)
 	reZeroWidth = regexp.MustCompile(zeroWidth)
 }
 
@@ -144,15 +147,32 @@ func expandLookbehind(reExpr string) (string, string) {
 	posExpr := reExpr
 	negExpr := ""
 
+	// ^{han}gul
+	// │  │   └─ other
+	// │  └─ look
+	// └─ edge
+
+	// This pattern always matches.
+	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
 	loc := reLookbehind.FindStringSubmatchIndex(posExpr)
-	if len(loc) == 6 {
-		// ^{han}gul
-		// │  │   └─ other
-		// │  └─ look
-		// └─ edge
-		edgeExpr := posExpr[loc[2]:loc[3]]
-		lookExpr := posExpr[loc[4]:loc[5]]
-		otherExpr := posExpr[loc[1]:]
+
+	edgeExpr := posExpr[loc[2]:loc[3]]
+	otherExpr := posExpr[loc[1]:]
+
+	// edgeExpr is one of "", "^", or "^^...".
+	switch edgeExpr {
+	case "":
+		break
+	case "^":
+		edgeExpr = `^|\s+`
+		break
+	default:
+		edgeExpr = "^"
+	}
+
+	lookExpr := ""
+	if loc[5]-loc[4] != 0 {
+		lookExpr = posExpr[loc[4]:loc[5]]
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookbehind
@@ -160,14 +180,11 @@ func expandLookbehind(reExpr string) (string, string) {
 
 			lookExpr = ".*" // require greedy matching
 		}
-
-		// Replace lookbehind with 2 parentheses:
-		// (^)(han)gul
-		posExpr = fmt.Sprintf(`(%s)(%s)%s`, edgeExpr, lookExpr, otherExpr)
-	} else {
-		// Prepend empty 2 parentheses.
-		posExpr = "()()" + posExpr
 	}
+
+	// Replace lookbehind with 2 parentheses:
+	//  (^)(han)gul
+	posExpr = fmt.Sprintf(`(%s)(%s)%s`, edgeExpr, lookExpr, otherExpr)
 
 	return posExpr, negExpr
 }
@@ -177,15 +194,32 @@ func expandLookbehind(reExpr string) (string, string) {
 func expandLookahead(reExpr string, negExpr string) (string, string) {
 	posExpr := reExpr
 
+	// han{gul}$
+	//  │   │  └─ edge
+	//  │   └─ look
+	//  └─ other
+
+	// This pattern always matches:
+	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
 	loc := reLookahead.FindStringSubmatchIndex(posExpr)
-	if len(loc) == 6 {
-		// han{gul}$
-		//  │   │  └─ edge
-		//  │   └─ look
-		//  └─ other
-		otherExpr := posExpr[:loc[0]]
-		lookExpr := posExpr[loc[2]:loc[3]]
-		edgeExpr := posExpr[loc[4]:loc[5]]
+
+	otherExpr := posExpr[:loc[0]]
+	edgeExpr := posExpr[loc[4]:loc[5]]
+
+	// edgeExpr is one of "", "$", or "$$...".
+	switch edgeExpr {
+	case "":
+		break
+	case "$":
+		edgeExpr = `$|\s+`
+		break
+	default:
+		edgeExpr = "$"
+	}
+
+	lookExpr := ""
+	if loc[3]-loc[2] != 0 {
+		lookExpr = posExpr[loc[2]:loc[3]]
 
 		// Lookahead can be remaining in the negative regexp
 		// the lookbehind determined.
@@ -203,14 +237,11 @@ func expandLookahead(reExpr string, negExpr string) (string, string) {
 
 			lookExpr = ".*" // require greedy matching
 		}
-
-		// Replace lookahead with 2 parentheses:
-		// han(gul)($)
-		posExpr = fmt.Sprintf(`%s(%s)(%s)`, otherExpr, lookExpr, edgeExpr)
-	} else {
-		// Append empty 2 parentheses.
-		posExpr = posExpr + "()()"
 	}
+
+	// Replace lookahead with 2 parentheses:
+	//  han(gul)($)
+	posExpr = fmt.Sprintf(`%s(%s)(%s)`, otherExpr, lookExpr, edgeExpr)
 
 	return posExpr, negExpr
 }

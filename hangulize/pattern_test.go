@@ -101,6 +101,11 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 	}
 }
 
+func TestMetaPatterns(t *testing.T) {
+	assert.True(t, reLookbehind.MatchString(""))
+	assert.True(t, reLookahead.MatchString(""))
+}
+
 func TestMacro(t *testing.T) {
 	p = compile("@") // @ means (a|e|i|o|u)
 	assertMatch(t, p, []string{
