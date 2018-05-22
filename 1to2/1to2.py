@@ -6,6 +6,7 @@ import sys
 
 import babel
 import hangulize
+import tests
 
 
 def quote(x):
@@ -84,6 +85,7 @@ def main(argv):
     lang = hangulize.get_lang(code)
     locale = babel.Locale(lang.iso639_1)
 
+    # find vars
     vars_ = []
     for attr in dir(lang.__class__):
         if attr.startswith('_'):
@@ -93,6 +95,16 @@ def main(argv):
         vars_.append(attr)
     if lang.vowels:
         vars_.append('vowels')
+
+    # find test
+    test_module = getattr(__import__('tests.%s' % code), code)
+    for attr, val in vars(test_module).items():
+        if attr.endswith('TestCase') and not attr.startswith('Hangulize'):
+            break
+    test_case = val
+    examples = test_case.get_examples()
+
+    # render
 
     sec = Section('lang')
     sec.put('id', code)
@@ -135,6 +147,11 @@ def main(argv):
         pattern = rule[0]
         repl = rule[1:]
         sec.put(pattern, repl)
+    print(sec.draw('->', quote_keys=True), end='')
+
+    sec = Section('test')
+    for loanword, hangul in examples.items():
+        sec.put(loanword, hangul)
     print(sec.draw('->', quote_keys=True), end='')
 
 
