@@ -79,13 +79,10 @@ func NewRewriter(
 // Rewrite performs rewriting for every rules sequentially.  Each rewriting
 // result will be the input for the next rewriting rule.
 func (r *Rewriter) Rewrite(word string) string {
-	dummy := make(chan Event)
-	return r._Rewrite(word, dummy)
+	return r._Rewrite(word, nil)
 }
 
-// Rewrite performs rewriting for every rules sequentially.  Each rewriting
-// result will be the input for the next rewriting rule.
-func (r *Rewriter) _Rewrite(word string, ch chan Event) string {
+func (r *Rewriter) _Rewrite(word string, ch chan<- Event) string {
 	for _, rule := range r.rules {
 		word = rule.Rewrite(word)
 	}

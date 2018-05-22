@@ -199,29 +199,30 @@ func (s *Spec) String() string {
 }
 
 func (s *Spec) Normalize(word string) string {
-	dummy := make(chan Event)
-	return s._Normalize(word, dummy)
+	return s._Normalize(word, nil)
 }
 
 func (s *Spec) Rewrite(word string) string {
-	dummy := make(chan Event)
-	return s._Rewrite(word, dummy)
+	return s._Rewrite(word, nil)
 }
 
 func (s *Spec) Hangulize(word string) string {
-	dummy := make(chan Event)
-	return s._Hangulize(word, dummy)
+	return s._Hangulize(word, nil)
 }
 
-func (s *Spec) _Normalize(word string, ch chan Event) string {
+func (s *Spec) _Normalize(word string, ch chan<- Event) string {
 	// TODO(sublee): Language-specific normalizer
-	return strings.ToLower(word)
+	lower := strings.ToLower(word)
+	if lower != word {
+		event(ch, word, lower, "lower")
+	}
+	return lower
 }
 
-func (s *Spec) _Rewrite(word string, ch chan Event) string {
+func (s *Spec) _Rewrite(word string, ch chan<- Event) string {
 	return s.rewrite._Rewrite(word, ch)
 }
 
-func (s *Spec) _Hangulize(word string, ch chan Event) string {
+func (s *Spec) _Hangulize(word string, ch chan<- Event) string {
 	return s.hangulize._Rewrite(word, ch)
 }
