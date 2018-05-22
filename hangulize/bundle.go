@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"sort"
 	"strings"
 
 	"github.com/gobuffalo/packr"
@@ -48,4 +49,19 @@ func LoadSpec(lang string) (*Spec, bool) {
 	// Cache it.
 	specs[lang] = spec
 	return spec, true
+}
+
+// ListSpecs returns the language name list of bundled specs.
+// The bundled spec can be loaded by LoadSpec.
+func ListSpecs() []string {
+	langs := make([]string, 0)
+
+	for _, filename := range bundle.List() {
+		if strings.HasSuffix(filename, ext) {
+			langs = append(langs, strings.TrimSuffix(filename, ext))
+		}
+	}
+
+	sort.Strings(langs)
+	return langs
 }
