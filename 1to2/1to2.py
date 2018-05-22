@@ -71,7 +71,7 @@ class Section(object):
             buf.write('\n')
 
         buf.write('\n')
-        return buf.getvalue()
+        return buf.getvalue().encode('utf-8')
 
 
 def main(argv):
@@ -105,7 +105,8 @@ def main(argv):
     sec = Section('config')
     sec.put('author', '???')
     sec.put('stage', '???')
-    sec.put('markers', *lang.__tmp__)
+    if lang.__tmp__:
+        sec.put('markers', *lang.__tmp__)
     print(sec.draw('='), end='')
 
     sec = Section('macros')
@@ -122,6 +123,8 @@ def main(argv):
     for x, rule in enumerate(lang.notation.rules):
         pattern = rule[0]
         repl = rule[1:]
+        if isinstance(repl[0], tuple):
+            repl = repl[0]
         if isinstance(repl[0], hangulize.Phoneme):
             break
         sec.put(pattern, repl)
@@ -131,7 +134,6 @@ def main(argv):
     for rule in lang.notation.rules[x:]:
         pattern = rule[0]
         repl = rule[1:]
-        assert isinstance(repl[0], hangulize.Phoneme)
         sec.put(pattern, repl)
     print(sec.draw('->', quote_keys=True), end='')
 
