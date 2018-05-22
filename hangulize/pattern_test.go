@@ -238,8 +238,8 @@ func TestNegativeLookahead(t *testing.T) {
 		"   ^^^ ",
 		o, "hanja",
 		"   ^^^  ",
-		// o, "hanhangul",
-		// "   ^^^      ",
+		o, "hanhangul",
+		"   ^^^      ",
 		o, "han_hangul",
 		"   ^^^       ",
 	})
