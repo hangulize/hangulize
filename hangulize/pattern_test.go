@@ -53,22 +53,38 @@ const x = ""
 //  })
 //
 func assertMatch(t *testing.T, p *Pattern, scenario []string) {
+	drawUnderline := func(start int, stop int) string {
+		return strings.Repeat(" ", start) + strings.Repeat("^", stop-start)
+	}
+
 	for i := 0; i < len(scenario); {
 		mustMatch := scenario[i] == o
-		text := scenario[i+1]
+		word := scenario[i+1]
 		i += 2
 
-		matched := p.Match(text)
+		matched, ok := p.Match(word)
 
 		if !mustMatch {
-			assert.Emptyf(t, matched,
-				"must NOT MATCH with %#v\n%s", text, ExplainPattern(p))
+			if !ok {
+				continue
+			}
+
+			assert.Failf(t, "unexpectedly matched", ""+
+				"expected: NOT MATCH\n"+
+				"actual  : \"%s\"\n"+
+				"           %s\n"+
+				"%s",
+				word,
+				drawUnderline(matched[0], matched[1]),
+				ExplainPattern(p))
 			continue
 		}
 
 		// Must match.
-		assert.NotEmptyf(t, matched,
-			"must MATCH with %#v\n%s", text, ExplainPattern(p))
+		if !ok {
+			assert.Failf(t, "must match but not matched",
+				"must MATCH with %#v\n%s", word, ExplainPattern(p))
+		}
 
 		if i == len(scenario) {
 			break
@@ -81,8 +97,8 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		}
 		i++
 
-		if len(underline) != len(text)+3 {
-			panic("underline length must be len(text)+3")
+		if len(underline) != len(word)+3 {
+			panic("underline length must be len(word)+3")
 		}
 
 		if len(matched) == 0 {
@@ -93,11 +109,8 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		start := strings.Index(underline, "^") - 3
 		stop := strings.LastIndex(underline, "^") + 1 - 3
 
-		expected := safeSlice(text, start, stop)
-		got := text[matched[0]:matched[1]]
-
-		actualUnderline :=
-			strings.Repeat(" ", matched[0]) + strings.Repeat("^", len(got))
+		expected := safeSlice(word, start, stop)
+		got := word[matched[0]:matched[1]]
 
 		assert.Equalf(t, expected, got, ""+
 			"expected: \"%s\"\n"+
@@ -105,8 +118,8 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			"actual  : \"%s\"\n"+
 			"           %s\n"+
 			"%s",
-			text, underline[3:],
-			text, actualUnderline,
+			word, underline[3:],
+			word, drawUnderline(matched[0], matched[1]),
 			ExplainPattern(p))
 	}
 }
