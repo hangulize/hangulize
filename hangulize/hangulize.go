@@ -26,10 +26,15 @@ func NewHangulizer(spec *Spec) *Hangulizer {
 
 // Hangulize ...
 func (h *Hangulizer) Hangulize(word string) string {
-	word = h.spec.Normalize(word)
-	word = h.spec.Rewrite(word)
-	word = h.spec.Hangulize(word)
-	word = CompleteHangul(word)
+	dummy := make(chan Event)
+	return h.HangulizeTrace(word, dummy)
+}
+
+func (h *Hangulizer) HangulizeTrace(word string, ch chan Event) string {
+	word = h.spec._Normalize(word, ch)
+	word = h.spec._Rewrite(word, ch)
+	word = h.spec._Hangulize(word, ch)
+	word = _CompleteHangul(word, ch)
 	return word
 }
 
