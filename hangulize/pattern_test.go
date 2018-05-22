@@ -65,6 +65,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			continue
 		}
 
+		// Must match.
 		assert.NotEmptyf(t, matched,
 			"%s must MATCH with %#v\n%s", p, text, info)
 
@@ -72,7 +73,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			break
 		}
 
-		// find underline (^^^) which indicates expected match position
+		// Find underline (^^^) which indicates expected match position.
 		underline := scenario[i]
 		if underline == o || underline == x {
 			continue
@@ -83,11 +84,17 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			panic("underline length must be len(text)+3")
 		}
 
+		if len(matched) == 0 {
+			// Skip underline test because not matched.
+			continue
+		}
+
 		start := strings.Index(underline, "^") - 3
 		stop := strings.LastIndex(underline, "^") + 1 - 3
 
 		expected := text[start:stop]
 		got := text[matched[0]:matched[1]]
+
 		assert.Equalf(t, expected, got,
 			"%s on %#v must MATCH with %#v but %#v matched\n%s",
 			p, text, expected, got, info)
@@ -203,8 +210,10 @@ func TestNegativeLookbehind(t *testing.T) {
 		"    ^^^",
 		o, "mogul",
 		"     ^^^",
-		// o, "hangul_gul",
-		// "       ^^^^^^",
+		o, "hangulgul",
+		"         ^^^",
+		o, "hangul_gul",
+		"          ^^^",
 	})
 
 	p = compile("^{~han}gul")
@@ -229,7 +238,10 @@ func TestNegativeLookahead(t *testing.T) {
 		"   ^^^ ",
 		o, "hanja",
 		"   ^^^  ",
-		// o, "han_hangul",
+		// o, "hanhangul",
+		// "   ^^^      ",
+		o, "han_hangul",
+		"   ^^^       ",
 	})
 
 	p = compile("han{~gul}$")

@@ -22,32 +22,34 @@ func (p *Pattern) String() string {
 
 // Match reports whether the pattern matches the given text.
 func (p *Pattern) Match(text string) []int {
-	start := 0
+	offset := 0
 
 	for {
-		loc := p.re.FindStringSubmatchIndex(text[start:])
+		loc := p.re.FindStringSubmatchIndex(text[offset:])
 
-		// Early return if not matched.
+		// Not matched.
 		if len(loc) == 0 {
 			return make([]int, 0)
 		}
 
-		// Move cursor for the next match.
-		start = loc[1]
+		// p.re looks like (edge)(look)abc(look)(edge).
+		// Hold only non-zero-width matches.
+		start := offset + loc[5]
+		stop := offset + loc[len(loc)-4]
 
-		// Slice matched text only.  Call it "highlight".
+		// Pick matched text.  Call it "highlight".
 		highlight := text[loc[0]:loc[1]]
 
-		// Don't match if the negative pattern matches with the highlight.
-		if p.neg.MatchString(highlight) {
-			continue
+		// Test highlight with p.neg to determine whether skip or not.
+		negLoc := p.neg.FindStringIndex(highlight)
+
+		// If no negative match, this match has been succeeded.
+		if len(negLoc) == 0 {
+			return []int{start, stop}
 		}
 
-		// Regexp looks like (edge)(look)abc(look)(edge).  Here discards the
-		// zero-width groups.
-		afterLookbehind := loc[5]
-		beforeLookahead := loc[len(loc)-4]
-		return []int{afterLookbehind, beforeLookahead}
+		// Shift the cursor.
+		offset = loc[0] + negLoc[1]
 	}
 }
 
@@ -132,8 +134,10 @@ func expandVars(reExpr string, spec *Spec) string {
 func expandLookaround(reExpr string) (string, string) {
 	var loc []int
 
+	// /$^/ never matches with any text.
+	negExprs := [2]string{"$^", "$^"}
+
 	posExpr := reExpr
-	negExpr := "$^" // never match
 
 	// TODO(sublee): edge specialization
 
@@ -150,7 +154,7 @@ func expandLookaround(reExpr string) (string, string) {
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookbehind
-			negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
+			negExprs[0] = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
 			lookExpr = ".*" // require greedy matching
 		}
 
@@ -177,7 +181,7 @@ func expandLookaround(reExpr string) (string, string) {
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookahead
-			negExpr = fmt.Sprintf(`%s(%s)`, otherExpr, lookExpr[1:])
+			negExprs[1] = fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
 			lookExpr = ".*" // require greedy matching
 		}
 
@@ -194,5 +198,6 @@ func expandLookaround(reExpr string) (string, string) {
 		panic(fmt.Errorf("zero-width group found in middle: %#v", reExpr))
 	}
 
+	negExpr := strings.Join(negExprs[:], "|")
 	return posExpr, negExpr
 }
