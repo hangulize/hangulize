@@ -1,7 +1,6 @@
 package hangulize
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/sublee/hangulize2/hgl"
@@ -26,7 +25,8 @@ func (r *Rule) Rewrite(word string) string {
 			break
 		}
 
-		fmt.Println(r.from, loc)
+		// fmt.Println(r.from, loc)
+
 		start := loc[0] + offset
 		stop := loc[1] + offset
 
@@ -39,9 +39,9 @@ func (r *Rule) Rewrite(word string) string {
 	}
 
 	word = buf.String()
-	if offset != 0 {
-		fmt.Println(word, r.from, r.to)
-	}
+	// if offset != 0 {
+	// 	fmt.Println(word, r.from, r.to)
+	// }
 	return word
 }
 

@@ -2,7 +2,6 @@ package hangulize
 
 import (
 	"bufio"
-	"fmt"
 	"strings"
 
 	"github.com/suapapa/go_hangul"
@@ -35,8 +34,8 @@ func CompleteHangul(jamo string) string {
 
 			letter := hangul.Join(l, m, t)
 
-			fmt.Println("l, m, t:", string(l), string(m), string(t))
-			fmt.Println("letter:", string(letter))
+			// fmt.Println("l, m, t:", string(l), string(m), string(t))
+			// fmt.Println("letter:", string(letter))
 
 			buf.WriteRune(letter)
 		}
@@ -48,7 +47,7 @@ func CompleteHangul(jamo string) string {
 			break
 		}
 
-		fmt.Println("ch:", string(ch))
+		// fmt.Println("ch:", string(ch))
 
 		// Hyphen is the prefix of a tail Jaeum.
 		// Perhaps the next ch is a Jaeum.
