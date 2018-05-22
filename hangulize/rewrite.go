@@ -20,9 +20,10 @@ func (r *Rule) Rewrite(word string) string {
 
 	start, stop := loc[0], loc[1]
 
-	fmt.Println(word, r.from, loc, r.to)
+	word = word[:start] + r.to[0] + word[stop:]
 
-	return word[:start] + r.to[0] + word[stop:]
+	fmt.Println(word, r.from, loc, r.to)
+	return word
 }
 
 // Rewriter ...
