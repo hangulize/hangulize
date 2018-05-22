@@ -10,11 +10,10 @@ import (
 const none = rune(0)
 
 func CompleteHangul(jamo string) string {
-	dummy := make(chan Event)
-	return _CompleteHangul(jamo, dummy)
+	return _CompleteHangul(jamo, nil)
 }
 
-func _CompleteHangul(jamo string, ch chan Event) string {
+func _CompleteHangul(jamo string, ch chan<- Event) string {
 	r := bufio.NewReader(strings.NewReader(jamo))
 	var buf strings.Builder
 
