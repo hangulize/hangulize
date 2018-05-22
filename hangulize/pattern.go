@@ -14,6 +14,15 @@ type Pattern struct {
 	neg *regexp.Regexp // negative regexp
 }
 
+func (p *Pattern) String() string {
+	return fmt.Sprintf("/%s/", p.expr)
+}
+
+func (p *Pattern) Match(text string) []int {
+	loc := p.re.FindStringSubmatchIndex(text)
+	return loc
+}
+
 // CompilePattern compiles an Pattern pattern for the given language spec.
 func CompilePattern(expr string, spec *Spec) *Pattern {
 	reExpr := expr
