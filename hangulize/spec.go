@@ -23,38 +23,6 @@ type Spec struct {
 	Test []hgl.Pair
 }
 
-func (s *Spec) String() string {
-	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
-}
-
-func (s *Spec) Normalize(word string) string {
-	dummy := make(chan Event)
-	return s._Normalize(word, dummy)
-}
-
-func (s *Spec) Rewrite(word string) string {
-	dummy := make(chan Event)
-	return s._Rewrite(word, dummy)
-}
-
-func (s *Spec) Hangulize(word string) string {
-	dummy := make(chan Event)
-	return s._Hangulize(word, dummy)
-}
-
-func (s *Spec) _Normalize(word string, ch chan Event) string {
-	// TODO(sublee): Language-specific normalizer
-	return strings.ToLower(word)
-}
-
-func (s *Spec) _Rewrite(word string, ch chan Event) string {
-	return s.rewrite._Rewrite(word, ch)
-}
-
-func (s *Spec) _Hangulize(word string, ch chan Event) string {
-	return s.hangulize._Rewrite(word, ch)
-}
-
 // Language identifies a natural language.
 type Language struct {
 	ID      string    // Arbitrary, but identifiable language ID.
@@ -224,4 +192,36 @@ func newMacros(dict *hgl.DictSection) (map[string]string, error) {
 	}
 
 	return macros, nil
+}
+
+func (s *Spec) String() string {
+	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
+}
+
+func (s *Spec) Normalize(word string) string {
+	dummy := make(chan Event)
+	return s._Normalize(word, dummy)
+}
+
+func (s *Spec) Rewrite(word string) string {
+	dummy := make(chan Event)
+	return s._Rewrite(word, dummy)
+}
+
+func (s *Spec) Hangulize(word string) string {
+	dummy := make(chan Event)
+	return s._Hangulize(word, dummy)
+}
+
+func (s *Spec) _Normalize(word string, ch chan Event) string {
+	// TODO(sublee): Language-specific normalizer
+	return strings.ToLower(word)
+}
+
+func (s *Spec) _Rewrite(word string, ch chan Event) string {
+	return s.rewrite._Rewrite(word, ch)
+}
+
+func (s *Spec) _Hangulize(word string, ch chan Event) string {
+	return s.hangulize._Rewrite(word, ch)
 }
