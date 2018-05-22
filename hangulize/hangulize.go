@@ -28,7 +28,7 @@ func NewHangulizer(spec *Spec) *Hangulizer {
 func (h *Hangulizer) Hangulize(word string) string {
 	// TODO(sublee): implement
 	// Hard coded to pass test.
-	return spec.Rewrite.Rewrite(word)
+	return h.spec.Rewrite.Rewrite(word)
 	// return "글로리아"
 }
 
