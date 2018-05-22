@@ -12,14 +12,31 @@ type Pattern struct {
 
 	re  *regexp.Regexp // positive regexp
 	neg *regexp.Regexp // negative regexp
+
+	// skip [2]int // [0]: left skip, [1]: right skip
 }
 
 func (p *Pattern) String() string {
 	return fmt.Sprintf("/%s/", p.expr)
 }
 
+// Match reports whether the pattern matches the given text.
 func (p *Pattern) Match(text string) []int {
 	loc := p.re.FindStringSubmatchIndex(text)
+
+	// Early return if not matched.
+	if len(loc) == 0 {
+		return loc
+	}
+
+	// Slice matched text only.  Call it "highlight".
+	highlight := text[loc[0]:loc[1]]
+
+	// Don't match if the negative pattern matches with the highlight.
+	if p.neg.MatchString(highlight) {
+		return make([]int, 0)
+	}
+
 	return loc
 }
 
@@ -51,7 +68,7 @@ func init() {
 	reVar = regexp.MustCompile(`<.+?>`)
 
 	var (
-		zeroWidth = `\{(.+?)\}` // {...}
+		zeroWidth = `\{(.*?)\}` // {...}
 		leftEdge  = `^(\^*)`    // "^", "^^", or empty start
 		rightEdge = `(\$*)$`    // "$", "$$", or empty end
 	)
@@ -121,6 +138,12 @@ func expandLookaround(reExpr string) (string, string) {
 		lookExpr := posExpr[loc[4]:loc[5]]
 		otherExpr := posExpr[loc[1]:]
 
+		if strings.HasPrefix(lookExpr, "~") {
+			// negative lookbehind
+			negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
+			lookExpr = ".*" // require greedy matching
+		}
+
 		// Replace lookbehind with 2 parentheses:
 		// (^)(han)gul
 		posExpr = fmt.Sprintf(`(%s)(%s)%s`, edgeExpr, lookExpr, otherExpr)
@@ -141,6 +164,12 @@ func expandLookaround(reExpr string) (string, string) {
 		otherExpr := posExpr[:loc[0]]
 		lookExpr := posExpr[loc[2]:loc[3]]
 		edgeExpr := posExpr[loc[4]:loc[5]]
+
+		if strings.HasPrefix(lookExpr, "~") {
+			// negative lookahead
+			negExpr = fmt.Sprintf(`%s(%s)`, otherExpr, lookExpr[1:])
+			lookExpr = ".*" // require greedy matching
+		}
 
 		// Replace lookahead with 2 parentheses:
 		// han(gul)($)
