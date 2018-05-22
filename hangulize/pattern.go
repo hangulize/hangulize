@@ -250,7 +250,6 @@ func expandEdges(reExpr string) string {
 	reExpr = reRightEdge.ReplaceAllStringFunc(reExpr, func(e string) string {
 		switch e {
 		case "":
-			fmt.Println("x")
 			return ""
 		case "$":
 			return `(?:$|\s+)`
