@@ -1,7 +1,7 @@
 package hangulize
 
 import (
-	"fmt"
+	// "fmt"
 
 	"github.com/sublee/hangulize2/hgl"
 )
@@ -43,8 +43,13 @@ func NewRewriter(
 }
 
 func (r *Rewriter) Rewrite(word string) string {
-	for i, rule := range r.rules {
-		fmt.Println(i, rule)
-	}
+	// for i, rule := range r.rules {
+	// 	loc := rule.from.Match(word)
+	// 	o := " "
+	// 	if len(loc) > 0 {
+	// 		o = "o"
+	// 	}
+	// 	fmt.Println(i, o, rule.from)
+	// }
 	return word
 }

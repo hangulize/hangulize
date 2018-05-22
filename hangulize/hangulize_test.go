@@ -17,7 +17,7 @@ func TestItaGloriaFromSource(t *testing.T) {
 	r := strings.NewReader(`
 lang:
     id      = "ita"
-    code    = "it", "ita", "ita"
+    codes   = "it", "ita"
     english = "Italian"
     korean  = "이탈리아어"
     script  = "roman"
@@ -189,8 +189,13 @@ test:
     "gn"       -> "뉴"
     "ogni"     -> "오니"
 	`)
-	spec, _ := ParseSpec(r)
+	spec, err := ParseSpec(r)
+	if err != nil {
+		panic(err)
+	}
+
 	hangulizer := NewHangulizer(spec)
+
 	gloria := hangulizer.Hangulize("gloria")
 	assert.Equal(t, "글로리아", gloria)
 }
