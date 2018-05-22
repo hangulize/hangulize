@@ -30,6 +30,7 @@ func (h *Hangulizer) Hangulize(word string) string {
 	// Hard coded to pass test.
 	word = h.spec.Rewrite.Rewrite(word)
 	word = h.spec.Hangulize.Rewrite(word)
+	word = CompleteHangul(word)
 	return word
 	// return "글로리아"
 }
