@@ -29,16 +29,16 @@ func safeSlice(s string, start int, stop int) string {
 	return ""
 }
 
-// Match reports whether the pattern matches the given text.
-func (p *Pattern) Match(text string) []int {
+// Match reports whether the pattern matches the given word.
+func (p *Pattern) Match(word string) ([]int, bool) {
 	offset := 0
 
 	for {
-		loc := p.re.FindStringSubmatchIndex(text[offset:])
+		loc := p.re.FindStringSubmatchIndex(word[offset:])
 
 		// Not matched.
 		if len(loc) == 0 {
-			return make([]int, 0)
+			return make([]int, 0), false
 		}
 
 		// p.re looks like (edge)(look)abc(look)(edge).
@@ -46,15 +46,15 @@ func (p *Pattern) Match(text string) []int {
 		start := offset + loc[5]
 		stop := offset + loc[len(loc)-4]
 
-		// Pick matched text.  Call it "highlight".
-		highlight := text[loc[0]:loc[1]]
+		// Pick matched word.  Call it "highlight".
+		highlight := word[loc[0]:loc[1]]
 
 		// Test highlight with p.neg to determine whether skip or not.
 		negLoc := p.neg.FindStringIndex(highlight)
 
 		// If no negative match, this match has been succeeded.
 		if len(negLoc) == 0 {
-			return []int{start, stop}
+			return []int{start, stop}, true
 		}
 
 		// Shift the cursor.
