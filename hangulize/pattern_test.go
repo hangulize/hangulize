@@ -31,7 +31,7 @@ macros:
 }
 
 func compile(expr string) *Pattern {
-	p, err := CompilePattern(expr, spec)
+	p, err := CompilePattern(expr, spec.Macros, spec.Vars)
 	if err != nil {
 		panic(err)
 	}
@@ -395,6 +395,6 @@ func TestComplexLookaround(t *testing.T) {
 func TestMalformedPattern(t *testing.T) {
 	var err error
 
-	p, err = CompilePattern(`{a} {b} {c}`, nil)
+	p, err = CompilePattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, ExplainPattern(p))
 }

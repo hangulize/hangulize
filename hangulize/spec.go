@@ -14,10 +14,10 @@ type Spec struct {
 	Lang   Language
 	Config Config
 
-	Vars      map[string][]string
 	Macros    map[string]string
-	Rewrite   []hgl.Pair
-	Hangulize []hgl.Pair
+	Vars      map[string][]string
+	Rewrite   *Rewriter
+	Hangulize *Rewriter
 
 	Test []hgl.Pair
 }
@@ -80,12 +80,6 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		config = *_config
 	}
 
-	// vars
-	var vars map[string][]string
-	if sec, ok := h["vars"]; ok {
-		vars = sec.(*hgl.DictSection).Map()
-	}
-
 	// macros
 	var macros map[string]string
 
@@ -97,16 +91,34 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		}
 	}
 
+	// vars
+	var vars map[string][]string
+	if sec, ok := h["vars"]; ok {
+		vars = sec.(*hgl.DictSection).Map()
+	}
+
 	// rewrite
-	var rewrite []hgl.Pair
+	var rewrite *Rewriter
+	var rewritePairs []hgl.Pair
 	if sec, ok := h["rewrite"]; ok {
-		rewrite = sec.(*hgl.ListSection).Array()
+		rewritePairs = sec.(*hgl.ListSection).Array()
+	}
+
+	rewrite, err = NewRewriter(rewritePairs, macros, vars)
+	if err != nil {
+		return nil, err
 	}
 
 	// hangulize
-	var hangulize []hgl.Pair
+	var hangulize *Rewriter
+	var hangulizePairs []hgl.Pair
 	if sec, ok := h["hangulize"]; ok {
-		hangulize = sec.(*hgl.ListSection).Array()
+		hangulizePairs = sec.(*hgl.ListSection).Array()
+	}
+
+	hangulize, err = NewRewriter(hangulizePairs, macros, vars)
+	if err != nil {
+		return nil, err
 	}
 
 	// test
@@ -118,8 +130,8 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	spec := Spec{
 		lang,
 		config,
-		vars,
 		macros,
+		vars,
 		rewrite,
 		hangulize,
 		test,

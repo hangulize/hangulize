@@ -71,14 +71,22 @@ func ExplainPattern(p *Pattern) string {
 	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
 }
 
-// CompilePattern compiles an HRE pattern from an expression for the given
-// language specification.
-func CompilePattern(expr string, spec *Spec) (*Pattern, error) {
+// CompilePattern compiles an HRE pattern from an expression.
+func CompilePattern(
+	expr string,
+
+	macros map[string]string,
+	vars map[string][]string,
+
+) (*Pattern, error) {
+
 	reExpr := expr
 
-	// spec dependent
-	reExpr = expandMacros(reExpr, spec)
-	reExpr = expandVars(reExpr, spec)
+	// macros
+	reExpr = expandMacros(reExpr, macros)
+
+	// vars
+	reExpr = expandVars(reExpr, vars)
 
 	// lookaround
 	reExpr, negExpr := expandLookbehind(reExpr)
@@ -137,17 +145,13 @@ func init() {
 	reRightEdge = regexp.MustCompile(rightEdge)
 }
 
-// expandMacros replaces macro sources in the spec to corresponding
-// destinations.  It must be evaluated at the first in CompilePattern.
-func expandMacros(reExpr string, spec *Spec) string {
-	if spec == nil {
-		return reExpr
-	}
-
-	args := make([]string, len(spec.Macros)*2)
+// expandMacros replaces macro sources to corresponding targets.
+// It must be evaluated at the first in CompilePattern.
+func expandMacros(reExpr string, macros map[string]string) string {
+	args := make([]string, len(macros)*2)
 
 	i := 0
-	for src, dst := range spec.Macros {
+	for src, dst := range macros {
 		args[i] = src
 		i++
 		args[i] = dst
@@ -159,15 +163,11 @@ func expandMacros(reExpr string, spec *Spec) string {
 }
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
-func expandVars(reExpr string, spec *Spec) string {
-	if spec == nil {
-		return reVar.ReplaceAllString(reExpr, `()`)
-	}
-
+func expandVars(reExpr string, vars map[string][]string) string {
 	return reVar.ReplaceAllStringFunc(reExpr, func(matched string) string {
 		// Retrieve var from spec.
 		varName := strings.Trim(matched, `<>`)
-		varVals := (*spec).Vars[varName]
+		varVals := vars[varName]
 
 		// Build as RegExp like /(a|b|c)/
 		escapedVals := make([]string, len(varVals))
