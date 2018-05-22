@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/sublee/hangulize2/hgl"
 )
@@ -13,16 +14,32 @@ type Rule struct {
 }
 
 func (r *Rule) Rewrite(word string) string {
-	loc, ok := r.from.Match(word)
-	if !ok {
-		return word
+	var buf strings.Builder
+	offset := 0
+
+	for {
+		loc, ok := r.from.Match(word[offset:])
+		if !ok {
+			buf.WriteString(word[offset:])
+			break
+		}
+
+		fmt.Println(r.from, loc)
+		start := loc[0] + offset
+		stop := loc[1] + offset
+
+		buf.WriteString(word[offset:start])
+
+		// TODO(sublee): Support multiple targets.
+		buf.WriteString(r.to[0])
+
+		offset = stop
 	}
 
-	start, stop := loc[0], loc[1]
-
-	word = word[:start] + r.to[0] + word[stop:]
-
-	fmt.Println(word, r.from, loc, r.to)
+	word = buf.String()
+	if offset != 0 {
+		fmt.Println(word, r.from, r.to)
+	}
 	return word
 }
 
