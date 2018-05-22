@@ -148,6 +148,28 @@ func TestLookahead(t *testing.T) {
 	})
 }
 
+func TestNegativeLookbehind(t *testing.T) {
+	p = compile("{~han}gul")
+	assertMatch(t, p, []string{
+		x, "hangul",
+		x, "hangulize",
+		x, "__hangul",
+		o, "gul",
+		o, "ngul",
+		o, "mogul",
+	})
+
+	p = compile("^{~han}gul")
+	assertMatch(t, p, []string{
+		o, "gul",
+		o, "angul",
+		o, "han_gul",
+		x, "hangul",
+		x, "hangul__",
+		x, "__hangul",
+	})
+}
+
 func TestNegativeLookahead(t *testing.T) {
 	p = compile("han{~gul}")
 	assertMatch(t, p, []string{
