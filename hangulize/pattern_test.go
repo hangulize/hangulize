@@ -92,7 +92,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		start := strings.Index(underline, "^") - 3
 		stop := strings.LastIndex(underline, "^") + 1 - 3
 
-		expected := text[start:stop]
+		expected := safeSlice(text, start, stop)
 		got := text[matched[0]:matched[1]]
 
 		assert.Equalf(t, expected, got,
@@ -373,5 +373,11 @@ func TestComplexLookaround(t *testing.T) {
 		o, "acxxx",
 		o, "xxbcx",
 		x, "xxacx",
+	})
+
+	p = compile("{foo}{bar}")
+	assertMatch(t, p, []string{
+		o, "foobar",
+		"         ",
 	})
 }
