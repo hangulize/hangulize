@@ -7,12 +7,14 @@ import (
 	"github.com/sublee/hangulize2/hgl"
 )
 
-// Rule ...
+// Rule represents a rewriting rule.  It describes how a word should be
+// rewritten.
 type Rule struct {
 	from *Pattern
 	to   []string
 }
 
+// Rewrite rewrites a word for a rule.
 func (r *Rule) Rewrite(word string) string {
 	var buf strings.Builder
 	offset := 0
@@ -43,11 +45,12 @@ func (r *Rule) Rewrite(word string) string {
 	return word
 }
 
-// Rewriter ...
+// Rewriter is a container of sequential rewriting rules.
 type Rewriter struct {
 	rules []Rule
 }
 
+// NewRewriter creates a Rewriter from HGL pairs which are read from a spec.
 func NewRewriter(
 	pairs []hgl.Pair,
 
@@ -73,6 +76,8 @@ func NewRewriter(
 	return &Rewriter{rules}, nil
 }
 
+// Rewrite performs rewriting for every rules sequentially.  Each rewriting
+// result will be the input for the next rewriting rule.
 func (r *Rewriter) Rewrite(word string) string {
 	for _, rule := range r.rules {
 		word = rule.Rewrite(word)
