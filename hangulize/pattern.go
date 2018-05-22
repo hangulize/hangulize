@@ -18,6 +18,12 @@ func (p *Pattern) String() string {
 	return fmt.Sprintf("/%s/", p.expr)
 }
 
+// Explain shows the expression with underlying
+// positive and negative regular expressions.
+func (p *Pattern) Explain() string {
+	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
+}
+
 func safeSlice(s string, start int, stop int) string {
 	if start < 0 || stop < 0 {
 		return ""
