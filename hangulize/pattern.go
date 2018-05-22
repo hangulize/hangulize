@@ -71,8 +71,8 @@ func CompilePattern(expr string, spec *Spec) *Pattern {
 	reExpr, negExpr = expandLookahead(reExpr, negExpr)
 	mustNoZeroWidth(reExpr)
 
-	if negExpr == "" {
-		negExpr = "$^" // It's a paradox.  Never matches with anything.
+	if negExpr == `` {
+		negExpr = `$^` // It's a paradox.  Never matches with anything.
 	}
 
 	reExpr = expandEdges(reExpr)
@@ -98,13 +98,13 @@ func init() {
 	var (
 		zeroWidth = `\{(.*?)\}` // {...}
 
-		leftEdge  = `(\^+)` // "^", "^^"
-		rightEdge = `(\$+)` // "$", "$$"
+		leftEdge  = `(\^+)` // `^`, `^^`, `^^^...`
+		rightEdge = `(\$+)` // `$`, `$$`, `$$$...`
 
 		// begin of text - optional leftEdge - optional zeroWidth
-		lookbehind = fmt.Sprintf("^(?:%s)?(?:%s)?", leftEdge, zeroWidth)
+		lookbehind = fmt.Sprintf(`^(?:%s)?(?:%s)?`, leftEdge, zeroWidth)
 		// optional zeroWidth - optional rightEdge - end of text
-		lookahead = fmt.Sprintf("(?:%s)?(?:%s)?$", zeroWidth, rightEdge)
+		lookahead = fmt.Sprintf(`(?:%s)?(?:%s)?$`, zeroWidth, rightEdge)
 	)
 
 	reLookbehind = regexp.MustCompile(lookbehind)
@@ -139,12 +139,12 @@ func expandMacros(reExpr string, spec *Spec) string {
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(reExpr string, spec *Spec) string {
 	if spec == nil {
-		return reVar.ReplaceAllString(reExpr, "()")
+		return reVar.ReplaceAllString(reExpr, `()`)
 	}
 
 	return reVar.ReplaceAllStringFunc(reExpr, func(matched string) string {
 		// Retrieve var from spec.
-		varName := strings.Trim(matched, "<>")
+		varName := strings.Trim(matched, `<>`)
 		varVals := (*spec).Vars[varName]
 
 		// Build as RegExp like /(a|b|c)/
@@ -152,7 +152,7 @@ func expandVars(reExpr string, spec *Spec) string {
 		for i, val := range varVals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
-		return "(" + strings.Join(escapedVals, "|") + ")"
+		return `(` + strings.Join(escapedVals, `|`) + `)`
 	})
 }
 
@@ -164,7 +164,7 @@ func expandLookbehind(reExpr string) (string, string) {
 	// └─ edge
 
 	posExpr := reExpr
-	negExpr := ""
+	negExpr := ``
 
 	// This pattern always matches.
 	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
@@ -174,11 +174,11 @@ func expandLookbehind(reExpr string) (string, string) {
 	lookExpr := safeSlice(posExpr, loc[4], loc[5])
 	otherExpr := posExpr[loc[1]:]
 
-	if strings.HasPrefix(lookExpr, "~") {
+	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookbehind
 		negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
 
-		lookExpr = ".*" // require greedy matching
+		lookExpr = `.*` // require greedy matching
 	}
 
 	// Replace lookbehind with 2 parentheses:
@@ -208,19 +208,19 @@ func expandLookahead(reExpr string, negExpr string) (string, string) {
 
 	// Lookahead can be remaining in the negative regexp
 	// the lookbehind determined.
-	if negExpr != "" {
+	if negExpr != `` {
 		lookaheadLen := len(posExpr) - loc[0]
 		negExpr = negExpr[:len(negExpr)-lookaheadLen]
 	}
 
-	if strings.HasPrefix(lookExpr, "~") {
+	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookahead
-		if negExpr != "" {
-			negExpr += "|"
+		if negExpr != `` {
+			negExpr += `|`
 		}
 		negExpr += fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
 
-		lookExpr = ".*" // require greedy matching
+		lookExpr = `.*` // require greedy matching
 	}
 
 	// Replace lookahead with 2 parentheses:
@@ -239,22 +239,24 @@ func mustNoZeroWidth(reExpr string) {
 func expandEdges(reExpr string) string {
 	reExpr = reLeftEdge.ReplaceAllStringFunc(reExpr, func(e string) string {
 		switch e {
-		case "":
-			return ""
-		case "^":
+		case ``:
+			return ``
+		case `^`:
 			return `(?:^|\s+)`
 		default:
-			return "^"
+			// ^^...
+			return `^`
 		}
 	})
 	reExpr = reRightEdge.ReplaceAllStringFunc(reExpr, func(e string) string {
 		switch e {
-		case "":
-			return ""
-		case "$":
+		case ``:
+			return ``
+		case `$`:
 			return `(?:$|\s+)`
 		default:
-			return "$"
+			// $$...
+			return `$`
 		}
 	})
 	return reExpr
