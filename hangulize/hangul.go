@@ -7,47 +7,47 @@ import (
 	"github.com/suapapa/go_hangul"
 )
 
-const null = rune(0)
+const none = rune(0)
 
 func CompleteHangul(jamo string) string {
 	r := bufio.NewReader(strings.NewReader(jamo))
-
 	var buf strings.Builder
+
 	var lmt [3]rune // [lead, medial, tail]
+	const (
+		lead   = 0
+		medial = 1
+		tail   = 2
+	)
+
+	prevScore := -1
+	score := -1
 
 	isTail := false
-	dirty := false
 
-	flush := func() {
-		if dirty {
-			// Flush
-			l, m, t := lmt[0], lmt[1], lmt[2]
-
-			if l == null {
-				l = 'ㅇ'
-			}
-			if m == null {
-				m = 'ㅡ'
-			}
-
-			lmt[0], lmt[1], lmt[2] = null, null, null
-
-			letter := hangul.Join(l, m, t)
-
-			// fmt.Println("l, m, t:", string(l), string(m), string(t))
-			// fmt.Println("letter:", string(letter))
-
-			buf.WriteRune(letter)
+	writeLetter := func() {
+		// Fill missing Jamo.
+		if lmt[0] == none {
+			lmt[0] = 'ㅇ'
 		}
+		if lmt[1] == none {
+			lmt[1] = 'ㅡ'
+		}
+
+		// Complete a letter.
+		letter := hangul.Join(lmt[0], lmt[1], lmt[2])
+		buf.WriteRune(letter)
+
+		// Clear.
+		lmt[0], lmt[1], lmt[2] = none, none, none
 	}
 
 	for {
 		ch, _, err := r.ReadRune()
+
 		if err != nil {
 			break
 		}
-
-		// fmt.Println("ch:", string(ch))
 
 		// Hyphen is the prefix of a tail Jaeum.
 		// Perhaps the next ch is a Jaeum.
@@ -56,31 +56,32 @@ func CompleteHangul(jamo string) string {
 			continue
 		}
 
+		// Classify Jamo.
 		if hangul.IsJaeum(ch) {
 			if isTail {
-				lmt[2] = ch
-				flush()
-				dirty = false
+				score = tail
 			} else {
-				flush()
-
-				lmt[0] = ch
-				dirty = true
+				score = lead
 			}
-		}
-		if hangul.IsMoeum(ch) {
-			if lmt[1] != null {
-				flush()
-			}
-
-			lmt[1] = ch
-			dirty = true
+		} else if hangul.IsMoeum(ch) {
+			score = medial
 		}
 
+		// Write a letter.
+		if score <= prevScore {
+			writeLetter()
+			prevScore = -1
+		}
+
+		lmt[score] = ch
+		prevScore = score
 		isTail = false
 	}
 
-	flush()
+	// Write the final letter.
+	if prevScore != -1 {
+		writeLetter()
+	}
 
 	return buf.String()
 }
