@@ -20,7 +20,8 @@ func TestBundledTestCases(t *testing.T) {
 
 			hangul := h.Hangulize(loanword)
 
-			assert.Equal(t, expected, hangul, loanword)
+			assert.Equalf(t, expected, hangul,
+				`lang: "%s", word: %#v`, lang, loanword)
 		}
 	}
 }
