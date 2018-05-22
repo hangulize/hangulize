@@ -10,7 +10,7 @@ import (
 )
 
 func TestBundledTestCases(t *testing.T) {
-	for _, lang := range ListSpecs() {
+	for _, lang := range ListLangs() {
 		spec, ok := LoadSpec(lang)
 
 		assert.Truef(t, ok, `failed to load "%s" spec`, lang)

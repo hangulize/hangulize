@@ -51,9 +51,9 @@ func LoadSpec(lang string) (*Spec, bool) {
 	return spec, true
 }
 
-// ListSpecs returns the language name list of bundled specs.
+// ListLangs returns the language name list of bundled specs.
 // The bundled spec can be loaded by LoadSpec.
-func ListSpecs() []string {
+func ListLangs() []string {
 	langs := make([]string, 0)
 
 	for _, filename := range bundle.List() {
