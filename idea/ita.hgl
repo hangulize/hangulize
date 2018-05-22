@@ -10,12 +10,11 @@ config:
     stage   = "beta"
     markers = ",", ";"
 
-vars:
-    # 모음
-    "vowels" = "a", "e", "i", "o", "u"
-
 macros:
     "@" = "<vowels>"
+
+vars:
+    "vowels" = "a", "e", "i", "o", "u"
 
 rewrite:
     # 의도 의도
@@ -118,9 +117,6 @@ rewrite:
     "l{mn}" -> "l,"
 
     ";" -> ""
-    
-    # 예시(원본에 없었음)
-    "a" -> "aa", "A" #  표기로 분기
 
 hangulize:
     "b"    -> "ㅂ"
@@ -129,7 +125,7 @@ hangulize:
     "g"    -> "ㄱ"
     "G"    -> "ㅈ"
     "k,"   -> "-ㄱ"
-    "k"    -> "ㄱ"
+    "k"    -> "ㅋ"
     "^l"   -> "ㄹ"
     "{,}l" -> "ㄹ"
     "l,"   -> "-ㄹ"
@@ -172,5 +168,5 @@ test:
     "montagna" -> "몬타냐"
     "gneiss"   -> "녜이스"
     "gnocco"   -> "뇨코"
-    "gn"       -> "뉴"
+    "gnu"      -> "뉴"
     "ogni"     -> "오니"
