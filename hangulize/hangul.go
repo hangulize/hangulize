@@ -13,8 +13,10 @@ func CompleteHangul(jamo string) string {
 	return _CompleteHangul(jamo, nil)
 }
 
-func _CompleteHangul(jamo string, ch chan<- Event) string {
-	r := bufio.NewReader(strings.NewReader(jamo))
+func _CompleteHangul(word string, ch chan<- Event) string {
+	orig := word
+
+	r := bufio.NewReader(strings.NewReader(word))
 	var buf strings.Builder
 
 	var lmt [3]rune // [lead, medial, tail]
@@ -89,5 +91,7 @@ func _CompleteHangul(jamo string, ch chan<- Event) string {
 		writeLetter()
 	}
 
-	return buf.String()
+	word = buf.String()
+	event(ch, word, orig, "complete-hangul")
+	return word
 }
