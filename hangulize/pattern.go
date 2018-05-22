@@ -62,11 +62,19 @@ func CompilePattern(expr string, spec *Spec) *Pattern {
 	reExpr = expandVars(reExpr, spec)
 
 	// lookaround
-	reExpr, negExpr := expandLookaround(reExpr)
+	// TODO(sublee): edge specialization
+	reExpr, negExpr := expandLookbehind(reExpr)
+	reExpr, negExpr = expandLookahead(reExpr, negExpr)
 
+	mustNoZeroWidth(reExpr)
+
+	if negExpr == "" {
+		negExpr = "$^" // It's a paradox.  Never matches with anything.
+	}
+
+	// Compile regexp.
 	re := regexp.MustCompile(reExpr)
 	neg := regexp.MustCompile(negExpr)
-
 	return &Pattern{expr, re, neg}
 }
 
@@ -131,16 +139,12 @@ func expandVars(reExpr string, spec *Spec) string {
 	})
 }
 
-func expandLookaround(reExpr string) (string, string) {
-	var loc []int
-	var negExprBuf strings.Builder
-
+// Lookbehind: {...} on the left-side.
+func expandLookbehind(reExpr string) (string, string) {
 	posExpr := reExpr
+	negExpr := ""
 
-	// TODO(sublee): edge specialization
-
-	// Lookbehind: Find {...} on the left-side.
-	loc = reLookbehind.FindStringSubmatchIndex(posExpr)
+	loc := reLookbehind.FindStringSubmatchIndex(posExpr)
 	if len(loc) == 6 {
 		// ^{han}gul
 		// │  │   └─ other
@@ -152,8 +156,7 @@ func expandLookaround(reExpr string) (string, string) {
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookbehind
-			negExpr := fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
-			negExprBuf.WriteString(negExpr)
+			negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
 
 			lookExpr = ".*" // require greedy matching
 		}
@@ -166,12 +169,16 @@ func expandLookaround(reExpr string) (string, string) {
 		posExpr = "()()" + posExpr
 	}
 
-	// Lookahead: Find {...} on the right-side.
-	// This block depends on the above Lookbehind block.
-	loc = reLookahead.FindStringSubmatchIndex(posExpr)
-	if len(loc) == 6 {
-		// lookahead found
+	return posExpr, negExpr
+}
 
+// Lookahead: {...} on the right-side.
+// negExpr should be passed from expandLookbehind.
+func expandLookahead(reExpr string, negExpr string) (string, string) {
+	posExpr := reExpr
+
+	loc := reLookahead.FindStringSubmatchIndex(posExpr)
+	if len(loc) == 6 {
 		// han{gul}$
 		//  │   │  └─ edge
 		//  │   └─ look
@@ -182,23 +189,17 @@ func expandLookaround(reExpr string) (string, string) {
 
 		// Lookahead can be remaining in the negative regexp
 		// the lookbehind determined.
-		if negExprBuf.Len() != 0 {
-			negExpr := negExprBuf.String()
-			negExprBuf.Reset()
-
+		if negExpr != "" {
 			lookaheadLen := len(posExpr) - loc[0]
-
 			negExpr = negExpr[:len(negExpr)-lookaheadLen]
-			negExprBuf.WriteString(negExpr)
 		}
 
 		if strings.HasPrefix(lookExpr, "~") {
 			// negative lookahead
-			if negExprBuf.Len() != 0 {
-				negExprBuf.WriteRune('|')
+			if negExpr != "" {
+				negExpr += "|"
 			}
-			negExpr := fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
-			negExprBuf.WriteString(negExpr)
+			negExpr += fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
 
 			lookExpr = ".*" // require greedy matching
 		}
@@ -211,15 +212,11 @@ func expandLookaround(reExpr string) (string, string) {
 		posExpr = posExpr + "()()"
 	}
 
-	// Find remaining zero-width groups.
-	if reZeroWidth.MatchString(posExpr) {
+	return posExpr, negExpr
+}
+
+func mustNoZeroWidth(reExpr string) {
+	if reZeroWidth.MatchString(reExpr) {
 		panic(fmt.Errorf("zero-width group found in middle: %#v", reExpr))
 	}
-
-	if negExprBuf.Len() == 0 {
-		negExprBuf.WriteString("$^") // never match
-	}
-
-	negExpr := negExprBuf.String()
-	return posExpr, negExpr
 }
