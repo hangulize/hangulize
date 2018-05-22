@@ -43,26 +43,54 @@ const x = ""
 //  p := compile("foo")
 //  assertMatch(t, p, []string{
 //    o, "foo",
+//    "   ^^^",
 //    o, "foobar",
+//    "   ^^^   ",
 //    x, "bar",
 //  })
 //
 func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 	info := fmt.Sprintf("re: /%s/, neg: /%s/", p.re, p.neg)
 
-	for i := 0; i < len(scenario); i += 2 {
+	for i := 0; i < len(scenario); {
 		mustMatch := scenario[i] == o
 		text := scenario[i+1]
+		i += 2
 
 		matched := p.Match(text)
 
-		if mustMatch {
-			assert.NotEmptyf(t, matched,
-				"%s must match with %#v\n%s", p, text, info)
-		} else {
+		if !mustMatch {
 			assert.Emptyf(t, matched,
-				"%s must not match with %#v\n%s", p, text, info)
+				"%s must NOT MATCH with %#v\n%s", p, text, info)
+			continue
 		}
+
+		assert.NotEmptyf(t, matched,
+			"%s must MATCH with %#v\n%s", p, text, info)
+
+		if i == len(scenario) {
+			break
+		}
+
+		// find underline (^^^) which indicates expected match position
+		underline := scenario[i]
+		if underline == o || underline == x {
+			continue
+		}
+		i++
+
+		if len(underline) != len(text)+3 {
+			panic("underline length must be len(text)+3")
+		}
+
+		start := strings.Index(underline, "^") - 3
+		stop := strings.LastIndex(underline, "^") + 1 - 3
+
+		expected := text[start:stop]
+		got := text[matched[0]:matched[1]]
+		assert.Equalf(t, expected, got,
+			"%s on %#v must MATCH with %#v but %#v matched\n%s",
+			p, text, expected, got, info)
 	}
 }
 
@@ -99,6 +127,7 @@ func TestVars(t *testing.T) {
 		o, "bd",
 		x, "db",
 		o, "fcf",
+		"    ^^",
 	})
 }
 
@@ -106,7 +135,9 @@ func TestSimple(t *testing.T) {
 	p = compile("hello, world")
 	assertMatch(t, p, []string{
 		o, "hello, world",
+		"   ^^^^^^^^^^^^",
 		o, "__hello, world__",
+		"     ^^^^^^^^^^^^  ",
 		x, "bye, world",
 	})
 }
@@ -115,8 +146,11 @@ func TestLookbehind(t *testing.T) {
 	p = compile("{han}gul")
 	assertMatch(t, p, []string{
 		o, "hangul",
+		"      ^^^",
 		o, "hangulize",
+		"      ^^^   ",
 		o, "__hangul",
+		"        ^^^",
 		x, "gul",
 		x, "ngul",
 		x, "mogul",
@@ -125,8 +159,11 @@ func TestLookbehind(t *testing.T) {
 	p = compile("^{han}gul")
 	assertMatch(t, p, []string{
 		o, "hangul",
+		"      ^^^",
 		o, "hangul__",
+		"      ^^^  ",
 		x, "__hangul",
+		x, "__hangul__",
 	})
 }
 
@@ -134,7 +171,9 @@ func TestLookahead(t *testing.T) {
 	p = compile("han{gul}")
 	assertMatch(t, p, []string{
 		o, "hangul",
+		"   ^^^   ",
 		o, "hangulize",
+		"   ^^^      ",
 		x, "han",
 		x, "hang",
 		x, "hanja",
@@ -143,8 +182,11 @@ func TestLookahead(t *testing.T) {
 	p = compile("han{gul}$")
 	assertMatch(t, p, []string{
 		o, "hangul",
+		"   ^^^   ",
 		o, "__hangul",
+		"     ^^^   ",
 		x, "hangul__",
+		x, "__hangul__",
 	})
 }
 
@@ -154,10 +196,15 @@ func TestNegativeLookbehind(t *testing.T) {
 		x, "hangul",
 		x, "hangulize",
 		x, "__hangul",
+
 		o, "gul",
+		"   ^^^",
 		o, "ngul",
+		"    ^^^",
 		o, "mogul",
-		o, "hangul_gul",
+		"     ^^^",
+		// o, "hangul_gul",
+		// "       ^^^^^^",
 	})
 
 	p = compile("^{~han}gul")
@@ -177,9 +224,12 @@ func TestNegativeLookahead(t *testing.T) {
 		x, "hangul",
 		x, "hangulize",
 		o, "han",
+		"   ^^^",
 		o, "hang",
+		"   ^^^ ",
 		o, "hanja",
-		o, "han_hangul",
+		"   ^^^  ",
+		// o, "han_hangul",
 	})
 
 	p = compile("han{~gul}$")
