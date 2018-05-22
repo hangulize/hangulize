@@ -70,7 +70,8 @@ func ExplainPattern(p *Pattern) string {
 	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
 }
 
-// CompilePattern compiles an Pattern pattern for the given language spec.
+// CompilePattern compiles a Hangulize-specific pattern for the given language
+// spec.
 func CompilePattern(expr string, spec *Spec) (*Pattern, error) {
 	reExpr := expr
 
