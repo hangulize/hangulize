@@ -22,22 +22,33 @@ func (p *Pattern) String() string {
 
 // Match reports whether the pattern matches the given text.
 func (p *Pattern) Match(text string) []int {
-	loc := p.re.FindStringSubmatchIndex(text)
+	start := 0
 
-	// Early return if not matched.
-	if len(loc) == 0 {
-		return loc
+	for {
+		loc := p.re.FindStringSubmatchIndex(text[start:])
+
+		// Early return if not matched.
+		if len(loc) == 0 {
+			return make([]int, 0)
+		}
+
+		// Move cursor for the next match.
+		start = loc[1]
+
+		// Slice matched text only.  Call it "highlight".
+		highlight := text[loc[0]:loc[1]]
+
+		// Don't match if the negative pattern matches with the highlight.
+		if p.neg.MatchString(highlight) {
+			continue
+		}
+
+		// Regexp looks like (edge)(look)abc(look)(edge).  Here discards the
+		// zero-width groups.
+		afterLookbehind := loc[5]
+		beforeLookahead := loc[len(loc)-4]
+		return []int{afterLookbehind, beforeLookahead}
 	}
-
-	// Slice matched text only.  Call it "highlight".
-	highlight := text[loc[0]:loc[1]]
-
-	// Don't match if the negative pattern matches with the highlight.
-	if p.neg.MatchString(highlight) {
-		return make([]int, 0)
-	}
-
-	return loc
 }
 
 // CompilePattern compiles an Pattern pattern for the given language spec.
