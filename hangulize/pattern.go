@@ -101,10 +101,9 @@ func expandLookaround(reExpr string) (string, string) {
 	// TODO(sublee): negative lookaround
 	// TODO(sublee): edge specialization
 
+	// Lookbehind: Find {...} on the left-side.
 	loc = reLookbehind.FindStringSubmatchIndex(posExpr)
 	if len(loc) == 6 {
-		// lookbehind found
-
 		// ^{han}gul
 		// │  │   └─ other
 		// │  └─ look
@@ -121,6 +120,7 @@ func expandLookaround(reExpr string) (string, string) {
 		posExpr = "()()" + posExpr
 	}
 
+	// Lookahead: Find {...} on the right-side.
 	loc = reLookahead.FindStringSubmatchIndex(posExpr)
 	if len(loc) == 6 {
 		// lookahead found
