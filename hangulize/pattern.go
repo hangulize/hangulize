@@ -43,8 +43,16 @@ func (p *Pattern) Match(word string) ([]int, bool) {
 
 		// p.re looks like (edge)(look)abc(look)(edge).
 		// Hold only non-zero-width matches.
-		start := offset + loc[5]         // lookbehind's stop
-		stop := offset + loc[len(loc)-4] // lookahead's start
+		lookbehindStop := loc[5]
+		if lookbehindStop == -1 {
+			lookbehindStop = loc[0]
+		}
+		lookaheadStart := loc[len(loc)-4]
+		if lookaheadStart == -1 {
+			lookaheadStart = loc[1]
+		}
+		start := offset + lookbehindStop
+		stop := offset + lookaheadStart
 
 		// Pick matched word.  Call it "highlight".
 		highlight := word[loc[0]:loc[1]]
