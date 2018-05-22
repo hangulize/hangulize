@@ -24,12 +24,14 @@ func NewHangulizer(spec *Spec) *Hangulizer {
 	return &Hangulizer{spec}
 }
 
-// Hangulize ...
+// Hangulize transcribes a loanword into Hangul.
 func (h *Hangulizer) Hangulize(word string) string {
 	dummy := make(chan Event)
 	return h.HangulizeTrace(word, dummy)
 }
 
+// HangulizeTrace transcribes a loanword into Hangul.  During
+// transcribing, it sends internal events to the given channel.
 func (h *Hangulizer) HangulizeTrace(word string, ch chan Event) string {
 	word = h.spec._Normalize(word, ch)
 	word = h.spec._Rewrite(word, ch)
