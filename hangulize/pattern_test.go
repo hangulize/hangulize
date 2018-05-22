@@ -157,6 +157,7 @@ func TestNegativeLookbehind(t *testing.T) {
 		o, "gul",
 		o, "ngul",
 		o, "mogul",
+		o, "hangul_gul",
 	})
 
 	p = compile("^{~han}gul")
@@ -178,6 +179,7 @@ func TestNegativeLookahead(t *testing.T) {
 		o, "han",
 		o, "hang",
 		o, "hanja",
+		o, "han_hangul",
 	})
 
 	p = compile("han{~gul}$")
