@@ -62,13 +62,13 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 
 		if !mustMatch {
 			assert.Emptyf(t, matched,
-				"must NOT MATCH with %#v\n%s", text, p.Explain())
+				"must NOT MATCH with %#v\n%s", text, ExplainPattern(p))
 			continue
 		}
 
 		// Must match.
 		assert.NotEmptyf(t, matched,
-			"must MATCH with %#v\n%s", text, p.Explain())
+			"must MATCH with %#v\n%s", text, ExplainPattern(p))
 
 		if i == len(scenario) {
 			break
@@ -107,7 +107,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			"%s",
 			text, underline[3:],
 			text, actualUnderline,
-			p.Explain())
+			ExplainPattern(p))
 	}
 }
 
@@ -396,5 +396,5 @@ func TestMalformedPattern(t *testing.T) {
 	var err error
 
 	p, err = CompilePattern(`{a} {b} {c}`, nil)
-	assert.Error(t, err, p.Explain())
+	assert.Error(t, err, ExplainPattern(p))
 }
