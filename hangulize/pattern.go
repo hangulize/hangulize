@@ -116,7 +116,7 @@ func init() {
 	reVar = regexp.MustCompile(`<.+?>`)
 
 	var (
-		zeroWidth = `\{(.*?)\}` // {...}
+		zeroWidth = `\{([^}]*)\}` // {...}
 
 		leftEdge  = `(\^+)` // `^`, `^^`, `^^^...`
 		rightEdge = `(\$+)` // `$`, `$$`, `$$$...`
