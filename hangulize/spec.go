@@ -16,14 +16,22 @@ type Spec struct {
 
 	Macros    map[string]string
 	Vars      map[string][]string
-	Rewrite   *Rewriter
-	Hangulize *Rewriter
+	rewrite   *Rewriter
+	hangulize *Rewriter
 
 	Test []hgl.Pair
 }
 
 func (s *Spec) String() string {
 	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
+}
+
+func (s *Spec) Rewrite(word string) string {
+	return s.rewrite.Rewrite(word)
+}
+
+func (s *Spec) Hangulize(word string) string {
+	return s.hangulize.Rewrite(word)
 }
 
 // Language identifies a natural language.
