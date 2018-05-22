@@ -1,6 +1,6 @@
 # Hangulize 2
 
-(WIP: 아직 개발 중)
+(WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
 > 외국어의 한글 표기 체계가 제대로 서려면 일반인이 외국어를 한글로 표기하고
 > 싶을 때 바로바로 쉽게 용례를 찾을 수 있어야 한다. 정기적으로 회의를 열어
@@ -32,7 +32,7 @@ Hangulize 2의 전신인 [Hangulize](https://github.com/sublee/hangulize)는
 [hangulize.org](http://hangulize.org)를 제공하고 있습니다.
 
 기존 Hangulize의 기능은 모두 계승하면서, 성능을 높이고 코드의 유지보수 가능성과
-규칙 설계 시 생산성을 높이기 위해 리부트합니다. Hangulize 2는 Go로 개발합니다.
+규칙 설계 시 생산성을 높이기 위해 리부트합니다. Hangulize 2는 Go로 개발됩니다.
 
 ## 목표
 
@@ -48,10 +48,10 @@ Hangulize 2의 전신인 [Hangulize](https://github.com/sublee/hangulize)는
 
 ## 만든이
 
-- 이흥섭, Heungsub Lee <sub@subl.ee>
+- 이흥섭, Heungsub Lee <<sub@subl.ee>>
 
-## 사용권
+## 라이선스
 
 Hangulize 2는 BSD-3-Clause 라이선스 하에 공개되어 있습니다. 소스코드를 사용할
-경우 라이선스 내용을 준수해주세요. 라이선스 전문은 LICENSE 파일에서 확인하실
+경우 라이선스 내용을 준수해주세요. 라이선스 전문은 `LICENSE` 파일에서 확인하실
 수 있습니다.
