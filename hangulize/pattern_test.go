@@ -75,3 +75,26 @@ func TestVars(t *testing.T) {
 	p = compile("<abc><def>")
 	assert.Equal(t, "(a|b|c)(d|e|f)", p.reExpr)
 }
+
+func TestMatch(t *testing.T) {
+	p = compile("hello, world")
+	assertMatch(t, p, []string{
+		o, "hello, world",
+		o, "__hello, world__",
+		x, "bye, world",
+	})
+
+	p = compile("han{gul}")
+	assertMatch(t, p, []string{
+		o, "hangul",
+		o, "hangulize",
+		x, "hanja",
+	})
+
+	p = compile("han{gul}$")
+	assertMatch(t, p, []string{
+		o, "hangul",
+		o, "__hangul",
+		x, "hangulize",
+	})
+}
