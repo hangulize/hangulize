@@ -19,9 +19,10 @@ $ go get -u github.com/sublee/hangulize2/hangulize
 ```
 
 ```go
-gore> :import github.com/sublee/hangulize2/hangulize
-gore> hangulize.Hangulize("ita", "gloria")
-"글로리아"
+import "github.com/sublee/hangulize2/hangulize"
+
+hangulize.Hangulize("ita", "gloria")
+// output: "글로리아"
 ```
 
 ## 리부트
