@@ -73,7 +73,9 @@ func CompleteHangul(jamo string) string {
 			prevScore = -1
 		}
 
-		lmt[score] = ch
+		if score != -1 {
+			lmt[score] = ch
+		}
 		prevScore = score
 		isTail = false
 	}
