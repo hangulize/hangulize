@@ -391,3 +391,10 @@ func TestComplexLookaround(t *testing.T) {
 		"         ",
 	})
 }
+
+func TestMalformedPattern(t *testing.T) {
+	var err error
+
+	p, err = CompilePattern("{a} {b} {c}", nil)
+	assert.Error(t, err, p.Explain())
+}
