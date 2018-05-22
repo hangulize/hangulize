@@ -51,7 +51,13 @@ func init() {
 	reZeroWidth = regexp.MustCompile(zeroWidth)
 }
 
+// expandMacros replaces macro sources in the spec to corresponding
+// destinations.  It must be evaluated at the first in CompilePattern.
 func expandMacros(reExpr string, spec *Spec) string {
+	if spec == nil {
+		return reExpr
+	}
+
 	args := make([]string, len(spec.Macros)*2)
 
 	i := 0
@@ -66,8 +72,12 @@ func expandMacros(reExpr string, spec *Spec) string {
 	return replacer.Replace(reExpr)
 }
 
+// expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(reExpr string, spec *Spec) string {
-	// Expand <var> through spec.
+	if spec == nil {
+		return reVar.ReplaceAllString(reExpr, "()")
+	}
+
 	return reVar.ReplaceAllStringFunc(reExpr, func(matched string) string {
 		// Retrieve var from spec.
 		varName := strings.Trim(matched, "<>")
