@@ -62,6 +62,16 @@ func _CompleteHangul(word string, ch chan<- Event) string {
 			continue
 		}
 
+		if !hangul.IsHangul(ch) {
+			if prevScore != -1 {
+				writeLetter()
+			}
+
+			buf.WriteRune(ch)
+			prevScore = -1
+			continue
+		}
+
 		// Classify Jamo.
 		if hangul.IsJaeum(ch) {
 			if isTail {
