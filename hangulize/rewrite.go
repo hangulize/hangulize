@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/sublee/hangulize2/hgl"
@@ -19,6 +20,8 @@ func (r *Rule) Rewrite(word string) string {
 }
 
 func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
+	orig := word
+
 	var buf strings.Builder
 	offset := 0
 
@@ -43,9 +46,7 @@ func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
 	}
 
 	word = buf.String()
-	// if offset != 0 {
-	// 	fmt.Println(word, r.from, r.to)
-	// }
+	event(ch, word, orig, fmt.Sprintf("%s->%#v", r.from, r.to[0]))
 	return word
 }
 

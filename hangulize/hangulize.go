@@ -33,10 +33,13 @@ func (h *Hangulizer) Hangulize(word string) string {
 // transcribing, it sends internal events to the given channel.
 func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Event) string {
 	defer close(ch)
+	event(ch, word, "", "input")
+
 	word = h.spec._Normalize(word, ch)
 	word = h.spec._Rewrite(word, ch)
 	word = h.spec._Hangulize(word, ch)
 	word = _CompleteHangul(word, ch)
+
 	return word
 }
 
