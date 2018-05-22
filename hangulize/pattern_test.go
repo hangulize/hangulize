@@ -303,4 +303,33 @@ func TestEdge(t *testing.T) {
 		"       ^^^   ",
 		x, "barfoobar",
 	})
+
+	p = compile("^^foo")
+	assertMatch(t, p, []string{
+		o, "foobar",
+		"   ^^^   ",
+		o, "foobar bar",
+		"   ^^^       ",
+		x, "bar foobar",
+	})
+
+	p = compile("foo$")
+	assertMatch(t, p, []string{
+		o, "foo",
+		"   ^^^",
+		o, "barfoo",
+		"      ^^^",
+		o, "barfoo foo",
+		"      ^^^    ",
+		x, "barfoobar",
+	})
+
+	p = compile("foo$$")
+	assertMatch(t, p, []string{
+		o, "barfoo",
+		"      ^^^",
+		o, "foo barfoo",
+		"          ^^^",
+		x, "foo foobar",
+	})
 }
