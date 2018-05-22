@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -47,15 +48,20 @@ const x = ""
 //  })
 //
 func assertMatch(t *testing.T, p *Pattern, scenario []string) {
+	info := fmt.Sprintf("re: /%s/, neg: /%s/", p.re.String(), p.neg.String())
+
 	for i := 0; i < len(scenario); i += 2 {
 		mustMatch := scenario[i] == o
 		text := scenario[i+1]
 
 		matched := p.Match(text)
+
 		if mustMatch {
-			assert.NotEmptyf(t, matched, "%s must match with %#v", p, text)
+			assert.NotEmptyf(t, matched,
+				"%s must match with %#v\n%s", p, text, info)
 		} else {
-			assert.Emptyf(t, matched, "%s must not match with %#v", p, text)
+			assert.Emptyf(t, matched,
+				"%s must not match with %#v\n%s", p, text, info)
 		}
 	}
 }
