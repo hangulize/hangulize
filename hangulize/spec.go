@@ -3,6 +3,7 @@ package hangulize
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -24,6 +25,11 @@ type Spec struct {
 
 func (s *Spec) String() string {
 	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
+}
+
+func (s *Spec) Normalize(word string) string {
+	// TODO(sublee): Language-specific normalizer
+	return strings.ToLower(word)
 }
 
 func (s *Spec) Rewrite(word string) string {

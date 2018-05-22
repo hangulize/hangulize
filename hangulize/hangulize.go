@@ -26,6 +26,7 @@ func NewHangulizer(spec *Spec) *Hangulizer {
 
 // Hangulize ...
 func (h *Hangulizer) Hangulize(word string) string {
+	word = h.spec.Normalize(word)
 	word = h.spec.Rewrite(word)
 	word = h.spec.Hangulize(word)
 	word = CompleteHangul(word)
