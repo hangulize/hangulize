@@ -117,9 +117,8 @@ func init() {
 
 	var (
 		zeroWidth = `\{([^}]*)\}` // {...}
-
-		leftEdge  = `(\^+)` // `^`, `^^`, `^^^...`
-		rightEdge = `(\$+)` // `$`, `$$`, `$$$...`
+		leftEdge  = `(\^+)`       // `^`, `^^`, `^^^...`
+		rightEdge = `(\$+)`       // `$`, `$$`, `$$$...`
 
 		// begin of text - optional leftEdge - optional zeroWidth
 		lookbehind = fmt.Sprintf(`^(?:%s)?(?:%s)?`, leftEdge, zeroWidth)
