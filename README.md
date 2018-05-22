@@ -44,7 +44,7 @@ Hangulize 2의 전신인 [Hangulize](https://github.com/sublee/hangulize)는
 
 ## 지원하는 언어
 
-1. 이탈리아어(`ita`)
+1. 이탈리아어(`ita`)<sup>beta</sup>
 
 ## 만든이
 
