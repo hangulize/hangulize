@@ -277,3 +277,25 @@ func TestNegativeLookaround(t *testing.T) {
 		o, "__ng__",
 	})
 }
+
+func TestComplexLookaround(t *testing.T) {
+	p = compile("{^^a|b}c")
+	assertMatch(t, p, []string{
+		o, "acxxx",
+		o, "xxbcx",
+		x, "xxacx",
+	})
+}
+
+func TestEdge(t *testing.T) {
+	p = compile("^foo")
+	assertMatch(t, p, []string{
+		o, "foo",
+		"   ^^^",
+		o, "foobar",
+		"   ^^^   ",
+		o, "bar foobar",
+		"       ^^^   ",
+		x, "barfoobar",
+	})
+}
