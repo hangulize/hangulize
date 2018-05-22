@@ -12,6 +12,29 @@ def quote(x):
     return '"%s"' % x
 
 
+def stringify(x):
+    if not x:
+        return ''
+
+    if isinstance(x, tuple):
+        return ''.join(map(stringify, x))
+
+    if isinstance(x, unicode):
+        return x
+
+    if isinstance(x, bytes):
+        return x.decode('utf-8')
+
+    if isinstance(x, hangulize.Choseong):
+        return x.letter
+
+    if isinstance(x, hangulize.Jungseong):
+        return x.letter
+
+    if isinstance(x, hangulize.Jongseong):
+        return '-' + x.letter
+
+
 class Section(object):
 
     def __init__(self, name):
@@ -19,7 +42,8 @@ class Section(object):
         self.pairs = []
 
     def put(self, k, *vs):
-        self.pairs.append((k, map(unicode, vs)))
+        pair = (k, map(stringify, vs))
+        self.pairs.append(pair)
 
     def draw(self, sep, quote_keys=False):
         pairs = self.pairs[:]
@@ -93,6 +117,23 @@ def main(argv):
     for var in vars_:
         sec.put(var, *getattr(lang, var))
     print(sec.draw('=', quote_keys=True), end='')
+
+    sec = Section('rewrite')
+    for x, rule in enumerate(lang.notation.rules):
+        pattern = rule[0]
+        repl = rule[1:]
+        if isinstance(repl[0], hangulize.Phoneme):
+            break
+        sec.put(pattern, repl)
+    print(sec.draw('->', quote_keys=True), end='')
+
+    sec = Section('hangulize')
+    for rule in lang.notation.rules[x:]:
+        pattern = rule[0]
+        repl = rule[1:]
+        assert isinstance(repl[0], hangulize.Phoneme)
+        sec.put(pattern, repl)
+    print(sec.draw('->', quote_keys=True), end='')
 
 
 if __name__ == '__main__':
