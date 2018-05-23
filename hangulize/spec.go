@@ -210,18 +210,18 @@ func (s *Spec) Hangulize(word string) string {
 	return s._Hangulize(word, nil)
 }
 
-func (s *Spec) _Normalize(word string, ch chan<- Event) string {
+func (s *Spec) _Normalize(word string, ch chan<- Trace) string {
 	// TODO(sublee): Language-specific normalizer
 	orig := word
 	word = strings.ToLower(word)
-	event(ch, word, orig, "to-lower")
+	trace(ch, word, orig, "to-lower")
 	return word
 }
 
-func (s *Spec) _Rewrite(word string, ch chan<- Event) string {
+func (s *Spec) _Rewrite(word string, ch chan<- Trace) string {
 	return s.rewrite._Rewrite(word, ch)
 }
 
-func (s *Spec) _Hangulize(word string, ch chan<- Event) string {
+func (s *Spec) _Hangulize(word string, ch chan<- Trace) string {
 	return s.hangulize._Rewrite(word, ch)
 }
