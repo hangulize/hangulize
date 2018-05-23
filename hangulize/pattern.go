@@ -121,38 +121,6 @@ func CompilePattern(
 	return p, nil
 }
 
-// Pre-compiled regexp patterns to compile HRE patterns.
-var (
-	reVar        *regexp.Regexp
-	reLookbehind *regexp.Regexp
-	reLookahead  *regexp.Regexp
-	reZeroWidth  *regexp.Regexp
-	reLeftEdge   *regexp.Regexp
-	reRightEdge  *regexp.Regexp
-)
-
-func init() {
-	reVar = regexp.MustCompile(`<.+?>`)
-
-	var (
-		zeroWidth = `\{([^}]*)\}` // {...}
-		leftEdge  = `(\^+)`       // `^`, `^^`, `^^^...`
-		rightEdge = `(\$+)`       // `$`, `$$`, `$$$...`
-
-		// begin of text - optional leftEdge - optional zeroWidth
-		lookbehind = fmt.Sprintf(`^(?:%s)?(?:%s)?`, leftEdge, zeroWidth)
-		// optional zeroWidth - optional rightEdge - end of text
-		lookahead = fmt.Sprintf(`(?:%s)?(?:%s)?$`, zeroWidth, rightEdge)
-	)
-
-	reLookbehind = regexp.MustCompile(lookbehind)
-	reLookahead = regexp.MustCompile(lookahead)
-	reZeroWidth = regexp.MustCompile(zeroWidth)
-
-	reLeftEdge = regexp.MustCompile(leftEdge)
-	reRightEdge = regexp.MustCompile(rightEdge)
-}
-
 // expandMacros replaces macro sources to corresponding targets.
 // It must be evaluated at the first in CompilePattern.
 func expandMacros(reExpr string, macros map[string]string) string {
@@ -173,16 +141,15 @@ func expandMacros(reExpr string, macros map[string]string) string {
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(reExpr string, vars map[string][]string) string {
 	return reVar.ReplaceAllStringFunc(reExpr, func(matched string) string {
-		// Retrieve var from spec.
-		varName := strings.Trim(matched, `<>`)
-		varVals := vars[varName]
+		// Retrieve variable name and values.
+		name, vals := getVar(matched, vars)
 
 		// Build as RegExp like /(a|b|c)/
-		escapedVals := make([]string, len(varVals))
-		for i, val := range varVals {
+		escapedVals := make([]string, len(vals))
+		for i, val := range vals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
-		return `(?P<` + varName + `>` + strings.Join(escapedVals, `|`) + `)`
+		return `(?P<` + name + `>` + strings.Join(escapedVals, `|`) + `)`
 	})
 }
 
