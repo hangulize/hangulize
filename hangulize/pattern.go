@@ -30,47 +30,6 @@ func (p *Pattern) String() string {
 	return fmt.Sprintf(`/%s/`, p.expr)
 }
 
-// Match reports whether the pattern matches the given word.
-func (p *Pattern) Match(word string) ([]int, bool) {
-	offset := 0
-
-	for {
-		loc := p.re.FindStringSubmatchIndex(word[offset:])
-
-		// Not matched.
-		if len(loc) == 0 {
-			return make([]int, 0), false
-		}
-
-		// p.re looks like (edge)(look)abc(look)(edge).
-		// Hold only non-zero-width matches.
-		lookbehindStop := loc[5]
-		if lookbehindStop == -1 {
-			lookbehindStop = loc[0]
-		}
-		lookaheadStart := loc[len(loc)-4]
-		if lookaheadStart == -1 {
-			lookaheadStart = loc[1]
-		}
-		start := offset + lookbehindStop
-		stop := offset + lookaheadStart
-
-		// Pick matched word.  Call it "highlight".
-		highlight := word[loc[0]:loc[1]]
-
-		// Test highlight with p.neg to determine whether skip or not.
-		negLoc := p.neg.FindStringIndex(highlight)
-
-		// If no negative match, this match has been succeeded.
-		if len(negLoc) == 0 {
-			return []int{start, stop}, true
-		}
-
-		// Shift the cursor.
-		offset = loc[0] + negLoc[1]
-	}
-}
-
 // ExplainPattern shows the HRE expression with
 // the underlying standard regexp patterns.
 func ExplainPattern(p *Pattern) string {
@@ -259,4 +218,45 @@ func expandEdges(reExpr string) string {
 		}
 	})
 	return reExpr
+}
+
+// Match reports whether the pattern matches the given word.
+func (p *Pattern) Match(word string) ([]int, bool) {
+	offset := 0
+
+	for {
+		loc := p.re.FindStringSubmatchIndex(word[offset:])
+
+		// Not matched.
+		if len(loc) == 0 {
+			return make([]int, 0), false
+		}
+
+		// p.re looks like (edge)(look)abc(look)(edge).
+		// Hold only non-zero-width matches.
+		lookbehindStop := loc[5]
+		if lookbehindStop == -1 {
+			lookbehindStop = loc[0]
+		}
+		lookaheadStart := loc[len(loc)-4]
+		if lookaheadStart == -1 {
+			lookaheadStart = loc[1]
+		}
+		start := offset + lookbehindStop
+		stop := offset + lookaheadStart
+
+		// Pick matched word.  Call it "highlight".
+		highlight := word[loc[0]:loc[1]]
+
+		// Test highlight with p.neg to determine whether skip or not.
+		negLoc := p.neg.FindStringIndex(highlight)
+
+		// If no negative match, this match has been succeeded.
+		if len(negLoc) == 0 {
+			return []int{start, stop}, true
+		}
+
+		// Shift the cursor.
+		offset = loc[0] + negLoc[1]
+	}
 }
