@@ -38,7 +38,10 @@ func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
 		buf.WriteString(word[offset:start])
 
 		// TODO(sublee): Support multiple targets.
-		buf.WriteString(r.to[0])
+		repl := r.to[0]
+
+		// Write replacement instead of the match.
+		buf.WriteString(repl)
 
 		offset = stop
 	}
