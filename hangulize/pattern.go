@@ -182,7 +182,7 @@ func expandVars(reExpr string, vars map[string][]string) string {
 		for i, val := range varVals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
-		return `(?:` + strings.Join(escapedVals, `|`) + `)`
+		return `(?P<` + varName + `>` + strings.Join(escapedVals, `|`) + `)`
 	})
 }
 
