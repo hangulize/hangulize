@@ -21,7 +21,7 @@ func TestBundledTestCases(t *testing.T) {
 			loanword := testCase.Left()
 			expected := testCase.Right()[0]
 
-			ch := make(chan Event, 1000)
+			ch := make(chan Trace, 1000)
 			got := h.HangulizeTrace(loanword, ch)
 
 			if got == expected {

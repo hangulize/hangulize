@@ -19,7 +19,7 @@ func (r *Rule) Rewrite(word string) string {
 	return r._Rewrite(word, nil)
 }
 
-func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
+func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
 	orig := word
 
 	var buf strings.Builder
@@ -44,7 +44,7 @@ func (r *Rule) _Rewrite(word string, ch chan<- Event) string {
 	}
 
 	word = buf.String()
-	event(ch, word, orig, fmt.Sprintf("%s->%#v", r.from, r.to[0]))
+	trace(ch, word, orig, fmt.Sprintf("%s->%#v", r.from, r.to[0]))
 	return word
 }
 
@@ -85,7 +85,7 @@ func (r *Rewriter) Rewrite(word string) string {
 	return r._Rewrite(word, nil)
 }
 
-func (r *Rewriter) _Rewrite(word string, ch chan<- Event) string {
+func (r *Rewriter) _Rewrite(word string, ch chan<- Trace) string {
 	for _, rule := range r.rules {
 		word = rule._Rewrite(word, ch)
 	}
