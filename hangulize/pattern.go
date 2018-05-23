@@ -8,6 +8,17 @@ import (
 
 // Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
 // It is used for the rewrite of Hangulize.
+//
+// Some expressions in Pattern have special meaning:
+//
+// - "^" - start of chunk
+// - "^^" - start of string
+// - "$" - end of chunk
+// - "$$" - end of string
+// - "{...}" - zero-width match
+// - "{~...}" - zero-width negative match
+// - "<var>" - one of var values (defined in spec)
+//
 type Pattern struct {
 	expr string
 
