@@ -7,7 +7,7 @@ import (
 
 // <...>
 // └───┴─ (0)
-var reVar = regexp.MustCompile(`<.+?>`)
+var reVar = regex(`<.+?>`)
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(expr string, vars map[string][]string) string {
