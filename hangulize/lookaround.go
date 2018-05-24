@@ -7,11 +7,27 @@ import (
 )
 
 var (
-	reZeroWidth  *regexp.Regexp
-	reLeftEdge   *regexp.Regexp
-	reRightEdge  *regexp.Regexp
+	// {...}
+	//  └─┴─ (1)
+	reZeroWidth *regexp.Regexp
+
+	// ^^^
+	// └─┴─ (1)
+	reLeftEdge *regexp.Regexp
+
+	// $$$
+	// └─┴─ (1)
+	reRightEdge *regexp.Regexp
+
+	// ^^^{...}
+	// │ │ └─┴─ (2)
+	// └─┴─ (1)
 	reLookbehind *regexp.Regexp
-	reLookahead  *regexp.Regexp
+
+	// {...}$$$
+	//  │ │ └─┴─ (2)
+	//  └─┴─ (1)
+	reLookahead *regexp.Regexp
 )
 
 func init() {

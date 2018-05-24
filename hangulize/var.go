@@ -5,7 +5,8 @@ import (
 	"strings"
 )
 
-// match: [start, stop]
+// <...>
+// └───┴─ (0)
 var reVar = regexp.MustCompile(`<.+?>`)
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
