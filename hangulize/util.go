@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"regexp"
+	"strings"
 )
 
 var (
@@ -54,4 +55,15 @@ func safeSlice(s string, start int, stop int) string {
 		return s[start:stop]
 	}
 	return ""
+}
+
+// captured returns the captured substring by their group number.
+func captured(s string, m []int, n int) string {
+	i := (1 + n) * 2
+	return s[m[i]:m[i+1]]
+}
+
+// noCapture removes capturing groups in a regexp string.
+func noCapture(expr string) string {
+	return strings.Replace(expr, "(", "(?:", -1)
 }

@@ -24,6 +24,9 @@ type Pattern struct {
 
 	re  *regexp.Regexp // positive regexp
 	neg *regexp.Regexp // negative regexp
+
+	// References to expanded vars.
+	usedVars [][]string
 }
 
 func (p *Pattern) String() string {
@@ -39,8 +42,8 @@ func ExplainPattern(p *Pattern) string {
 	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
 }
 
-// CompilePattern compiles an HRE pattern from an expression.
-func CompilePattern(
+// NewPattern compiles an HRE pattern from an expression.
+func NewPattern(
 	expr string,
 
 	macros map[string]string,
@@ -51,7 +54,9 @@ func CompilePattern(
 	reExpr := expr
 
 	reExpr = expandMacros(reExpr, macros)
-	reExpr = expandVars(reExpr, vars)
+	// reExpr = expandGroups(reExpr)
+
+	reExpr, usedVars := expandVars(reExpr, vars)
 
 	reExpr, negExpr, err := expandLookaround(reExpr)
 	if err != nil {
@@ -64,7 +69,7 @@ func CompilePattern(
 	re := regexp.MustCompile(reExpr)
 	neg := regexp.MustCompile(negExpr)
 
-	p := &Pattern{expr, re, neg}
+	p := &Pattern{expr, re, neg, usedVars}
 	return p, nil
 }
 
@@ -86,7 +91,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 		// p.re looks like (edge)(look)abc(look)(edge).
 		// Hold only non-zero-width matches.
-		if len(m) != 10 {
+		if len(m) < 10 {
 			panic(fmt.Errorf("unexpected submatches: %v", m))
 		}
 
@@ -107,7 +112,12 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 		// If no negative match, this match is successful.
 		if len(negM) == 0 {
-			matches = append(matches, []int{start, stop})
+			match := []int{start, stop}
+
+			// Keep content ()...
+			match = append(match, m[6:len(m)-4]...)
+
+			matches = append(matches, match)
 		}
 
 		// Shift the cursor.
