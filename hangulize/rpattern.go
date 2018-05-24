@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"fmt"
+	"strings"
 )
 
 // RPattern is used for dynamic replacement.  "R" of RPattern means
@@ -18,8 +19,8 @@ type RPattern struct {
 	parts []rPart
 }
 
-func (p *RPattern) String() string {
-	return fmt.Sprintf(`"%s"`, p.expr)
+func (rp *RPattern) String() string {
+	return fmt.Sprintf(`"%s"`, rp.expr)
 }
 
 // -----------------------------------------------------------------------------
@@ -79,4 +80,37 @@ func NewRPattern(expr string,
 	}
 
 	return &RPattern{expr, parts}
+}
+
+// -----------------------------------------------------------------------------
+
+// Interpolate determines the final replacement based on the matched Pattern.
+func (rp *RPattern) Interpolate(p *Pattern, word string, m []int) string {
+	var buf strings.Builder
+	varIndex := 0
+
+	for _, part := range rp.parts {
+		switch part.tok {
+
+		case plain:
+			// just plain text
+			buf.WriteString(part.lit)
+
+		case toVar:
+			// var-to-var: <var> in Pattern to <var> in RPattern.
+			fromVar := p.usedVars[varIndex]
+			fromVal := captured(word, m, varIndex+1)
+
+			// Find index of the matched character in the var.
+			i := indexOf(fromVal, fromVar)
+
+			// Choose a replacement character at the same index.
+			toVal := part.usedVar[i]
+
+			buf.WriteString(toVal)
+			varIndex++
+		}
+	}
+
+	return buf.String()
 }

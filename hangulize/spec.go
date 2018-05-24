@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/sublee/hangulize2/hgl"
+	"../hgl"
 )
 
 // Spec represents a transactiption specification for a language.
