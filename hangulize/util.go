@@ -12,13 +12,13 @@ var (
 	reWhitespace = regexp.MustCompile(`(^|[^\\])\s+`)
 )
 
-// regex compiles a verbose regular expression.
+// re compiles a verbose regular expression.
 //
 // The expression can be indented and described by comments.  Every comment
 // lines and whitespace except escaped "\ " will be removed before compiling.
 //
 // Example:
-//  var reEmail = regex(`
+//  var reEmail = re(`
 //  --- start of string
 //      ^
 //  --- user
@@ -37,7 +37,7 @@ var (
 //      $
 //  `)
 //
-func regex(verboseExpr string) *regexp.Regexp {
+func re(verboseExpr string) *regexp.Regexp {
 	expr := reComment.ReplaceAllString(verboseExpr, ``)
 
 	// Remove all whitespace except "\ ".

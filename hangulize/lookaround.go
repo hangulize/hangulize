@@ -7,14 +7,14 @@ import (
 
 var (
 	// ^^
-	reLeftEdge = regex(`\^+`)
+	reLeftEdge = re(`\^+`)
 
 	// $$
-	reRightEdge = regex(`\$+`)
+	reRightEdge = re(`\$+`)
 
 	// {...}
 	//  └─┴─ (1)
-	reZeroWidth = regex(`
+	reZeroWidth = re(`
 	--- open brace
 		\{
 
@@ -28,7 +28,7 @@ var (
 	// ^^{...}
 	// ││ └─┴─ (2)
 	// └┴─ (1)
-	reLookbehind = regex(`
+	reLookbehind = re(`
 	--- start of string
 		^
 
@@ -46,7 +46,7 @@ var (
 	// {...}$$
 	//  │ │ └┴─ (2)
 	//  └─┴─ (1)
-	reLookahead = regex(`
+	reLookahead = re(`
 	--- zero-width
 		(?:
 			\{
