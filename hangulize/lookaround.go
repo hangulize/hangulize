@@ -39,7 +39,9 @@ var (
 
 	# zero-width
 		(?:
-			\{ ( [^}]* ) \}
+			\{
+			( [^}]* )
+			\}
 		)?
 	`)
 
@@ -49,7 +51,9 @@ var (
 	reLookahead = regex(`
 	# zero-width
 		(?:
-			\{ ( [^}]* ) \}
+			\{
+			( [^}]* )
+			\}
 		)?
 
 	# right-edge
