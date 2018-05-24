@@ -6,20 +6,21 @@ import (
 )
 
 // <...>
-// └───┴─ (0)
-var reVar = regex(`<.+?>`)
+//  └─┴─ (1)
+var reVar = regex(`<(.+?)>`)
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(expr string, vars map[string][]string) string {
-	return reVar.ReplaceAllStringFunc(expr, func(matched string) string {
+	return reVar.ReplaceAllStringFunc(expr, func(varExpr string) string {
 		// Retrieve variable name and values.
-		name, vals := getVar(matched, vars)
+		name, vals := getVar(varExpr, vars)
 
-		// Build as RegExp like /(a|b|c)/
+		// Build as RegExp like /(a|b|c)/.
 		escapedVals := make([]string, len(vals))
 		for i, val := range vals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
+
 		// return `(?P<` + name + `>` + strings.Join(escapedVals, `|`) + `)`
 		_ = name
 		return `(?:` + strings.Join(escapedVals, `|`) + `)`
