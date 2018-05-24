@@ -5,13 +5,8 @@ import (
 	"strings"
 )
 
-var (
-	reVar *regexp.Regexp
-)
-
-func init() {
-	reVar = regexp.MustCompile(`<.+?>`)
-}
+// match: [start, stop]
+var reVar = regexp.MustCompile(`<.+?>`)
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(expr string, vars map[string][]string) string {
