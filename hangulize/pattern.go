@@ -86,6 +86,10 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 		// p.re looks like (edge)(look)abc(look)(edge).
 		// Hold only non-zero-width matches.
+		if len(m) != 10 {
+			panic(fmt.Errorf("unexpected submatches: %v", m))
+		}
+
 		start := m[5]
 		if start == -1 {
 			start = m[0]
