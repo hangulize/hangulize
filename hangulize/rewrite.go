@@ -7,6 +7,54 @@ import (
 	"github.com/sublee/hangulize2/hgl"
 )
 
+// Rewriter is a container of sequential rewriting rules.
+type Rewriter struct {
+	rules []Rule
+}
+
+// NewRewriter creates a Rewriter from HGL pairs which are read from a spec.
+func NewRewriter(
+	pairs []hgl.Pair,
+
+	macros map[string]string,
+	vars map[string][]string,
+
+) (*Rewriter, error) {
+
+	rules := make([]Rule, len(pairs))
+
+	for i, pair := range pairs {
+		from, err := NewPattern(pair.Left(), macros, vars)
+		if err != nil {
+			return nil, err
+		}
+
+		right := pair.Right()
+		to := make([]*RPattern, len(right))
+
+		for j, expr := range right {
+			p, err := NewRPattern(expr, macros, vars)
+			if err != nil {
+				return nil, err
+			}
+			to[j] = p
+		}
+
+		rules[i] = Rule{from, to}
+	}
+
+	return &Rewriter{rules}, nil
+}
+
+// Rewrite performs rewriting for every rules sequentially.  Each rewriting
+// result will be the input for the next rewriting rule.
+func (r *Rewriter) Rewrite(word string, ch chan<- Trace) string {
+	for _, rule := range r.rules {
+		word = rule.Rewrite(word, ch)
+	}
+	return word
+}
+
 // Rule represents a rewriting rule.  It describes how a word should be
 // rewritten.
 type Rule struct {
@@ -15,11 +63,7 @@ type Rule struct {
 }
 
 // Rewrite rewrites a word for a rule.
-func (r *Rule) Rewrite(word string) string {
-	return r._Rewrite(word, nil)
-}
-
-func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
+func (r *Rule) Rewrite(word string, ch chan<- Trace) string {
 	orig := word
 
 	var buf strings.Builder
@@ -75,56 +119,4 @@ func Interpolate(left *Pattern, right *RPattern, word string, m []int) string {
 	}
 
 	return buf.String()
-}
-
-// Rewriter is a container of sequential rewriting rules.
-type Rewriter struct {
-	rules []Rule
-}
-
-// NewRewriter creates a Rewriter from HGL pairs which are read from a spec.
-func NewRewriter(
-	pairs []hgl.Pair,
-
-	macros map[string]string,
-	vars map[string][]string,
-
-) (*Rewriter, error) {
-
-	rules := make([]Rule, len(pairs))
-
-	for i, pair := range pairs {
-		from, err := NewPattern(pair.Left(), macros, vars)
-		if err != nil {
-			return nil, err
-		}
-
-		right := pair.Right()
-		to := make([]*RPattern, len(right))
-
-		for j, expr := range right {
-			p, err := NewRPattern(expr, macros, vars)
-			if err != nil {
-				return nil, err
-			}
-			to[j] = p
-		}
-
-		rules[i] = Rule{from, to}
-	}
-
-	return &Rewriter{rules}, nil
-}
-
-// Rewrite performs rewriting for every rules sequentially.  Each rewriting
-// result will be the input for the next rewriting rule.
-func (r *Rewriter) Rewrite(word string) string {
-	return r._Rewrite(word, nil)
-}
-
-func (r *Rewriter) _Rewrite(word string, ch chan<- Trace) string {
-	for _, rule := range r.rules {
-		word = rule._Rewrite(word, ch)
-	}
-	return word
 }
