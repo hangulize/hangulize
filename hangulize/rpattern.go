@@ -20,12 +20,26 @@ func (p *RPattern) String() string {
 	return fmt.Sprintf(`"%s"`, p.expr)
 }
 
+type rpToken int
+
+const (
+	plain rpToken = iota
+	toVar
+	edge
+)
+
 func CompileRPattern(expr string,
 
 	macros map[string]string,
 	vars map[string][]string,
 
 ) (*RPattern, error) {
+	// TODO(sublee): RPattern should understand "ab<cd>e" as:
+	//
+	// - "ab" (normal)
+	// - "<cd>" (i: 0, var: cd, vals: c, d)
+	// - "e" (norhldkq3al)
+	//
 
 	_expr := expr
 

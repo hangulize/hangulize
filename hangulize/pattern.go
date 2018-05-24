@@ -50,27 +50,14 @@ func CompilePattern(
 
 	reExpr := expr
 
-	// macros
 	reExpr = expandMacros(reExpr, macros)
-
-	// vars
 	reExpr = expandVars(reExpr, vars)
 
-	// lookaround
-	reExpr, negExpr := expandLookbehind(reExpr)
-	reExpr, negExpr = expandLookahead(reExpr, negExpr)
-
-	err := mustNoZeroWidth(reExpr)
+	reExpr, negExpr, err := expandLookaround(reExpr)
 	if err != nil {
 		return nil, err
 	}
 
-	if negExpr == `` {
-		// This regexp has a paradox.  So it never matches with any text.
-		negExpr = `$^`
-	}
-
-	// edges
 	reExpr = expandEdges(reExpr)
 
 	// Compile regexp.
@@ -79,147 +66,6 @@ func CompilePattern(
 
 	p := &Pattern{expr, re, neg}
 	return p, nil
-}
-
-// expandMacros replaces macro sources to corresponding targets.
-// It must be evaluated at the first in CompilePattern.
-func expandMacros(reExpr string, macros map[string]string) string {
-	args := make([]string, len(macros)*2)
-
-	i := 0
-	for src, dst := range macros {
-		args[i] = src
-		i++
-		args[i] = dst
-		i++
-	}
-
-	replacer := strings.NewReplacer(args...)
-	return replacer.Replace(reExpr)
-}
-
-// expandVars replaces <var> to corresponding content regexp such as (a|b|c).
-func expandVars(reExpr string, vars map[string][]string) string {
-	return reVar.ReplaceAllStringFunc(reExpr, func(matched string) string {
-		// Retrieve variable name and values.
-		name, vals := getVar(matched, vars)
-
-		// Build as RegExp like /(a|b|c)/
-		escapedVals := make([]string, len(vals))
-		for i, val := range vals {
-			escapedVals[i] = regexp.QuoteMeta(val)
-		}
-		// return `(?P<` + name + `>` + strings.Join(escapedVals, `|`) + `)`
-		_ = name
-		return `(?:` + strings.Join(escapedVals, `|`) + `)`
-	})
-}
-
-// Lookbehind: {...} on the left-side.
-func expandLookbehind(reExpr string) (string, string) {
-	// ^{han}gul
-	// │  │   └─ other
-	// │  └─ look
-	// └─ edge
-
-	posExpr := reExpr
-	negExpr := ``
-
-	// This pattern always matches.
-	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
-	m := reLookbehind.FindStringSubmatchIndex(posExpr)
-
-	edgeExpr := safeSlice(posExpr, m[2], m[3])
-	lookExpr := safeSlice(posExpr, m[4], m[5])
-	otherExpr := posExpr[m[1]:]
-
-	if strings.HasPrefix(lookExpr, `~`) {
-		// negative lookbehind
-		negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
-
-		lookExpr = `.*` // require greedy matching
-	}
-
-	// Replace lookbehind with 2 parentheses:
-	//  (^)(han)gul
-	posExpr = fmt.Sprintf(`(%s)(%s)%s`, edgeExpr, lookExpr, otherExpr)
-
-	return posExpr, negExpr
-}
-
-// Lookahead: {...} on the right-side.
-// negExpr should be passed from expandLookbehind.
-func expandLookahead(reExpr string, negExpr string) (string, string) {
-	// han{gul}$
-	//  │   │  └─ edge
-	//  │   └─ look
-	//  └─ other
-
-	posExpr := reExpr
-
-	// This pattern always matches:
-	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
-	m := reLookahead.FindStringSubmatchIndex(posExpr)
-
-	otherExpr := posExpr[:m[0]]
-	lookExpr := safeSlice(posExpr, m[2], m[3])
-	edgeExpr := safeSlice(posExpr, m[4], m[5])
-
-	// Lookahead can be remaining in the negative regexp
-	// the lookbehind determined.
-	if negExpr != `` {
-		lookaheadLen := len(posExpr) - m[0]
-		negExpr = negExpr[:len(negExpr)-lookaheadLen]
-	}
-
-	if strings.HasPrefix(lookExpr, `~`) {
-		// negative lookahead
-		if negExpr != `` {
-			negExpr += `|`
-		}
-		negExpr += fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
-
-		lookExpr = `.*` // require greedy matching
-	}
-
-	// Replace lookahead with 2 parentheses:
-	//  han(gul)($)
-	posExpr = fmt.Sprintf(`%s(%s)(%s)`, otherExpr, lookExpr, edgeExpr)
-
-	return posExpr, negExpr
-}
-
-func mustNoZeroWidth(reExpr string) error {
-	if reZeroWidth.MatchString(reExpr) {
-		return fmt.Errorf("zero-width group found in middle: %#v", reExpr)
-	}
-	return nil
-}
-
-func expandEdges(reExpr string) string {
-	reExpr = reLeftEdge.ReplaceAllStringFunc(reExpr, func(e string) string {
-		switch e {
-		case ``:
-			return ``
-		case `^`:
-			return `(?:^|\s+)`
-		default:
-			// ^^...
-			return `^`
-		}
-	})
-	reExpr = reRightEdge.ReplaceAllStringFunc(reExpr, func(e string) string {
-		switch e {
-		case ``:
-			return ``
-		case `$`:
-			return `(?:$|\s+)`
-		default:
-			// $$...
-			return `$`
-		}
-	})
-	return reExpr
 }
 
 // Find searches up to n matches in the word.
