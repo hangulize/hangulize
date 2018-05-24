@@ -3,7 +3,6 @@ package hangulize
 import (
 	"fmt"
 	"regexp"
-	"strings"
 )
 
 // Pre-compiled regexp patterns to compile HRE patterns.
@@ -36,12 +35,4 @@ func init() {
 
 	reLeftEdge = regexp.MustCompile(leftEdge)
 	reRightEdge = regexp.MustCompile(rightEdge)
-}
-
-func getVar(matched string, vars map[string][]string) (string, []string) {
-	// matched looks like "<var>".
-	name := strings.Trim(matched, `<>`)
-	vals := vars[name]
-
-	return name, vals
 }
