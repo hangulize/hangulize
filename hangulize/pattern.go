@@ -109,7 +109,9 @@ func expandVars(reExpr string, vars map[string][]string) string {
 		for i, val := range vals {
 			escapedVals[i] = regexp.QuoteMeta(val)
 		}
-		return `(?P<` + name + `>` + strings.Join(escapedVals, `|`) + `)`
+		// return `(?P<` + name + `>` + strings.Join(escapedVals, `|`) + `)`
+		_ = name
+		return `(?:` + strings.Join(escapedVals, `|`) + `)`
 	})
 }
 
@@ -125,11 +127,11 @@ func expandLookbehind(reExpr string) (string, string) {
 
 	// This pattern always matches.
 	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
-	loc := reLookbehind.FindStringSubmatchIndex(posExpr)
+	m := reLookbehind.FindStringSubmatchIndex(posExpr)
 
-	edgeExpr := safeSlice(posExpr, loc[2], loc[3])
-	lookExpr := safeSlice(posExpr, loc[4], loc[5])
-	otherExpr := posExpr[loc[1]:]
+	edgeExpr := safeSlice(posExpr, m[2], m[3])
+	lookExpr := safeSlice(posExpr, m[4], m[5])
+	otherExpr := posExpr[m[1]:]
 
 	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookbehind
@@ -157,16 +159,16 @@ func expandLookahead(reExpr string, negExpr string) (string, string) {
 
 	// This pattern always matches:
 	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
-	loc := reLookahead.FindStringSubmatchIndex(posExpr)
+	m := reLookahead.FindStringSubmatchIndex(posExpr)
 
-	otherExpr := posExpr[:loc[0]]
-	lookExpr := safeSlice(posExpr, loc[2], loc[3])
-	edgeExpr := safeSlice(posExpr, loc[4], loc[5])
+	otherExpr := posExpr[:m[0]]
+	lookExpr := safeSlice(posExpr, m[2], m[3])
+	edgeExpr := safeSlice(posExpr, m[4], m[5])
 
 	// Lookahead can be remaining in the negative regexp
 	// the lookbehind determined.
 	if negExpr != `` {
-		lookaheadLen := len(posExpr) - loc[0]
+		lookaheadLen := len(posExpr) - m[0]
 		negExpr = negExpr[:len(negExpr)-lookaheadLen]
 	}
 
@@ -220,43 +222,51 @@ func expandEdges(reExpr string) string {
 	return reExpr
 }
 
-// Match reports whether the pattern matches the given word.
-func (p *Pattern) Match(word string) ([]int, bool) {
+// Find searches up to n matches in the word.
+func (p *Pattern) Find(word string, n int) [][]int {
+	matches := make([][]int, 0)
 	offset := 0
 
-	for {
-		loc := p.re.FindStringSubmatchIndex(word[offset:])
+	for n < 0 || len(matches) < n {
+		// Erase visited characters on the word with "\x00".  Because of
+		// lookaround, the search cursor should be calculated manually.
+		erased := strings.Repeat(".", offset) + word[offset:]
 
-		// Not matched.
-		if len(loc) == 0 {
-			return make([]int, 0), false
+		m := p.re.FindStringSubmatchIndex(erased)
+		if len(m) == 0 {
+			// No more match.
+			break
 		}
 
 		// p.re looks like (edge)(look)abc(look)(edge).
 		// Hold only non-zero-width matches.
-		lookbehindStop := loc[5]
-		if lookbehindStop == -1 {
-			lookbehindStop = loc[0]
+		start := m[5]
+		if start == -1 {
+			start = m[0]
 		}
-		lookaheadStart := loc[len(loc)-4]
-		if lookaheadStart == -1 {
-			lookaheadStart = loc[1]
+		stop := m[len(m)-4]
+		if stop == -1 {
+			stop = m[1]
 		}
-		start := offset + lookbehindStop
-		stop := offset + lookaheadStart
 
 		// Pick matched word.  Call it "highlight".
-		highlight := word[loc[0]:loc[1]]
+		highlight := erased[m[0]:m[1]]
 
 		// Test highlight with p.neg to determine whether skip or not.
-		negLoc := p.neg.FindStringIndex(highlight)
+		negM := p.neg.FindStringSubmatchIndex(highlight)
 
-		// If no negative match, this match has been succeeded.
-		if len(negLoc) == 0 {
-			return []int{start, stop}, true
+		// If no negative match, this match is successful.
+		if len(negM) == 0 {
+			matches = append(matches, []int{start, stop})
 		}
 
 		// Shift the cursor.
-		offset = loc[0] + negLoc[1]
+		if len(negM) == 0 {
+			offset = stop
+		} else {
+			offset = m[0] + negM[1]
+		}
 	}
+
+	return matches
 }

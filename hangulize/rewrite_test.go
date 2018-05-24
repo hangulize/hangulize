@@ -7,7 +7,7 @@ import (
 )
 
 func rewrite(word string, fromExpr string, toExpr string) string {
-	r := Rule{from: compile(fromExpr), to: []string{toExpr}}
+	r := Rule{from: compile(fromExpr), to: rcompile(toExpr)}
 	return r.Rewrite(word)
 }
 
