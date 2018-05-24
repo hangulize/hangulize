@@ -2,8 +2,38 @@ package hangulize
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 )
+
+var (
+	reZeroWidth  *regexp.Regexp
+	reLeftEdge   *regexp.Regexp
+	reRightEdge  *regexp.Regexp
+	reLookbehind *regexp.Regexp
+	reLookahead  *regexp.Regexp
+)
+
+func init() {
+	var (
+		zeroWidth = `\{([^}]*)\}` // {...}
+		leftEdge  = `(\^+)`       // `^`, `^^`, `^^^...`
+		rightEdge = `(\$+)`       // `$`, `$$`, `$$$...`
+
+		// begin of text - optional leftEdge - optional zeroWidth
+		lookbehind = fmt.Sprintf(`^(?:%s)?(?:%s)?`, leftEdge, zeroWidth)
+		// optional zeroWidth - optional rightEdge - end of text
+		lookahead = fmt.Sprintf(`(?:%s)?(?:%s)?$`, zeroWidth, rightEdge)
+	)
+
+	reZeroWidth = regexp.MustCompile(zeroWidth)
+
+	reLeftEdge = regexp.MustCompile(leftEdge)
+	reRightEdge = regexp.MustCompile(rightEdge)
+
+	reLookbehind = regexp.MustCompile(lookbehind)
+	reLookahead = regexp.MustCompile(lookahead)
+}
 
 func expandLookaround(expr string) (string, string, error) {
 	posExpr, negExpr := expandLookbehind(expr)
@@ -101,4 +131,30 @@ func mustNoZeroWidth(expr string) error {
 		return fmt.Errorf("zero-width group found in middle: %#v", expr)
 	}
 	return nil
+}
+
+func expandEdges(expr string) string {
+	expr = reLeftEdge.ReplaceAllStringFunc(expr, func(e string) string {
+		switch e {
+		case ``:
+			return ``
+		case `^`:
+			return `(?:^|\s+)`
+		default:
+			// ^^...
+			return `^`
+		}
+	})
+	expr = reRightEdge.ReplaceAllStringFunc(expr, func(e string) string {
+		switch e {
+		case ``:
+			return ``
+		case `$`:
+			return `(?:$|\s+)`
+		default:
+			// $$...
+			return `$`
+		}
+	})
+	return expr
 }
