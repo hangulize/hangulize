@@ -7,14 +7,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var spec *Spec
-var p *Pattern
+var fixtureSpec *Spec
 
-func init() {
-	var err error
+func ensureFixtureSpec() *Spec {
+	if fixtureSpec != nil {
+		return fixtureSpec
+	}
 
-	// fixture spec
-	spec, err = ParseSpec(strings.NewReader(strings.TrimSpace(`
+	spec, err := ParseSpec(strings.NewReader(strings.TrimSpace(`
 # ------------------------------------------------------------------------------
 
 vars:
@@ -30,17 +30,25 @@ macros:
 	if err != nil {
 		panic(err)
 	}
+
+	fixtureSpec = spec
+	return spec
 }
 
 func fixturePattern(expr string) *Pattern {
+	spec := ensureFixtureSpec()
+
 	p, err := CompilePattern(expr, spec.Macros, spec.Vars)
 	if err != nil {
 		panic(err)
 	}
+
 	return p
 }
 
 func fixtureRPatterns(exprs ...string) []*RPattern {
+	spec := ensureFixtureSpec()
+
 	to := make([]*RPattern, len(exprs))
 
 	for i, expr := range exprs {
