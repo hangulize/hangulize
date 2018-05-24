@@ -3,7 +3,7 @@ package hangulize
 import (
 	"fmt"
 
-	"../hgl"
+	"github.com/sublee/hangulize2/hgl"
 )
 
 // Rewriter is a container of sequential rewriting rules.
