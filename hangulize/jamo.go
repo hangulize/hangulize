@@ -9,11 +9,12 @@ import (
 
 const none = rune(0)
 
-func CompleteHangul(jamo string) string {
-	return _CompleteHangul(jamo, nil)
-}
-
-func _CompleteHangul(word string, ch chan<- Trace) string {
+// AssembleJamo makes a complete Hangul word from a decomposed Jamo word.
+//
+// A decomposed Jamo word looks like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ".  A Jaeum
+// after a hyphen becomes a tail (Moeum).
+//
+func AssembleJamo(word string, ch chan<- Trace) string {
 	orig := word
 
 	r := bufio.NewReader(strings.NewReader(word))

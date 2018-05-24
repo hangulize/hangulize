@@ -33,11 +33,7 @@ func NewRewriter(
 		to := make([]*RPattern, len(right))
 
 		for j, expr := range right {
-			p, err := NewRPattern(expr, macros, vars)
-			if err != nil {
-				return nil, err
-			}
-			to[j] = p
+			to[j] = NewRPattern(expr, macros, vars)
 		}
 
 		rules[i] = Rule{from, to}
@@ -54,6 +50,8 @@ func (r *Rewriter) Rewrite(word string, ch chan<- Trace) string {
 	}
 	return word
 }
+
+// -----------------------------------------------------------------------------
 
 // Rule represents a rewriting rule.  It describes how a word should be
 // rewritten.
@@ -92,6 +90,7 @@ func (r *Rule) Rewrite(word string, ch chan<- Trace) string {
 }
 
 // Interpolate determines the final replacement based on Pattern and RPattern.
+// TODO(sublee): Move to Pattern.Replace()
 func Interpolate(left *Pattern, right *RPattern, word string, m []int) string {
 	var buf strings.Builder
 
@@ -105,7 +104,7 @@ func Interpolate(left *Pattern, right *RPattern, word string, m []int) string {
 		case toVar:
 			fromVarVals := left.usedVars[varIndex]
 
-			fromVarVal := captured(word, m, varIndex)
+			fromVarVal := captured(word, m, varIndex+1)
 
 			pos := 0
 			for ; fromVarVals[pos] != fromVarVal; pos++ {

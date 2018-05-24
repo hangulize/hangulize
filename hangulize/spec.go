@@ -22,20 +22,8 @@ type Spec struct {
 	Test []hgl.Pair
 }
 
-// Language identifies a natural language.
-type Language struct {
-	ID      string    // Arbitrary, but identifiable language ID.
-	Codes   [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
-	English string    // The langauge name in English.
-	Korean  string    // The langauge name in Korean.
-	Script  string
-}
-
-// Config keeps some configurations for a transactiption specification.
-type Config struct {
-	Authors []string
-	Stage   string
-	Markers []rune
+func (s *Spec) String() string {
+	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
 }
 
 // ParseSpec parses a Spec from an HGL source.
@@ -135,6 +123,17 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	return &spec, nil
 }
 
+// -----------------------------------------------------------------------------
+
+// Language identifies a natural language.
+type Language struct {
+	ID      string    // Arbitrary, but identifiable language ID.
+	Codes   [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
+	English string    // The langauge name in English.
+	Korean  string    // The langauge name in Korean.
+	Script  string
+}
+
 func newLanguage(dict *hgl.DictSection) (*Language, error) {
 	_codes := dict.All("codes")
 
@@ -154,6 +153,15 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 		Script:  dict.One("script"),
 	}
 	return &lang, nil
+}
+
+// -----------------------------------------------------------------------------
+
+// Config keeps some configurations for a transactiption specification.
+type Config struct {
+	Authors []string
+	Stage   string
+	Markers []rune
 }
 
 func newConfig(dict *hgl.DictSection) (*Config, error) {
@@ -177,6 +185,8 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 	return &config, nil
 }
 
+// -----------------------------------------------------------------------------
+
 func newMacros(dict *hgl.DictSection) (map[string]string, error) {
 	_map := dict.Map()
 	macros := make(map[string]string, len(_map))
@@ -191,8 +201,4 @@ func newMacros(dict *hgl.DictSection) (map[string]string, error) {
 	}
 
 	return macros, nil
-}
-
-func (s *Spec) String() string {
-	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
 }

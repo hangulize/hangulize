@@ -47,6 +47,8 @@ func re(verboseExpr string) *regexp.Regexp {
 	return regexp.MustCompile(expr)
 }
 
+// safeSlice is a safe version of s[start:stop].  When start or stop is
+// invalid, this function returns "" instead of panic().
 func safeSlice(s string, start int, stop int) string {
 	if start < 0 || stop < 0 {
 		return ""
@@ -59,8 +61,8 @@ func safeSlice(s string, start int, stop int) string {
 
 // captured returns the captured substring by their group number.
 func captured(s string, m []int, n int) string {
-	i := (1 + n) * 2
-	return s[m[i]:m[i+1]]
+	i := n * 2
+	return safeSlice(s, m[i], m[i+1])
 }
 
 // noCapture removes capturing groups in a regexp string.
