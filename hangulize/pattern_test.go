@@ -12,6 +12,8 @@ func TestMetaPatterns(t *testing.T) {
 }
 
 func TestMacro(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`@`) // @ means (a|e|i|o|u)
 	assertMatch(t, p, []string{
 		o, "a",
@@ -30,6 +32,8 @@ func TestMacro(t *testing.T) {
 }
 
 func TestVars(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`<abc>`)
 	assertMatch(t, p, []string{
 		o, "a",
@@ -49,7 +53,7 @@ func TestVars(t *testing.T) {
 }
 
 func TestSimple(t *testing.T) {
-	p = fixturePattern(`hello, world`)
+	p := fixturePattern(`hello, world`)
 	assertMatch(t, p, []string{
 		o, "hello, world",
 		"   ^^^^^^^^^^^^",
@@ -60,6 +64,8 @@ func TestSimple(t *testing.T) {
 }
 
 func TestLookbehind(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`{han}gul`)
 	assertMatch(t, p, []string{
 		o, "hangul",
@@ -85,6 +91,8 @@ func TestLookbehind(t *testing.T) {
 }
 
 func TestLookahead(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`han{gul}`)
 	assertMatch(t, p, []string{
 		o, "hangul",
@@ -108,6 +116,8 @@ func TestLookahead(t *testing.T) {
 }
 
 func TestNegativeLookbehind(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`{~han}gul`)
 	assertMatch(t, p, []string{
 		x, "hangul",
@@ -138,6 +148,8 @@ func TestNegativeLookbehind(t *testing.T) {
 }
 
 func TestNegativeLookahead(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`han{~gul}`)
 	assertMatch(t, p, []string{
 		x, "hangul",
@@ -166,7 +178,7 @@ func TestNegativeLookahead(t *testing.T) {
 }
 
 func TestLookaround(t *testing.T) {
-	p = fixturePattern(`{ha}ng{ul}`)
+	p := fixturePattern(`{ha}ng{ul}`)
 	assertMatch(t, p, []string{
 		o, "hangul",
 		o, "hangulize",
@@ -178,7 +190,7 @@ func TestLookaround(t *testing.T) {
 }
 
 func TestNegativeLookaround(t *testing.T) {
-	p = fixturePattern(`{~ha}ng{~ul}`)
+	p := fixturePattern(`{~ha}ng{~ul}`)
 	assertMatch(t, p, []string{
 		x, "hangul",
 		x, "hangulize",
@@ -189,6 +201,8 @@ func TestNegativeLookaround(t *testing.T) {
 }
 
 func TestEdge(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`^foo`)
 	assertMatch(t, p, []string{
 		o, "foo",
@@ -231,6 +245,8 @@ func TestEdge(t *testing.T) {
 }
 
 func TestEdgeInLookaround(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`{^}foo`)
 	assertMatch(t, p, []string{
 		o, "foo",
@@ -273,6 +289,8 @@ func TestEdgeInLookaround(t *testing.T) {
 }
 
 func TestComplexLookaround(t *testing.T) {
+	var p *Pattern
+
 	p = fixturePattern(`{^^a|b}c`)
 	assertMatch(t, p, []string{
 		o, "acxxx",
@@ -288,14 +306,12 @@ func TestComplexLookaround(t *testing.T) {
 }
 
 func TestMalformedPattern(t *testing.T) {
-	var err error
-
-	p, err = CompilePattern(`{a} {b} {c}`, nil, nil)
+	p, err := CompilePattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, ExplainPattern(p))
 }
 
 func TestRegression(t *testing.T) {
-	p = fixturePattern(`;|-`)
+	p := fixturePattern(`;|-`)
 	assertMatch(t, p, []string{
 		o, "калинин,град-",
 	})
