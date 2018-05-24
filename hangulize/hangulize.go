@@ -74,8 +74,8 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 	// TODO(sublee): Language-specific normalizer
 	orig := word
-	word = strings.ToLower(word)
-	trace(ch, word, orig, "to-lower")
+	word = NormalizeRoman(word)
+	trace(ch, word, orig, "roman")
 	return word
 }
 
