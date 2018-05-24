@@ -90,12 +90,17 @@ func expandLookbehind(expr string) (string, string) {
 	negExpr := ``
 
 	// This pattern always matches.
-	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
 	m := reLookbehind.FindStringSubmatchIndex(posExpr)
 
-	edgeExpr := noCapture(safeSlice(posExpr, m[2], m[3]))
-	lookExpr := noCapture(safeSlice(posExpr, m[4], m[5]))
-	otherExpr := posExpr[m[1]:]
+	stop := m[1]
+	otherExpr := posExpr[stop:]
+
+	edgeExpr := captured(posExpr, m, 1)
+	lookExpr := captured(posExpr, m, 2)
+
+	// Don't allow capturing groups in zero-width matches.
+	edgeExpr = noCapture(edgeExpr)
+	lookExpr = noCapture(lookExpr)
 
 	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookbehind
@@ -121,13 +126,18 @@ func expandLookahead(expr string, negExpr string) (string, string) {
 
 	posExpr := expr
 
-	// This pattern always matches:
-	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
+	// This pattern always matches.
 	m := reLookahead.FindStringSubmatchIndex(posExpr)
 
-	otherExpr := posExpr[:m[0]]
-	lookExpr := noCapture(safeSlice(posExpr, m[2], m[3]))
-	edgeExpr := noCapture(safeSlice(posExpr, m[4], m[5]))
+	start := m[0]
+	otherExpr := posExpr[:start]
+
+	edgeExpr := captured(posExpr, m, 2)
+	lookExpr := captured(posExpr, m, 1)
+
+	// Don't allow capturing groups in zero-width matches.
+	edgeExpr = noCapture(edgeExpr)
+	lookExpr = noCapture(lookExpr)
 
 	// Lookahead can be remaining in the negative regexp
 	// the lookbehind determined.

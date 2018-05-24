@@ -22,12 +22,14 @@ func (p *RPattern) String() string {
 	return fmt.Sprintf(`"%s"`, p.expr)
 }
 
+// -----------------------------------------------------------------------------
+
 type rToken int
 
 const (
 	plain rToken = iota
 	toVar
-	edge
+	// edge
 )
 
 type rPart struct {
@@ -38,45 +40,43 @@ type rPart struct {
 	usedVar []string
 }
 
+// -----------------------------------------------------------------------------
+
+// NewRPattern parses the given expression and creates an RPattern.
 func NewRPattern(expr string,
 
 	macros map[string]string,
 	vars map[string][]string,
 
-) (*RPattern, error) {
-	// TODO(sublee): RPattern should understand "ab<cd>e" as:
-	//
-	// - "ab" (normal)
-	// - "<cd>" (i: 0, var: cd, vals: c, d)
-	// - "e" (norhldkq3al)
-	//
+) *RPattern {
 
-	_expr := expr
+	_expr := expandMacros(expr, macros)
 
-	_expr = expandMacros(_expr, macros)
-
+	// Split expr into several parts.
+	// Adjoining 2 parts have different token with each other.
+	offset := 0
 	parts := make([]rPart, 0)
 
-	offset := 0
 	for _, m := range reVar.FindAllStringSubmatchIndex(_expr, -1) {
+		// Keep plain text before var.
 		plainText := _expr[offset:m[0]]
 		if plainText != "" {
 			parts = append(parts, rPart{plain, plainText, nil})
 		}
 
-		varExpr := _expr[m[0]:m[1]]
+		// Keep var and the var values.
+		varExpr := captured(_expr, m, 0)
 		_, vals := getVar(varExpr, vars)
-
 		parts = append(parts, rPart{toVar, varExpr, vals})
 
 		offset = m[1]
 	}
 
+	// Keep remaining plain text.
 	plainText := _expr[offset:]
 	if plainText != "" {
 		parts = append(parts, rPart{plain, plainText, nil})
 	}
 
-	p := &RPattern{expr, parts}
-	return p, nil
+	return &RPattern{expr, parts}
 }

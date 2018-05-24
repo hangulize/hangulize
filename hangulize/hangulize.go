@@ -64,7 +64,7 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	word = h.hangulize(word, ch)
 	// word = h.spec._RemoveMarkers(word, ch)
 
-	word = _CompleteHangul(word, ch)
+	word = AssembleJamo(word, ch)
 	return word
 }
 

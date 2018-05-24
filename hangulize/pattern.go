@@ -33,15 +33,6 @@ func (p *Pattern) String() string {
 	return fmt.Sprintf(`/%s/`, p.expr)
 }
 
-// ExplainPattern shows the HRE expression with
-// the underlying standard regexp patterns.
-func ExplainPattern(p *Pattern) string {
-	if p == nil {
-		return fmt.Sprintf("%#v", nil)
-	}
-	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
-}
-
 // NewPattern compiles an HRE pattern from an expression.
 func NewPattern(
 	expr string,
@@ -72,6 +63,17 @@ func NewPattern(
 	p := &Pattern{expr, re, neg, usedVars}
 	return p, nil
 }
+
+// ExplainPattern shows the HRE expression with
+// the underlying standard regexp patterns.
+func ExplainPattern(p *Pattern) string {
+	if p == nil {
+		return fmt.Sprintf("%#v", nil)
+	}
+	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
+}
+
+// -----------------------------------------------------------------------------
 
 // Find searches up to n matches in the word.
 func (p *Pattern) Find(word string, n int) [][]int {

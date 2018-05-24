@@ -33,8 +33,9 @@ func expandVars(expr string, vars map[string][]string) (string, [][]string) {
 	return expr, usedVars
 }
 
+// getVar parses a var expression, which looks like "<var>",
+// and returns the var name and values.
 func getVar(expr string, vars map[string][]string) (string, []string) {
-	// expr is the matched string.  It looks like "<var>".
 	name := strings.Trim(expr, `<>`)
 	vals := vars[name]
 
