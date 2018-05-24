@@ -15,13 +15,13 @@ var (
 	// {...}
 	//  └─┴─ (1)
 	reZeroWidth = regex(`
-	# open brace
+	--- open brace
 		\{
 
-	# inside of brace
+	--- inside of brace
 		( [^}]* )
 
-	# close brace
+	--- close brace
 		\}
 	`)
 
@@ -29,13 +29,13 @@ var (
 	// ││ └─┴─ (2)
 	// └┴─ (1)
 	reLookbehind = regex(`
-	# start of string
+	--- start of string
 		^
 
-	# left-edge
+	--- left-edge
 		( \^* )
 
-	# zero-width
+	--- zero-width
 		(?:
 			\{
 			( [^}]* )
@@ -47,17 +47,17 @@ var (
 	//  │ │ └┴─ (2)
 	//  └─┴─ (1)
 	reLookahead = regex(`
-	# zero-width
+	--- zero-width
 		(?:
 			\{
 			( [^}]* )
 			\}
 		)?
 
-	# right-edge
+	--- right-edge
 		( \$* )
 
-	# end of string
+	--- end of string
 		$
 	`)
 )

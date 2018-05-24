@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	// Match with a line starting with "#".
-	reComment = regexp.MustCompile(`#.*`)
+	// Match with a line starting with "---".
+	reComment = regexp.MustCompile(`---.*`)
 
 	// Match with a character or start of string before a whitespace.
 	reWhitespace = regexp.MustCompile(`(^|[^\\])\s+`)
