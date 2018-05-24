@@ -14,6 +14,28 @@ Post by Brian: http://iceager.egloos.com/2610028
 */
 package hangulize
 
+import (
+	"strings"
+)
+
+// Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
+//
+//    Hangulize("ita", "gloria")
+//    // Output: "글로리아"
+//
+func Hangulize(lang string, word string) string {
+	spec, ok := LoadSpec(lang)
+	if !ok {
+		// spec not found
+		return word
+	}
+
+	h := NewHangulizer(spec)
+	return h.Hangulize(word)
+}
+
+// -----------------------------------------------------------------------------
+
 // Hangulizer ...
 type Hangulizer struct {
 	spec *Spec
@@ -37,26 +59,29 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	}
 	trace(ch, word, "", "input")
 
-	word = h.spec._Normalize(word, ch)
-	word = h.spec._Rewrite(word, ch)
-	word = h.spec._Hangulize(word, ch)
-	word = _CompleteHangul(word, ch)
+	word = h.normalize(word, ch)
+	word = h.rewrite(word, ch)
+	word = h.hangulize(word, ch)
+	// word = h.spec._RemoveMarkers(word, ch)
 
+	word = _CompleteHangul(word, ch)
 	return word
 }
 
-// Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
-//
-//    Hangulize("ita", "gloria")
-//    // Output: "글로리아"
-//
-func Hangulize(lang string, word string) string {
-	spec, ok := LoadSpec(lang)
-	if !ok {
-		// spec not found
-		return word
-	}
+// -----------------------------------------------------------------------------
 
-	h := NewHangulizer(spec)
-	return h.Hangulize(word)
+func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
+	// TODO(sublee): Language-specific normalizer
+	orig := word
+	word = strings.ToLower(word)
+	trace(ch, word, orig, "to-lower")
+	return word
+}
+
+func (h *Hangulizer) rewrite(word string, ch chan<- Trace) string {
+	return h.spec.rewrite.Rewrite(word, ch)
+}
+
+func (h *Hangulizer) hangulize(word string, ch chan<- Trace) string {
+	return h.spec.hangulize.Rewrite(word, ch)
 }

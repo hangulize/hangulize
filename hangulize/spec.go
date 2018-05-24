@@ -3,7 +3,6 @@ package hangulize
 import (
 	"fmt"
 	"io"
-	"strings"
 
 	"github.com/pkg/errors"
 
@@ -196,32 +195,4 @@ func newMacros(dict *hgl.DictSection) (map[string]string, error) {
 
 func (s *Spec) String() string {
 	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
-}
-
-func (s *Spec) Normalize(word string) string {
-	return s._Normalize(word, nil)
-}
-
-func (s *Spec) Rewrite(word string) string {
-	return s._Rewrite(word, nil)
-}
-
-func (s *Spec) Hangulize(word string) string {
-	return s._Hangulize(word, nil)
-}
-
-func (s *Spec) _Normalize(word string, ch chan<- Trace) string {
-	// TODO(sublee): Language-specific normalizer
-	orig := word
-	word = strings.ToLower(word)
-	trace(ch, word, orig, "to-lower")
-	return word
-}
-
-func (s *Spec) _Rewrite(word string, ch chan<- Trace) string {
-	return s.rewrite._Rewrite(word, ch)
-}
-
-func (s *Spec) _Hangulize(word string, ch chan<- Trace) string {
-	return s.hangulize._Rewrite(word, ch)
 }

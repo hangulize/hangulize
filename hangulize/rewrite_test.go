@@ -8,7 +8,7 @@ import (
 
 func rewrite(word string, fromExpr string, toExpr string) string {
 	r := Rule{from: fixturePattern(fromExpr), to: fixtureRPatterns(toExpr)}
-	return r.Rewrite(word)
+	return r.Rewrite(word, nil)
 }
 
 func TestVarToVar(t *testing.T) {
