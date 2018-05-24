@@ -7,11 +7,9 @@ import (
 
 var (
 	// ^^
-	// └┴─ (1)
 	reLeftEdge = regex(`\^+`)
 
 	// $$
-	// └┴─ (1)
 	reRightEdge = regex(`\$+`)
 
 	// {...}
