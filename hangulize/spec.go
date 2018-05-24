@@ -14,8 +14,9 @@ type Spec struct {
 	Lang   Language
 	Config Config
 
-	Macros    map[string]string
-	Vars      map[string][]string
+	macros map[string]string
+	vars   map[string][]string
+
 	rewrite   *Rewriter
 	hangulize *Rewriter
 

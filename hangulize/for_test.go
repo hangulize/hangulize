@@ -31,7 +31,7 @@ macros:
 }
 
 func fixturePattern(expr string) *Pattern {
-	p, err := NewPattern(expr, fxtSpec.Macros, fxtSpec.Vars)
+	p, err := NewPattern(expr, fxtSpec.macros, fxtSpec.vars)
 	if err != nil {
 		panic(err)
 	}
@@ -43,7 +43,7 @@ func fixtureRPatterns(exprs ...string) []*RPattern {
 	to := make([]*RPattern, len(exprs))
 
 	for i, expr := range exprs {
-		to[i] = NewRPattern(expr, fxtSpec.Macros, fxtSpec.Vars)
+		to[i] = NewRPattern(expr, fxtSpec.macros, fxtSpec.vars)
 	}
 
 	return to
