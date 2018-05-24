@@ -2,9 +2,8 @@ package hangulize
 
 import (
 	"fmt"
-	"strings"
 
-	"github.com/sublee/hangulize2/hgl"
+	"../hgl"
 )
 
 // Rewriter is a container of sequential rewriting rules.
@@ -63,59 +62,7 @@ type Rule struct {
 // Rewrite rewrites a word for a rule.
 func (r *Rule) Rewrite(word string, ch chan<- Trace) string {
 	orig := word
-
-	var buf strings.Builder
-	offset := 0
-
-	for _, m := range r.from.Find(word, -1) {
-		start, stop := m[0], m[1]
-		trace(ch, orig, "", fmt.Sprintf("%v", m))
-
-		buf.WriteString(word[offset:start])
-
-		// TODO(sublee): Support multiple targets.
-		to := r.to[0]
-
-		// Write replacement instead of the match.
-		buf.WriteString(Interpolate(r.from, to, word, m))
-
-		offset = stop
-	}
-
-	buf.WriteString(word[offset:])
-
-	word = buf.String()
+	word = r.from.Replace(word, r.to, -1)[0]
 	trace(ch, word, orig, fmt.Sprintf("%s->%s", r.from, r.to[0]))
 	return word
-}
-
-// Interpolate determines the final replacement based on Pattern and RPattern.
-// TODO(sublee): Move to Pattern.Replace()
-func Interpolate(left *Pattern, right *RPattern, word string, m []int) string {
-	var buf strings.Builder
-
-	varIndex := 0
-
-	for _, part := range right.parts {
-		switch part.tok {
-		case plain:
-			buf.WriteString(part.lit)
-			break
-		case toVar:
-			fromVarVals := left.usedVars[varIndex]
-
-			fromVarVal := captured(word, m, varIndex+1)
-
-			pos := 0
-			for ; fromVarVals[pos] != fromVarVal; pos++ {
-			}
-
-			buf.WriteString(part.usedVar[pos])
-
-			varIndex++
-			break
-		}
-	}
-
-	return buf.String()
 }

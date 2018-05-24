@@ -132,3 +132,30 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 	return matches
 }
+
+// -----------------------------------------------------------------------------
+
+// Replace searches up to n matches in the word and replaces them with the
+// RPattern list.
+func (p *Pattern) Replace(word string, rpatterns []*RPattern, n int) []string {
+	var buf strings.Builder
+	offset := 0
+
+	for _, m := range p.Find(word, n) {
+		start, stop := m[0], m[1]
+
+		buf.WriteString(word[offset:start])
+
+		// TODO(sublee): Support multiple targets.
+		rp := rpatterns[0]
+
+		// Write replacement instead of the match.
+		buf.WriteString(rp.Interpolate(p, word, m))
+
+		offset = stop
+	}
+
+	buf.WriteString(word[offset:])
+
+	return []string{buf.String()}
+}
