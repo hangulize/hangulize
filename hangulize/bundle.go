@@ -8,17 +8,13 @@ import (
 	"github.com/pkg/errors"
 )
 
-// cached specs
-var specs map[string]*Spec
-
-var bundle packr.Box
-
 const ext = `.hgl`
 
-func init() {
-	specs = make(map[string]*Spec)
+// cached specs
+var (
+	specs  = make(map[string]*Spec)
 	bundle = packr.NewBox("./bundle")
-}
+)
 
 // LoadSpec finds a bundled spec by the given language name.
 // Once it loads a spec, it will cache the spec.
