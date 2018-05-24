@@ -39,6 +39,29 @@ func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
 		offset = stop
 	}
 
+	buf.WriteString(word[offset:])
+
+	// 	for {
+	// 		loc, ok := r.from.Match(word[offset:])
+	// 		if !ok {
+	// 			buf.WriteString(word[offset:])
+	// 			break
+	// 		}
+
+	// 		start := loc[0] + offset
+	// 		stop := loc[1] + offset
+
+	// 		buf.WriteString(word[offset:start])
+
+	// 		// TODO(sublee): Support multiple targets.
+	// 		repl := r.to[0]
+
+	// 		// Write replacement instead of the match.
+	// 		buf.WriteString(repl)
+
+	// 		offset = stop
+	// 	}
+
 	word = buf.String()
 	trace(ch, word, orig, fmt.Sprintf("%s->%#v", r.from, r.to[0]))
 	return word
