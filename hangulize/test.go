@@ -12,6 +12,8 @@ var p *Pattern
 
 func init() {
 	var err error
+
+	// fixture spec
 	spec, err = ParseSpec(strings.NewReader(strings.TrimSpace(`
 # ------------------------------------------------------------------------------
 
@@ -30,7 +32,7 @@ macros:
 	}
 }
 
-func compile(expr string) *Pattern {
+func fixturePattern(expr string) *Pattern {
 	p, err := CompilePattern(expr, spec.Macros, spec.Vars)
 	if err != nil {
 		panic(err)
@@ -38,7 +40,7 @@ func compile(expr string) *Pattern {
 	return p
 }
 
-func rcompile(exprs ...string) []*RPattern {
+func fixtureRPatterns(exprs ...string) []*RPattern {
 	to := make([]*RPattern, len(exprs))
 
 	for i, expr := range exprs {
@@ -57,7 +59,7 @@ const x = ""
 
 // assertMatch is a helper to test a pattern with multiple examples:
 //
-//  p := compile(`foo`)
+//  p := fixturePattern(`foo`)
 //  assertMatch(t, p, []string{
 //    o, "foo",
 //    "   ^^^",
