@@ -11,7 +11,7 @@ import (
 // rewritten.
 type Rule struct {
 	from *Pattern
-	to   []string
+	to   []*RPattern
 }
 
 // Rewrite rewrites a word for a rule.
@@ -25,15 +25,8 @@ func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
 	var buf strings.Builder
 	offset := 0
 
-	for {
-		loc, ok := r.from.Match(word[offset:])
-		if !ok {
-			buf.WriteString(word[offset:])
-			break
-		}
-
-		start := loc[0] + offset
-		stop := loc[1] + offset
+	for _, m := range r.from.Find(word, -1) {
+		start, stop := m[0], m[1]
 
 		buf.WriteString(word[offset:start])
 
@@ -41,7 +34,7 @@ func (r *Rule) _Rewrite(word string, ch chan<- Trace) string {
 		repl := r.to[0]
 
 		// Write replacement instead of the match.
-		buf.WriteString(repl)
+		buf.WriteString(repl.expr)
 
 		offset = stop
 	}
@@ -68,15 +61,23 @@ func NewRewriter(
 	rules := make([]Rule, len(pairs))
 
 	for i, pair := range pairs {
-		p, err := CompilePattern(pair.Left(), macros, vars)
+		from, err := CompilePattern(pair.Left(), macros, vars)
 		if err != nil {
 			return nil, err
 		}
 
-		rules[i] = Rule{
-			from: p,
-			to:   pair.Right(),
+		right := pair.Right()
+		to := make([]*RPattern, len(right))
+
+		for j, expr := range right {
+			p, err := CompileRPattern(expr, macros, vars)
+			if err != nil {
+				return nil, err
+			}
+			to[j] = p
 		}
+
+		rules[i] = Rule{from, to}
 	}
 
 	return &Rewriter{rules}, nil

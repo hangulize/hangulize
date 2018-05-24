@@ -38,6 +38,20 @@ func compile(expr string) *Pattern {
 	return p
 }
 
+func rcompile(exprs ...string) []*RPattern {
+	to := make([]*RPattern, len(exprs))
+
+	for i, expr := range exprs {
+		p, err := CompileRPattern(expr, spec.Macros, spec.Vars)
+		if err != nil {
+			panic(err)
+		}
+		to[i] = p
+	}
+
+	return to
+}
+
 const o = "MUST_MATCH"
 const x = ""
 
@@ -62,7 +76,13 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		word := scenario[i+1]
 		i += 2
 
-		matched, ok := p.Match(word)
+		matches := p.Find(word, 1)
+		ok := len(matches) != 0
+
+		m := []int{0, 0}
+		if ok {
+			m = matches[0]
+		}
 
 		if !mustMatch {
 			if !ok {
@@ -75,7 +95,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 				"           %s\n"+
 				"%s",
 				word,
-				drawUnderline(matched[0], matched[1]),
+				drawUnderline(m[0], m[1]),
 				ExplainPattern(p))
 			continue
 		}
@@ -101,7 +121,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			panic("underline length must be len(word)+3")
 		}
 
-		if len(matched) == 0 {
+		if len(m) == 0 {
 			// Skip underline test because not matched.
 			continue
 		}
@@ -110,7 +130,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 		stop := strings.LastIndex(underline, "^") + 1 - 3
 
 		expected := safeSlice(word, start, stop)
-		got := word[matched[0]:matched[1]]
+		got := word[m[0]:m[1]]
 
 		assert.Equalf(t, expected, got, ""+
 			"expected: \"%s\"\n"+
@@ -119,7 +139,7 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			"           %s\n"+
 			"%s",
 			word, underline[3:],
-			word, drawUnderline(matched[0], matched[1]),
+			word, drawUnderline(m[0], m[1]),
 			ExplainPattern(p))
 	}
 }
