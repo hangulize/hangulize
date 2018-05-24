@@ -62,9 +62,10 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	word = h.normalize(word, ch)
 	word = h.rewrite(word, ch)
 	word = h.hangulize(word, ch)
-	// word = h.spec._RemoveMarkers(word, ch)
 
+	word = h.removeMarkers(word, ch)
 	word = AssembleJamo(word, ch)
+
 	return word
 }
 
@@ -84,4 +85,16 @@ func (h *Hangulizer) rewrite(word string, ch chan<- Trace) string {
 
 func (h *Hangulizer) hangulize(word string, ch chan<- Trace) string {
 	return h.spec.hangulize.Rewrite(word, ch)
+}
+
+func (h *Hangulizer) removeMarkers(word string, ch chan<- Trace) string {
+	orig := word
+
+	markers := h.spec.Config.Markers
+	for _, marker := range markers {
+		word = strings.Replace(word, string(marker), "", -1)
+	}
+
+	trace(ch, word, orig, "remove-markers")
+	return word
 }

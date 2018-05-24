@@ -16,6 +16,6 @@ func expandMacros(expr string, macros map[string]string) string {
 		i++
 	}
 
-	replacer := strings.NewReplacer(args...)
-	return replacer.Replace(expr)
+	rep := strings.NewReplacer(args...)
+	return rep.Replace(expr)
 }
