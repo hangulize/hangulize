@@ -11,3 +11,11 @@ func TestSlash(t *testing.T) {
 	// The result was "글로르이아" without the slash.
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
 }
+
+func TestLowerEnUpperJay(t *testing.T) {
+	p := fixturePattern(`n{@|J}`)
+	assertMatch(t, p, []string{
+		o, "inJazio",
+		"    ^     ",
+	})
+}

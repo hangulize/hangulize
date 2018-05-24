@@ -14,21 +14,31 @@ import (
 //
 type RPattern struct {
 	expr string
+
+	parts []rPart
 }
 
 func (p *RPattern) String() string {
 	return fmt.Sprintf(`"%s"`, p.expr)
 }
 
-type rpToken int
+type rToken int
 
 const (
-	plain rpToken = iota
+	plain rToken = iota
 	toVar
 	edge
 )
 
-func CompileRPattern(expr string,
+type rPart struct {
+	tok rToken
+	lit string
+
+	// References to the var.
+	usedVar []string
+}
+
+func NewRPattern(expr string,
 
 	macros map[string]string,
 	vars map[string][]string,
@@ -45,10 +55,28 @@ func CompileRPattern(expr string,
 
 	_expr = expandMacros(_expr, macros)
 
+	parts := make([]rPart, 0)
+
+	offset := 0
 	for _, m := range reVar.FindAllStringSubmatchIndex(_expr, -1) {
-		fmt.Println(m)
+		plainText := _expr[offset:m[0]]
+		if plainText != "" {
+			parts = append(parts, rPart{plain, plainText, nil})
+		}
+
+		varExpr := _expr[m[0]:m[1]]
+		_, vals := getVar(varExpr, vars)
+
+		parts = append(parts, rPart{toVar, varExpr, vals})
+
+		offset = m[1]
 	}
 
-	p := &RPattern{expr}
+	plainText := _expr[offset:]
+	if plainText != "" {
+		parts = append(parts, rPart{plain, plainText, nil})
+	}
+
+	p := &RPattern{expr, parts}
 	return p, nil
 }

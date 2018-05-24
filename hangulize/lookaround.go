@@ -93,8 +93,8 @@ func expandLookbehind(expr string) (string, string) {
 	//  [start, stop, edgeStart, edgeStop, lookStart, lookStop]
 	m := reLookbehind.FindStringSubmatchIndex(posExpr)
 
-	edgeExpr := safeSlice(posExpr, m[2], m[3])
-	lookExpr := safeSlice(posExpr, m[4], m[5])
+	edgeExpr := noCapture(safeSlice(posExpr, m[2], m[3]))
+	lookExpr := noCapture(safeSlice(posExpr, m[4], m[5]))
 	otherExpr := posExpr[m[1]:]
 
 	if strings.HasPrefix(lookExpr, `~`) {
@@ -126,8 +126,8 @@ func expandLookahead(expr string, negExpr string) (string, string) {
 	m := reLookahead.FindStringSubmatchIndex(posExpr)
 
 	otherExpr := posExpr[:m[0]]
-	lookExpr := safeSlice(posExpr, m[2], m[3])
-	edgeExpr := safeSlice(posExpr, m[4], m[5])
+	lookExpr := noCapture(safeSlice(posExpr, m[2], m[3]))
+	edgeExpr := noCapture(safeSlice(posExpr, m[4], m[5]))
 
 	// Lookahead can be remaining in the negative regexp
 	// the lookbehind determined.
