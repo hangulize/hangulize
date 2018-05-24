@@ -2,54 +2,63 @@ package hangulize
 
 import (
 	"fmt"
-	"regexp"
 	"strings"
 )
 
 var (
+	// ^^
+	// └┴─ (1)
+	reLeftEdge = regex(`\^+`)
+
+	// $$
+	// └┴─ (1)
+	reRightEdge = regex(`\$+`)
+
 	// {...}
 	//  └─┴─ (1)
-	reZeroWidth *regexp.Regexp
+	reZeroWidth = regex(`
+	# open brace
+		\{
 
-	// ^^^
-	// └─┴─ (1)
-	reLeftEdge *regexp.Regexp
+	# inside of brace
+		( [^}]* )
 
-	// $$$
-	// └─┴─ (1)
-	reRightEdge *regexp.Regexp
+	# close brace
+		\}
+	`)
 
-	// ^^^{...}
-	// │ │ └─┴─ (2)
-	// └─┴─ (1)
-	reLookbehind *regexp.Regexp
+	// ^^{...}
+	// ││ └─┴─ (2)
+	// └┴─ (1)
+	reLookbehind = regex(`
+	# start of string
+		^
 
-	// {...}$$$
-	//  │ │ └─┴─ (2)
+	# left-edge
+		( \^* )
+
+	# zero-width
+		(?:
+			\{ ( [^}]* ) \}
+		)?
+	`)
+
+	// {...}$$
+	//  │ │ └┴─ (2)
 	//  └─┴─ (1)
-	reLookahead *regexp.Regexp
+	reLookahead = regex(`
+	# zero-width
+		(?:
+			\{ ( [^}]* ) \}
+		)?
+
+	# right-edge
+		( \$* )
+
+	# end of string
+		$
+	`)
 )
-
-func init() {
-	var (
-		zeroWidth = `\{([^}]*)\}` // {...}
-		leftEdge  = `(\^+)`       // `^`, `^^`, `^^^...`
-		rightEdge = `(\$+)`       // `$`, `$$`, `$$$...`
-
-		// begin of text - optional leftEdge - optional zeroWidth
-		lookbehind = fmt.Sprintf(`^(?:%s)?(?:%s)?`, leftEdge, zeroWidth)
-		// optional zeroWidth - optional rightEdge - end of text
-		lookahead = fmt.Sprintf(`(?:%s)?(?:%s)?$`, zeroWidth, rightEdge)
-	)
-
-	reZeroWidth = regexp.MustCompile(zeroWidth)
-
-	reLeftEdge = regexp.MustCompile(leftEdge)
-	reRightEdge = regexp.MustCompile(rightEdge)
-
-	reLookbehind = regexp.MustCompile(lookbehind)
-	reLookahead = regexp.MustCompile(lookahead)
-}
 
 func expandLookaround(expr string) (string, string, error) {
 	posExpr, negExpr := expandLookbehind(expr)
