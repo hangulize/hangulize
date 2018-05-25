@@ -99,5 +99,5 @@ func set(vals []string) []string {
 
 func inSet(val string, set []string) bool {
 	i := sort.SearchStrings(set, val)
-	return set[i] == val
+	return i < len(set) && set[i] == val
 }
