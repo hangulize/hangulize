@@ -128,6 +128,22 @@ func (s *DictSection) Map() map[string][]string {
 	return s.dict
 }
 
+// Injective returns the underying 1-to-1 map of a dict section.
+// If some right (values) has multiple values, it returns an error.
+func (s *DictSection) Injective() (map[string]string, error) {
+	oneToOne := make(map[string]string, len(s.dict))
+
+	for left, right := range s.dict {
+		if len(right) != 1 {
+			err := fmt.Errorf("right %#v has multiple values", right)
+			return nil, err
+		}
+		oneToOne[left] = right[0]
+	}
+
+	return oneToOne, nil
+}
+
 // One assumes the given left (key) has only one right (values).  Then returns
 // the only right value.
 func (s *DictSection) One(left string) string {
