@@ -88,7 +88,7 @@ func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 	rep := strings.NewReplacer(args...)
 	word = rep.Replace(word)
 
-	word = NormalizeRoman(word, except)
+	word = Normalize(word, RomanNormalizer{}, except)
 
 	word = strings.ToLower(word)
 
