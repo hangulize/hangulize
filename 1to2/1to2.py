@@ -6,7 +6,6 @@ import sys
 
 import babel
 import hangulize
-import tests
 
 
 def quote(x):
