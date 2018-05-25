@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+from collections import defaultdict
 import io
 import sys
 
@@ -84,6 +85,25 @@ def main(argv):
     lang = hangulize.get_lang(code)
     locale = babel.Locale(lang.iso639_1)
 
+    # detect normalize
+    additional_of_normalize_roman = {}
+
+    def hacked_normalize_roman(string, additional=None):
+        if additional:
+            additional_of_normalize_roman.update(additional)
+
+    normalize_f = lang.normalize.__func__
+    normalize_f.__globals__['normalize_roman'] = hacked_normalize_roman
+    normalize_f(lang, '')
+
+    normalize = defaultdict(set)
+    for src, dst in additional_of_normalize_roman.items():
+        assert dst == dst.lower()
+        src = src.lower()
+        if src == dst:
+            continue
+        normalize[dst].add(src.lower())
+
     # find vars
     vars_ = []
     for attr in dir(lang.__class__):
@@ -128,6 +148,11 @@ def main(argv):
     sec = Section('vars')
     for var in vars_:
         sec.put(var, *getattr(lang, var))
+    print(sec.draw('=', quote_keys=True), end='')
+
+    sec = Section('normalize')
+    for to, froms in normalize.items():
+        sec.put(to, *froms)
     print(sec.draw('=', quote_keys=True), end='')
 
     sec = Section('rewrite')
