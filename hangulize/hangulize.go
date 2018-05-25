@@ -74,7 +74,34 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 	// TODO(sublee): Language-specific normalizer
 	orig := word
-	word = NormalizeRoman(word)
+
+	word = strings.ToLower(word)
+
+	except := make([]string, 0)
+
+	args := make([]string, 0)
+	for to, froms := range h.spec.normalize {
+		for _, from := range froms {
+			args = append(args, from, to)
+		}
+
+		except = append(except, to)
+	}
+	rep := strings.NewReplacer(args...)
+	word = rep.Replace(word)
+
+	for _, rule := range h.spec.rewrite.rules {
+		for _, ch := range rule.from.expr {
+			except = append(except, string(ch))
+		}
+	}
+	for _, rule := range h.spec.hangulize.rules {
+		for _, ch := range rule.from.expr {
+			except = append(except, string(ch))
+		}
+	}
+
+	word = NormalizeRoman(word, except)
 	trace(ch, word, orig, "roman")
 	return word
 }

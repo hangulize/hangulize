@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -73,12 +74,30 @@ func noCapture(expr string) string {
 // indexOf finds the index of the given value in a string array.  It returns -1
 // if not found.  The time complexity is O(n).
 func indexOf(val string, vals []string) int {
-	i := 0
-	for {
-		if vals[i] == val {
+	for i, _val := range vals {
+		if _val == val {
 			return i
 		}
-		i++
 	}
 	return -1
+}
+
+func set(vals []string) []string {
+	unique := make(map[string]bool)
+	for _, val := range vals {
+		unique[val] = true
+	}
+
+	set := make([]string, 0)
+	for val := range unique {
+		set = append(set, val)
+	}
+
+	sort.Strings(set)
+	return set
+}
+
+func inSet(val string, set []string) bool {
+	i := sort.SearchStrings(set, val)
+	return set[i] == val
 }
