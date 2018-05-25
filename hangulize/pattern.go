@@ -85,7 +85,8 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		erased := strings.Repeat(".", offset) + word[offset:]
 
 		m := p.re.FindStringSubmatchIndex(erased)
-		if len(m) == 0 {
+
+		if len(m) == 0 || m[1]-m[0] == 0 {
 			// No more match.
 			break
 		}
