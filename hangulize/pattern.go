@@ -45,7 +45,6 @@ func NewPattern(
 	reExpr := expr
 
 	reExpr = expandMacros(reExpr, macros)
-	// reExpr = expandGroups(reExpr)
 
 	reExpr, usedVars := expandVars(reExpr, vars)
 
