@@ -16,7 +16,7 @@ type Spec struct {
 
 	macros    map[string]string
 	vars      map[string][]string
-	normalize map[string]string
+	normalize map[string][]string
 
 	rewrite   *Rewriter
 	hangulize *Rewriter
@@ -84,13 +84,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// normalize
-	var normalize map[string]string
+	var normalize map[string][]string
 	if sec, ok := h["normalize"]; ok {
-		normalize, err = sec.(*hgl.DictSection).Injective()
-
-		if err != nil {
-			return nil, err
-		}
+		normalize = sec.(*hgl.DictSection).Map()
 	}
 
 	// rewrite

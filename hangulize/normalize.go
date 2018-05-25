@@ -6,36 +6,34 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-func NormalizeRoman(word string) string {
+// NormalizeRoman normalizes various Roman letters into [a-z].  But it keeps
+// the letters in except.
+func NormalizeRoman(word string, except []string) string {
 	var buf strings.Builder
 
-	text := []rune(word)
+	// Sort exception letters.
+	exceptions := set(except)
 
+	// Normalize forms based on Unicode.
 	var iter norm.Iter
 	iter.InitString(norm.NFD, word)
+	text := []rune(word)
 
 	i := 0
 	for !iter.Done() {
 		bin := iter.Next()
+		letter := string(text[i])
 
-		// POC(sublee): Spanish
-		switch string(text[i]) {
-		case "Ñ":
-			buf.WriteString("ñ")
-		case "ñ":
-			buf.WriteString("ñ")
-		case "Ǘ":
-			buf.WriteString("ü")
-		case "ü":
-			buf.WriteString("ü")
-		case "Ü":
-			buf.WriteString("ü")
-		default:
+		isException := inSet(letter, exceptions)
+
+		if isException {
+			buf.WriteString(letter)
+		} else {
 			buf.WriteByte(bin[0])
 		}
 
 		i++
 	}
 
-	return strings.ToLower(buf.String())
+	return buf.String()
 }
