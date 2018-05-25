@@ -37,3 +37,22 @@ func NormalizeRoman(word string, except []string) string {
 
 	return buf.String()
 }
+
+// NormalizeKana converts Hiragana to Katakana.
+func NormalizeKana(word string) string {
+	var buf strings.Builder
+
+	hiraganaMin := rune(0x3040)
+	hiraganaMax := rune(0x309f)
+
+	for _, ch := range word {
+		if hiraganaMin <= rune(ch) && rune(ch) <= hiraganaMax {
+			// hiragana to katakana
+			buf.WriteRune(ch + 96)
+		} else {
+			buf.WriteRune(ch)
+		}
+	}
+
+	return buf.String()
+}
