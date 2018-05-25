@@ -135,6 +135,10 @@ type Language struct {
 	Script  string
 }
 
+func (l *Language) String() string {
+	return fmt.Sprintf("%s(%s)", l.ID, l.English)
+}
+
 func newLanguage(dict *hgl.DictSection) (*Language, error) {
 	_codes := dict.All("codes")
 
