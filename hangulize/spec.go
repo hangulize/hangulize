@@ -14,8 +14,9 @@ type Spec struct {
 	Lang   Language
 	Config Config
 
-	macros map[string]string
-	vars   map[string][]string
+	macros    map[string]string
+	vars      map[string][]string
+	normalize map[string]string
 
 	rewrite   *Rewriter
 	hangulize *Rewriter
@@ -69,7 +70,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	var macros map[string]string
 
 	if sec, ok := h["macros"]; ok {
-		macros, err = newMacros(sec.(*hgl.DictSection))
+		macros, err = sec.(*hgl.DictSection).Injective()
 
 		if err != nil {
 			return nil, err
@@ -80,6 +81,16 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	var vars map[string][]string
 	if sec, ok := h["vars"]; ok {
 		vars = sec.(*hgl.DictSection).Map()
+	}
+
+	// normalize
+	var normalize map[string]string
+	if sec, ok := h["normalize"]; ok {
+		normalize, err = sec.(*hgl.DictSection).Injective()
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	// rewrite
@@ -117,6 +128,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		config,
 		macros,
 		vars,
+		normalize,
 		rewrite,
 		hangulize,
 		test,
@@ -188,22 +200,4 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 		Markers: markers,
 	}
 	return &config, nil
-}
-
-// -----------------------------------------------------------------------------
-
-func newMacros(dict *hgl.DictSection) (map[string]string, error) {
-	_map := dict.Map()
-	macros := make(map[string]string, len(_map))
-
-	for src, dst := range _map {
-		if len(dst) != 1 {
-			err := fmt.Errorf("macro %#v must has single target", src)
-			return nil, err
-		}
-
-		macros[src] = dst[0]
-	}
-
-	return macros, nil
 }
