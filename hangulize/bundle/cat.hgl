@@ -141,7 +141,7 @@ rewrite:
     "l{m;|n;}"       -> "l,"
     ";"              -> ""
 
-hangulize:
+transcribe:
     "b"    -> "ㅂ"
     "c,"   -> "-ㄱ"
     "c"    -> "ㅋ"

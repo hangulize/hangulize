@@ -116,7 +116,7 @@ rewrite:
     "{@}k{<vl>}" -> "k,"
     "{@}p{<vl>}" -> "p,"
 
-hangulize:
+transcribe:
     "b"    -> "ㅂ"
     "c"    -> "ㅊ"
     "C"    -> "ㅊ"

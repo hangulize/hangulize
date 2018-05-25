@@ -18,8 +18,8 @@ type Spec struct {
 	vars      map[string][]string
 	normalize map[string][]string
 
-	rewrite   *Rewriter
-	hangulize *Rewriter
+	rewrite    *Rewriter
+	transcribe *Rewriter
 
 	Test []hgl.Pair
 }
@@ -101,14 +101,14 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		return nil, err
 	}
 
-	// hangulize
-	var hangulize *Rewriter
-	var hangulizePairs []hgl.Pair
-	if sec, ok := h["hangulize"]; ok {
-		hangulizePairs = sec.(*hgl.ListSection).Array()
+	// transcribe
+	var transcribe *Rewriter
+	var transcribePairs []hgl.Pair
+	if sec, ok := h["transcribe"]; ok {
+		transcribePairs = sec.(*hgl.ListSection).Array()
 	}
 
-	hangulize, err = NewRewriter(hangulizePairs, macros, vars)
+	transcribe, err = NewRewriter(transcribePairs, macros, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -126,7 +126,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		vars,
 		normalize,
 		rewrite,
-		hangulize,
+		transcribe,
 		test,
 	}
 	return &spec, nil

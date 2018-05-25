@@ -99,7 +99,7 @@ rewrite:
     "{,|-}l" -> "L"
     "-"      -> ""
 
-hangulize:
+transcribe:
     "b"      -> "ㅂ"
     "d"      -> "ㄷ"
     "f"      -> "ㅍ"

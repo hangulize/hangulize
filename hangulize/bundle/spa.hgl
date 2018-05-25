@@ -70,7 +70,7 @@ rewrite:
     "tt"            -> "t"
     "vv"            -> "v"
 
-hangulize:
+transcribe:
     "b"              -> "ㅂ"
     "C"              -> "ㅊ"
     "d"              -> "ㄷ"
