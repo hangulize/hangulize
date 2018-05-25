@@ -73,7 +73,7 @@ rewrite:
     "t{@|l}"     -> "Xt"
     "{@}t"       -> "tX"
 
-hangulize:
+transcribe:
     "^l"      -> "ㄹ"
     "{X}l{@}" -> "ㄹ"
     "l{@}"    -> "-ㄹㄹ"

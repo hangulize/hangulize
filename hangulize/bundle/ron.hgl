@@ -78,7 +78,7 @@ rewrite:
     "kk"      -> "k"
     "ll"      -> "l"
 
-hangulize:
+transcribe:
     "{@}mm{@}"          -> "-ㅁㅁ"
     "mm"                -> "m"
     "{@}nn{@}"          -> "-ㄴㄴ"

@@ -131,7 +131,7 @@ rewrite:
     ";"                -> ""
     "-"                -> ""
 
-hangulize:
+transcribe:
     "b"    -> "ㅂ"
     "c"    -> "ㅊ"
     "d"    -> "ㄷ"

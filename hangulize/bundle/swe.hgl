@@ -190,7 +190,7 @@ rewrite:
     "l{m;|n;}"       -> "l,"
     ";"              -> ""
 
-hangulize:
+transcribe:
     "b"    -> "ㅂ"
     "d"    -> "ㄷ"
     "f"    -> "ㅍ"

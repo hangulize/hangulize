@@ -156,7 +156,7 @@ rewrite:
     "d{b|c|f|g|h|j|J|k|l|m|n|p|s|S|v|w|z}" -> "t"
     "g{b|c|d|f|h|j|J|k|m|n|p|s|S|t|v|w|z}" -> "k"
 
-hangulize:
+transcribe:
     "^U$"           -> "ㅔㅓ"
     "^{<cons>}U$"   -> "ㅔㅓ"
     "X"             -> "ㅎ"
