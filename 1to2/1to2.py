@@ -99,10 +99,9 @@ def main(argv):
     normalize = defaultdict(set)
     for src, dst in additional_of_normalize_roman.items():
         assert dst == dst.lower()
-        src = src.lower()
         if src == dst:
             continue
-        normalize[dst].add(src.lower())
+        normalize[dst].add(src)
 
     # find vars
     vars_ = []
