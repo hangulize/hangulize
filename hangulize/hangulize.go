@@ -88,17 +88,6 @@ func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 	rep := strings.NewReplacer(args...)
 	word = rep.Replace(word)
 
-	for _, rule := range h.spec.rewrite.rules {
-		for _, ch := range rule.from.expr {
-			except = append(except, string(ch))
-		}
-	}
-	for _, rule := range h.spec.hangulize.rules {
-		for _, ch := range rule.from.expr {
-			except = append(except, string(ch))
-		}
-	}
-
 	word = NormalizeRoman(word, except)
 
 	word = strings.ToLower(word)
