@@ -16,7 +16,7 @@ func rewrite(word string, fromExpr string, toExpr string) string {
 	macros:
 		"@" = "<vowels>"
 	`)
-	r := Rule{
+	r := RewriteRule{
 		from: newPattern(fromExpr, spec),
 		to:   []*RPattern{newRPattern(toExpr, spec)},
 	}

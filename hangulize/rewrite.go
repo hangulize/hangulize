@@ -8,7 +8,7 @@ import (
 
 // Rewriter is a container of sequential rewriting rules.
 type Rewriter struct {
-	rules []Rule
+	rules []RewriteRule
 }
 
 // NewRewriter creates a Rewriter from HGL pairs which are read from a spec.
@@ -20,7 +20,7 @@ func NewRewriter(
 
 ) (*Rewriter, error) {
 
-	rules := make([]Rule, len(pairs))
+	rules := make([]RewriteRule, len(pairs))
 
 	for i, pair := range pairs {
 		from, err := NewPattern(pair.Left(), macros, vars)
@@ -35,7 +35,7 @@ func NewRewriter(
 			to[j] = NewRPattern(expr, macros, vars)
 		}
 
-		rules[i] = Rule{from, to}
+		rules[i] = RewriteRule{from, to}
 	}
 
 	return &Rewriter{rules}, nil
@@ -52,15 +52,15 @@ func (r *Rewriter) Rewrite(word string, ch chan<- Trace) string {
 
 // -----------------------------------------------------------------------------
 
-// Rule represents a rewriting rule.  It describes how a word should be
+// RewriteRule represents a rewriting rule.  It describes how a word should be
 // rewritten.
-type Rule struct {
+type RewriteRule struct {
 	from *Pattern
 	to   []*RPattern
 }
 
 // Rewrite rewrites a word for a rule.
-func (r *Rule) Rewrite(word string, ch chan<- Trace) string {
+func (r *RewriteRule) Rewrite(word string, ch chan<- Trace) string {
 	orig := word
 	word = r.from.Replace(word, r.to, -1)[0]
 	trace(ch, word, orig, fmt.Sprintf("%s->%s", r.from, r.to[0]))
