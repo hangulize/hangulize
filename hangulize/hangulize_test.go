@@ -17,22 +17,22 @@ func hangulize(spec *Spec, word string) string {
 // TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
 	for _, lang := range ListLangs() {
-		t.Run(lang, func(t *testing.T) {
-			spec, ok := LoadSpec(lang)
+		spec, ok := LoadSpec(lang)
 
-			assert.Truef(t, ok, `failed to load "%s" spec`, lang)
+		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
 
-			h := NewHangulizer(spec)
+		h := NewHangulizer(spec)
 
-			for _, testCase := range spec.Test {
-				loanword := testCase.Left()
-				expected := testCase.Right()[0]
+		for _, testCase := range spec.Test {
+			loanword := testCase.Left()
+			expected := testCase.Right()[0]
 
+			t.Run(lang+"/"+loanword, func(t *testing.T) {
 				ch := make(chan Trace, 1000)
 				got := h.HangulizeTrace(loanword, ch)
 
 				if got == expected {
-					continue
+					return
 				}
 
 				// Trace result to understand the failure reason.
@@ -52,8 +52,8 @@ func TestLang(t *testing.T) {
 				fmt.Fprintln(f, hr)
 
 				assert.Equal(t, expected, got, f.String())
-			}
-		})
+			})
+		}
 	}
 }
 
