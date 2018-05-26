@@ -63,6 +63,10 @@ func TestSlash(t *testing.T) {
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
 }
 
+func TestSpecials(t *testing.T) {
+	assert.Equal(t, "<글로리아>", Hangulize("ita", "<gloria>"))
+}
+
 func TestHyphen(t *testing.T) {
 	spec := parseSpec(`
 	config:
