@@ -26,12 +26,12 @@ func Normalize(word string, norm Normalizer, keep []string) string {
 	return buf.String()
 }
 
-// -----------------------------------------------------------------------------
-
 // Normalizer normalizes a letter.
 type Normalizer interface {
 	Normalize(rune) rune
 }
+
+// -----------------------------------------------------------------------------
 
 // RomanNormalizer is a normalizer for Laion or Roman script.
 type RomanNormalizer struct{}
@@ -45,6 +45,11 @@ func (RomanNormalizer) Normalize(ch rune) rune {
 	}
 	return rune(bin[0])
 }
+
+// -----------------------------------------------------------------------------
+
+// TODO(sublee): Find out a Kanji to Kana dictionary to hangulize Japanese
+// perfectly.
 
 // KanaNormalizer is a normalizer for Kana script which is used in Japan.
 type KanaNormalizer struct{}
