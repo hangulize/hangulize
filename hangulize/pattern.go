@@ -133,8 +133,6 @@ func (p *Pattern) Find(word string, n int) [][]int {
 	return matches
 }
 
-// -----------------------------------------------------------------------------
-
 // Replace searches up to n matches in the word and replaces them with the
 // RPattern list.
 func (p *Pattern) Replace(word string, rpatterns []*RPattern, n int) []string {
