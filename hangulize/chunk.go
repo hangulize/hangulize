@@ -88,7 +88,6 @@ func (r *ChunkedReplacer) flush() {
 	sortedRepls := make([]*Replacement, len(r.word))
 	for i := range r.repls {
 		repl := &r.repls[i]
-		fmt.Println(sortedRepls, r.word, repl)
 		sortedRepls[repl.start] = repl
 	}
 
@@ -150,57 +149,4 @@ func (r *ChunkedReplacer) Chunks() []Chunk {
 	chunks = append(chunks, Chunk{buf.String(), age})
 
 	return chunks
-}
-
-// -----------------------------------------------------------------------------
-
-// Rewrite applies multiple replacers on a word.
-func Rewrite(chunks []Chunk, rules []*Rule) []Chunk {
-	var buf ChunkBuilder
-
-	for _, chunk := range chunks {
-		word := chunk.word
-		age := chunk.age
-
-		rep := NewChunkedReplacer(word, age)
-
-		for _, rule := range rules {
-			for _, r := range rule.Replacements(word) {
-				rep.Replace(r.start, r.stop, r.word)
-			}
-			word = rep.String()
-		}
-
-		buf.Put(rep.Chunks())
-	}
-
-	return buf.Chunks()
-}
-
-func Replace(chunks []Chunk, rules []*Rule) []Chunk {
-	var buf ChunkBuilder
-
-	for _, chunk := range chunks {
-		word := chunk.word
-		age := chunk.age
-
-		rep := NewChunkedReplacer(word, age)
-		dummy := NewChunkedReplacer(word, age)
-
-		for _, rule := range rules {
-			for _, r := range rule.Replacements(word) {
-				fmt.Printf("%#v %#v %#v\n", word, r.start, r.stop)
-				rep.Replace(r.start, r.stop, r.word)
-
-				nulls := strings.Repeat("\x00", len(r.word))
-				dummy.Replace(r.start, r.stop, nulls)
-			}
-			rep.flush()
-			word = dummy.String()
-		}
-
-		buf.Put(rep.Chunks())
-	}
-
-	return buf.Chunks()
 }
