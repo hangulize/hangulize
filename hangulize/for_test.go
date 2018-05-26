@@ -7,47 +7,32 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var fxtSpec *Spec
+// -----------------------------------------------------------------------------
+// create or panic
 
-func init() {
-	// fixture spec
-	spec, err := ParseSpec(strings.NewReader(strings.TrimSpace(`
-# ------------------------------------------------------------------------------
-
-vars:
-	vowels = "a", "e", "i", "o", "u"
-	abc    = "a", "b", "c"
-	def    = "d", "e", "f"
-
-macros:
-	"@" = "<vowels>"
-
-# ------------------------------------------------------------------------------
-	`)))
+func parseSpec(hgl string) *Spec {
+	spec, err := ParseSpec(strings.NewReader(hgl))
 	if err != nil {
 		panic(err)
 	}
-	fxtSpec = spec
+	return spec
 }
 
-func fixturePattern(expr string) *Pattern {
-	p, err := NewPattern(expr, fxtSpec.macros, fxtSpec.vars)
+func newPattern(expr string, spec *Spec) *Pattern {
+	p, err := NewPattern(expr, spec.macros, spec.vars)
 	if err != nil {
 		panic(err)
 	}
-
 	return p
 }
 
-func fixtureRPatterns(exprs ...string) []*RPattern {
-	to := make([]*RPattern, len(exprs))
-
-	for i, expr := range exprs {
-		to[i] = NewRPattern(expr, fxtSpec.macros, fxtSpec.vars)
-	}
-
-	return to
+func newRPattern(expr string, spec *Spec) *RPattern {
+	p := NewRPattern(expr, spec.macros, spec.vars)
+	return p
 }
+
+// -----------------------------------------------------------------------------
+// match assertion
 
 const o = "MUST_MATCH"
 const x = ""

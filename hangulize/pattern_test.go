@@ -6,6 +6,19 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func fixturePattern(expr string) *Pattern {
+	spec := parseSpec(`
+	vars:
+		vowels = "a", "e", "i", "o", "u"
+		abc    = "a", "b", "c"
+		def    = "d", "e", "f"
+
+	macros:
+		"@" = "<vowels>"
+	`)
+	return newPattern(expr, spec)
+}
+
 func TestMetaPatterns(t *testing.T) {
 	assert.True(t, reLookbehind.MatchString(""))
 	assert.True(t, reLookahead.MatchString(""))
@@ -310,9 +323,17 @@ func TestMalformedPattern(t *testing.T) {
 	assert.Error(t, err, ExplainPattern(p))
 }
 
-func TestRegression(t *testing.T) {
-	p := fixturePattern(`;|-`)
+func TestBugs(t *testing.T) {
+	var p *Pattern
+
+	p = fixturePattern(`;|-`)
 	assertMatch(t, p, []string{
 		o, "калинин,град-",
+	})
+
+	p = fixturePattern(`n{@|J}`)
+	assertMatch(t, p, []string{
+		o, "inJazio",
+		"    ^     ",
 	})
 }
