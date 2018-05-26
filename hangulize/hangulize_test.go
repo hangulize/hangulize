@@ -69,8 +69,9 @@ func TestHyphen(t *testing.T) {
 		markers = "-"
 
 	transcribe:
-		"e" -> "ㅔ"
 		"x" -> "-ㄱㅅ"
+		"e-" -> "ㅣ"
+		"e" -> "ㅔ"
 	`)
 	assert.Equal(t, "엑스", hangulize(spec, "ex"))
 }
