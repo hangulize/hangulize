@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
 	for _, lang := range ListLangs() {
 		t.Run(lang, func(t *testing.T) {
@@ -49,4 +50,19 @@ func TestLang(t *testing.T) {
 			}
 		})
 	}
+}
+
+// TestSlash tests "/" in input word.  The original Hangulize removes the "/"
+// so the result was "글로르이아" instead of "글로르/이아".
+func TestSlash(t *testing.T) {
+	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
+}
+
+func TestHyphen(t *testing.T) {
+	// config:
+	// 	markers = "-"
+
+	// transcribe:
+	// 	"x" -> "-ㄱㅅ"
+	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
 }

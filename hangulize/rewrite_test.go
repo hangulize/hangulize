@@ -7,7 +7,19 @@ import (
 )
 
 func rewrite(word string, fromExpr string, toExpr string) string {
-	r := Rule{from: fixturePattern(fromExpr), to: fixtureRPatterns(toExpr)}
+	spec := parseSpec(`
+	vars:
+		vowels = "a", "e", "i", "o", "u"
+		abc    = "a", "b", "c"
+		def    = "d", "e", "f"
+
+	macros:
+		"@" = "<vowels>"
+	`)
+	r := Rule{
+		from: newPattern(fromExpr, spec),
+		to:   []*RPattern{newRPattern(toExpr, spec)},
+	}
 	return r.Rewrite(word, nil)
 }
 
