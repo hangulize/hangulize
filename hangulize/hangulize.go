@@ -15,7 +15,6 @@ Post by Brian: http://iceager.egloos.com/2610028
 package hangulize
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -60,34 +59,63 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	}
 	trace(ch, word, "", "input")
 
-	// mask := h.newMask(word)
-	// fmt.Println(word, mask)
-
 	word = h.normalize(word, ch)
 
-	chunks := h.start(word)
+	chunks := h.begin(word)
+	word1 := NewChunkBuilder(chunks).String()
+	trace(ch, word1, word, "start")
 
 	chunks = h.rewrite(chunks)
-	fmt.Println("rewrite", chunks)
+	word2 := NewChunkBuilder(chunks).String()
+	trace(ch, word2, word1, "rewrite")
 
 	chunks = h.transcribe(chunks)
-	fmt.Println("transcribe", chunks)
+	word3 := NewChunkBuilder(chunks).String()
+	trace(ch, word3, word2, "transcribe")
 
 	word = h.assembleJamo(chunks)
-	fmt.Println("jamo", word)
+	trace(ch, word, word3, "jamo")
 
-	// word = NewChunkBuilder(chunks).String()
-	// fmt.Println("join", word)
-
-	// word = h.cleanUp(word)
 	return word
 }
 
 // -----------------------------------------------------------------------------
 // Hangulize pipeline
 
-func (h *Hangulizer) start(word string) []Chunk {
-	return []Chunk{Chunk{word, 0}}
+func (h *Hangulizer) begin(word string) []Chunk {
+	// Detect used letters.
+	var buf strings.Builder
+	rules := append(h.spec.rewrite, h.spec.transcribe...)
+	for _, rule := range rules {
+		buf.WriteString(regexpLetters(rule.from.re.String()))
+		buf.WriteString(regexpLetters(rule.from.neg.String()))
+	}
+
+	// Choose non-marker letters.
+	markers := set(h.spec.Config.Markers)
+
+	letters := make([]string, 0)
+	for _, ch := range buf.String() {
+		let := string(ch)
+		if inSet(let, markers) {
+			continue
+		}
+		letters = append(letters, let)
+	}
+
+	letters = set(letters)
+
+	// Split the word by their letters.
+	rep := NewChunkedReplacer(word, 0, 1)
+
+	for i, ch := range word {
+		let := string(ch)
+		if inSet(let, letters) {
+			rep.Replace(i, i+len(let), let)
+		}
+	}
+
+	return rep.Chunks()
 }
 
 // Rewrite applies multiple replacers on a word.
@@ -166,7 +194,7 @@ func (h *Hangulizer) assembleJamo(chunks []Chunk) string {
 		}
 		jamoBuf.WriteString(chunk.word)
 	}
-	buf.WriteString(jamoBuf.String())
+	buf.WriteString(AssembleJamo(jamoBuf.String()))
 
 	return buf.String()
 }
@@ -203,23 +231,4 @@ func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 
 	trace(ch, word, orig, "roman")
 	return word
-}
-
-func (h *Hangulizer) cleanUp(word string) string {
-	markers := h.spec.Config.Markers
-
-	args := make([]string, len(markers)*2)
-	for i, marker := range markers {
-		args[i*2] = string(marker)
-		args[i*2+1] = ""
-	}
-	rep := strings.NewReplacer(args...)
-
-	var buf strings.Builder
-
-	for _, ch := range word {
-		rep.WriteString(&buf, string(ch))
-	}
-
-	return buf.String()
 }

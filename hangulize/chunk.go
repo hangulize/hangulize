@@ -89,18 +89,8 @@ func (r *ChunkedReplacer) flush() {
 	var buf strings.Builder
 	levels := make([]int, 0)
 
-	sortedRepls := make([]*Replacement, len(r.word))
-	for i := range r.repls {
-		repl := &r.repls[i]
-		sortedRepls[repl.start] = repl
-	}
-
 	offset := 0
-	for _, repl := range sortedRepls {
-		if repl == nil {
-			continue
-		}
-
+	for _, repl := range r.repls {
 		start := repl.start
 		stop := repl.stop
 		word := repl.word

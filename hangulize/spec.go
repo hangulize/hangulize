@@ -172,20 +172,18 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 type Config struct {
 	Authors []string
 	Stage   string
-	Markers []rune
+	Markers []string
 }
 
 func newConfig(dict *hgl.DictSection) (*Config, error) {
 	// A marker must be 1-character.
-	stringMarkers := dict.All("markers")
-	markers := make([]rune, len(stringMarkers))
+	markers := dict.All("markers")
 
-	for i, stringMarker := range stringMarkers {
-		if len(stringMarker) != 1 {
-			err := fmt.Errorf("marker %#v must be 1-character", stringMarker)
+	for _, marker := range markers {
+		if len(marker) != 1 {
+			err := fmt.Errorf("marker %#v must be 1-character", marker)
 			return nil, err
 		}
-		markers[i] = rune(stringMarker[0])
 	}
 
 	config := Config{
