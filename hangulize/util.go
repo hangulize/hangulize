@@ -110,3 +110,18 @@ func trueFlags(length int) []bool {
 	}
 	return flags
 }
+
+func regexpLetters(reExpr string) string {
+	reQuoted := regexp.MustCompile(`\\.`)
+
+	// Remove escaped letters.
+	letters := reQuoted.ReplaceAllString(reExpr, ``)
+
+	// Quote Regexp meta letters.
+	letters = regexp.QuoteMeta(letters)
+
+	// Remove escaped letters again.
+	letters = reQuoted.ReplaceAllString(letters, ``)
+
+	return letters
+}
