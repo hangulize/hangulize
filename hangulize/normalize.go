@@ -6,20 +6,17 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-type Normalizer interface {
-	Normalize(rune) rune
-}
+// Normalize converts a word to normal form.  This behavior is called
+// "normalization".  It takes a normalizer which normalizes a letter.  It
+// doesn't normalize letters in array keep.
+func Normalize(word string, norm Normalizer, keep []string) string {
+	// Sort letters to keep.
+	keepSet := set(keep)
 
-// Normalize normalizes various Roman letters into [a-z].  But it keeps
-// the letters in except.
-func Normalize(word string, norm Normalizer, except []string) string {
 	var buf strings.Builder
 
-	// Sort exception letters.
-	exceptions := set(except)
-
 	for _, ch := range word {
-		if inSet(string(ch), exceptions) {
+		if inSet(string(ch), keepSet) {
 			buf.WriteRune(ch)
 		} else {
 			buf.WriteRune(norm.Normalize(ch))
@@ -29,9 +26,17 @@ func Normalize(word string, norm Normalizer, except []string) string {
 	return buf.String()
 }
 
-// RomanNormalizer converts various Roman letters into [a-zA-Z].
+// -----------------------------------------------------------------------------
+
+// Normalizer normalizes a letter.
+type Normalizer interface {
+	Normalize(rune) rune
+}
+
+// RomanNormalizer is a normalizer for Laion or Roman script.
 type RomanNormalizer struct{}
 
+// Normalize converts a Roman letter into ISO basic Latin alphabet [a-zA-Z].
 func (RomanNormalizer) Normalize(ch rune) rune {
 	props := norm.NFD.PropertiesString(string(ch))
 	bin := props.Decomposition()
@@ -41,9 +46,10 @@ func (RomanNormalizer) Normalize(ch rune) rune {
 	return rune(bin[0])
 }
 
-// KanaNormalizer converts Hiragana to Katakana.
+// KanaNormalizer is a normalizer for Kana script which is used in Japan.
 type KanaNormalizer struct{}
 
+// Normalize converts Hiragana to Katakana.
 func (KanaNormalizer) Normalize(ch rune) rune {
 	const (
 		hiraganaMin = rune(0x3040)
