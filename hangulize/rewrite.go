@@ -9,16 +9,61 @@ type Chunk struct {
 	age  int
 }
 
-// Rewriter remembers replacements in a buffer.  Finally, it applies the
+type ChunkBuilder struct {
+	chunks []Chunk
+}
+
+func NewChunkBuilder(chunks []Chunk) *ChunkBuilder {
+	return &ChunkBuilder{chunks}
+}
+
+func (b *ChunkBuilder) String() string {
+	var buf strings.Builder
+	for _, chunk := range b.chunks {
+		buf.WriteString(chunk.word)
+	}
+	return buf.String()
+}
+
+func (b *ChunkBuilder) Put(chunks []Chunk) {
+	b.chunks = append(b.chunks, chunks...)
+}
+
+func (b *ChunkBuilder) Chunks() []Chunk {
+	chunks := make([]Chunk, 0)
+
+	if len(b.chunks) == 0 {
+		return chunks
+	}
+
+	mergedChunk := Chunk{age: b.chunks[0].age}
+
+	for _, chunk := range b.chunks {
+		if chunk.age != mergedChunk.age {
+			chunks = append(chunks, mergedChunk)
+			mergedChunk = Chunk{age: chunk.age}
+		}
+
+		mergedChunk.word += chunk.word
+	}
+
+	chunks = append(chunks, mergedChunk)
+
+	return chunks
+}
+
+// -----------------------------------------------------------------------------
+
+// ChunkedReplacer remembers replacements in a buffer.  Finally, it applies the
 // replacements and splits the result in several chunks.
-type Rewriter struct {
+type ChunkedReplacer struct {
 	word  string
 	ages  []int
 	repls []Replacement
 }
 
-// NewRewriter creates a Rewriter for a word.
-func NewRewriter(word string, age int) *Rewriter {
+// NewChunkedReplacer creates a ChunkedReplacer for a word.
+func NewChunkedReplacer(word string, age int) *ChunkedReplacer {
 	ages := make([]int, len(word))
 	if age != 0 {
 		for i := 0; i < len(ages); i++ {
@@ -28,20 +73,31 @@ func NewRewriter(word string, age int) *Rewriter {
 
 	repls := make([]Replacement, 0)
 
-	return &Rewriter{word, ages, repls}
+	return &ChunkedReplacer{word, ages, repls}
 }
 
-// Rewrite remembers a replacement.
-func (r *Rewriter) Rewrite(repl Replacement) {
-	r.repls = append(r.repls, repl)
+// Replace remembers a replacement to be deferred.
+func (r *ChunkedReplacer) Replace(start, stop int, word string) {
+	r.repls = append(r.repls, Replacement{start, stop, word})
 }
 
-func (r *Rewriter) flush() {
+func (r *ChunkedReplacer) flush() {
 	var buf strings.Builder
 	ages := make([]int, 0)
 
+	sortedRepls := make([]*Replacement, len(r.word))
+	for i := range r.repls {
+		repl := &r.repls[i]
+		fmt.Println(sortedRepls, r.word, repl)
+		sortedRepls[repl.start] = repl
+	}
+
 	offset := 0
-	for _, repl := range r.repls {
+	for _, repl := range sortedRepls {
+		if repl == nil {
+			continue
+		}
+
 		// before replacement
 		buf.WriteString(r.word[offset:repl.start])
 		ages = append(ages, r.ages[offset:repl.start]...)
@@ -64,13 +120,13 @@ func (r *Rewriter) flush() {
 	r.repls = r.repls[:0]
 }
 
-func (r *Rewriter) String() string {
+func (r *ChunkedReplacer) String() string {
 	r.flush()
 	return r.word
 }
 
 // Chunks returns [{subWord, isRewritten}...].
-func (r *Rewriter) Chunks() []Chunk {
+func (r *ChunkedReplacer) Chunks() []Chunk {
 	r.flush()
 
 	chunks := make([]Chunk, 0)
@@ -99,97 +155,52 @@ func (r *Rewriter) Chunks() []Chunk {
 // -----------------------------------------------------------------------------
 
 // Rewrite applies multiple replacers on a word.
-func Rewrite(word string, rules []*Rule, age int) []Chunk {
-	rewr := NewRewriter(word, age)
-
-	for _, rule := range rules {
-		for _, r := range rule.Replacements(word) {
-			rewr.Rewrite(r)
-		}
-		word = rewr.String()
-	}
-
-	return rewr.Chunks()
-}
-
-func mergeChunks(chunks []Chunk) []Chunk {
-	buf := make([]Chunk, 0)
-
-	mergedChunk := Chunk{age: chunks[0].age}
+func Rewrite(chunks []Chunk, rules []*Rule) []Chunk {
+	var buf ChunkBuilder
 
 	for _, chunk := range chunks {
-		if chunk.age != mergedChunk.age {
-			buf = append(buf, mergedChunk)
-			mergedChunk = Chunk{age: chunk.age}
+		word := chunk.word
+		age := chunk.age
+
+		rep := NewChunkedReplacer(word, age)
+
+		for _, rule := range rules {
+			for _, r := range rule.Replacements(word) {
+				rep.Replace(r.start, r.stop, r.word)
+			}
+			word = rep.String()
 		}
 
-		mergedChunk.word += chunk.word
+		buf.Put(rep.Chunks())
 	}
-	buf = append(buf, mergedChunk)
 
-	return buf
+	return buf.Chunks()
 }
 
-func RewriteChunks(chunks []Chunk, rules []*Rule, age int) []Chunk {
-	buf := make([]Chunk, 0)
+func Replace(chunks []Chunk, rules []*Rule) []Chunk {
+	var buf ChunkBuilder
 
 	for _, chunk := range chunks {
-		if chunk.age == age {
-			buf = append(buf, Rewrite(chunk.word, rules, chunk.age)...)
-		} else {
-			buf = append(buf, chunk)
+		word := chunk.word
+		age := chunk.age
+
+		rep := NewChunkedReplacer(word, age)
+		dummy := NewChunkedReplacer(word, age)
+
+		for _, rule := range rules {
+			for _, r := range rule.Replacements(word) {
+				fmt.Printf("%#v %#v %#v\n", word, r.start, r.stop)
+				rep.Replace(r.start, r.stop, r.word)
+
+				nulls := strings.Repeat("\x00", len(r.word))
+				dummy.Replace(r.start, r.stop, nulls)
+			}
+			rep.flush()
+			word = dummy.String()
 		}
+
+		buf.Put(rep.Chunks())
 	}
 
-	return mergeChunks(buf)
+	return buf.Chunks()
 }
-
-func CleanUpChunks(chunks []Chunk, age int) []Chunk {
-	buf := make([]Chunk, 0)
-
-	for _, chunk := range chunks {
-		if chunk.age != age {
-			buf = append(buf, chunk)
-		}
-	}
-
-	return mergeChunks(buf)
-}
-
-func JoinChunks(chunks []Chunk) string {
-	var buf strings.Builder
-	for _, chunk := range chunks {
-		buf.WriteString(chunk.word)
-	}
-	return buf.String()
-}
-
-// const done = "\x00"
-
-// func Transcribe(word string, rules []*Rule) string {
-// 	transcribed := make([]string, len(word))
-
-// 	for _, rule := range rules {
-// 		var buf strings.Builder
-
-// 		offset := 0
-// 		for _, r := range rule.Replacements(word) {
-// 			buf.WriteString(word[offset:r.start])
-// 			buf.WriteString(done)
-// 			transcribed[r.start] = r.word
-// 			offset = r.stop
-// 		}
-// 		buf.WriteString(word[offset:])
-
-// 		word = buf.String()
-// 	}
-
-// 	for i, ch := range word {
-// 		fmt.Println(i, string(ch))
-// 		if string(ch) != done {
-// 			transcribed[i] = string(ch)
-// 		}
-// 	}
-
-// 	return strings.Join(transcribed, "")
-// }

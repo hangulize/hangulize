@@ -65,18 +65,13 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 
 	word = h.normalize(word, ch)
 
-	chunks := Rewrite(word, h.spec.rewrite, 0)
+	chunks := []Chunk{Chunk{word, 0}}
 
+	chunks = Rewrite(chunks, h.spec.rewrite)
 	fmt.Println("rewrite", chunks)
 
-	chunks = RewriteChunks(chunks, h.spec.transcribe, 0)
-	chunks = RewriteChunks(chunks, h.spec.transcribe, 1)
-
+	chunks = Replace(chunks, h.spec.transcribe)
 	fmt.Println("transcribe", chunks)
-
-	// chunks = CleanUpChunks(chunks, 1)
-
-	fmt.Println("cleanup", chunks)
 
 	for i, chunk := range chunks {
 		if chunk.age != 0 {
@@ -87,7 +82,7 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 
 	fmt.Println("jamo", chunks)
 
-	word = JoinChunks(chunks)
+	word = NewChunkBuilder(chunks).String()
 
 	fmt.Println("join", word)
 
