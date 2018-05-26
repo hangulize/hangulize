@@ -15,6 +15,7 @@ Post by Brian: http://iceager.egloos.com/2610028
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -65,8 +66,9 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	word = h.normalize(word, ch)
 
 	reps := h.spec.Replacers()
-	words := Rewrite(word, reps...)
-	word = words[0]
+	word, replaced := Rewrite(word, reps...)
+
+	fmt.Println(replaced)
 
 	// 	word = h.normalize(word, ch)
 	// 	word = h.rewrite(word, ch)

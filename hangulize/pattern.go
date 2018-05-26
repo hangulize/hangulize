@@ -149,6 +149,8 @@ func (p *Pattern) Replace(word string, rpatterns []*RPattern, n int) []string {
 		// TODO(sublee): Support multiple targets.
 		rp := rpatterns[0]
 
+		fmt.Println(start, stop, rp)
+
 		// Write replacement instead of the match.
 		buf.WriteString(rp.Interpolate(p, word, m))
 
