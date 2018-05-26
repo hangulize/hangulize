@@ -111,9 +111,9 @@ func trueFlags(length int) []bool {
 	return flags
 }
 
-func regexpLetters(reExpr string) string {
-	reQuoted := regexp.MustCompile(`\\.`)
+var reQuoted = regexp.MustCompile(`\\.`)
 
+func regexpLetters(reExpr string) string {
 	// Remove escaped letters.
 	letters := reQuoted.ReplaceAllString(reExpr, ``)
 

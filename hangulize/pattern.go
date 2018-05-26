@@ -25,6 +25,9 @@ type Pattern struct {
 	re  *regexp.Regexp // positive regexp
 	neg *regexp.Regexp // negative regexp
 
+	// Letters used in the positive/negative regexps.
+	letters []string
+
 	// References to expanded vars.
 	usedVars [][]string
 }
@@ -55,11 +58,18 @@ func NewPattern(
 
 	reExpr = expandEdges(reExpr)
 
+	// Collect letters in the regexps.
+	letters := make([]string, 0)
+	for _, ch := range regexpLetters(reExpr + negExpr) {
+		letters = append(letters, string(ch))
+	}
+	letters = set(letters)
+
 	// Compile regexp.
 	re := regexp.MustCompile(reExpr)
 	neg := regexp.MustCompile(negExpr)
 
-	p := &Pattern{expr, re, neg, usedVars}
+	p := &Pattern{expr, re, neg, letters, usedVars}
 	return p, nil
 }
 

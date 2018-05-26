@@ -59,7 +59,7 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	}
 	trace(ch, word, "", "input")
 
-	word = h.normalize(word, ch)
+	word = h.normalize(word)
 
 	chunks := h.begin(word)
 	word1 := NewChunkBuilder(chunks).String()
@@ -82,25 +82,43 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 // -----------------------------------------------------------------------------
 // Hangulize pipeline
 
-func (h *Hangulizer) begin(word string) []Chunk {
-	// Detect used letters.
-	var buf strings.Builder
-	rules := append(h.spec.rewrite, h.spec.transcribe...)
-	for _, rule := range rules {
-		buf.WriteString(regexpLetters(rule.from.re.String()))
-		buf.WriteString(regexpLetters(rule.from.neg.String()))
-	}
+// 1. Normalize input word.
+func (h *Hangulizer) normalize(word string) string {
+	// TODO(sublee): Language-specific normalizer
+	except := make([]string, 0)
 
-	// Choose non-marker letters.
+	args := make([]string, 0)
+	for to, froms := range h.spec.normalize {
+		for _, from := range froms {
+			args = append(args, from, to)
+		}
+
+		except = append(except, to)
+	}
+	rep := strings.NewReplacer(args...)
+	word = rep.Replace(word)
+
+	word = Normalize(word, RomanNormalizer{}, except)
+
+	word = strings.ToLower(word)
+
+	return word
+}
+
+func (h *Hangulizer) begin(word string) []Chunk {
+	// Detect letters used in patterns except markers.
+	rules := append(h.spec.rewrite, h.spec.transcribe...)
 	markers := set(h.spec.Config.Markers)
 
 	letters := make([]string, 0)
-	for _, ch := range buf.String() {
-		let := string(ch)
-		if inSet(let, markers) {
-			continue
+
+	for _, rule := range rules {
+		for _, let := range rule.from.letters {
+			if inSet(let, markers) {
+				continue
+			}
+			letters = append(letters, let)
 		}
-		letters = append(letters, let)
 	}
 
 	letters = set(letters)
@@ -197,38 +215,4 @@ func (h *Hangulizer) assembleJamo(chunks []Chunk) string {
 	buf.WriteString(AssembleJamo(jamoBuf.String()))
 
 	return buf.String()
-}
-
-// -----------------------------------------------------------------------------
-
-func (h *Hangulizer) newMask(word string) []bool {
-	text := []rune(word)
-	return make([]bool, len(text))
-}
-
-// -----------------------------------------------------------------------------
-
-func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
-	// TODO(sublee): Language-specific normalizer
-	orig := word
-
-	except := make([]string, 0)
-
-	args := make([]string, 0)
-	for to, froms := range h.spec.normalize {
-		for _, from := range froms {
-			args = append(args, from, to)
-		}
-
-		except = append(except, to)
-	}
-	rep := strings.NewReplacer(args...)
-	word = rep.Replace(word)
-
-	word = Normalize(word, RomanNormalizer{}, except)
-
-	word = strings.ToLower(word)
-
-	trace(ch, word, orig, "roman")
-	return word
 }
