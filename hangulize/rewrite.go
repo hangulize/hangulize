@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -11,6 +12,12 @@ type Replacement struct {
 	repls []string
 }
 
+func (r Replacement) String() string {
+	return fmt.Sprintf(`%d-%d -> %s`,
+		r.start, r.stop, strings.Join(r.repls, ","),
+	)
+}
+
 // Replacer determines replacements.
 type Replacer interface {
 	Replacements(string) []Replacement
@@ -18,15 +25,60 @@ type Replacer interface {
 
 // -----------------------------------------------------------------------------
 
+// Replaced is an indicator which letters have been replaced.
+type Replaced struct {
+	flags []bool
+}
+
+func NewReplaced(word string) *Replaced {
+	flags := make([]bool, len(word))
+	return &Replaced{flags}
+}
+
+func (r Replaced) String() string {
+	var buf strings.Builder
+
+	for _, flag := range r.flags {
+		if flag {
+			buf.WriteRune('#')
+		} else {
+			buf.WriteRune('_')
+		}
+	}
+
+	return buf.String()
+}
+
+func (r *Replaced) Mark(start, stop, length int) {
+	left := r.flags[:start]
+	right := r.flags[stop:]
+
+	mid := make([]bool, length)
+	for i := 0; i < length; i++ {
+		mid[i] = true
+	}
+
+	r.flags = append(left, append(mid, right...)...)
+}
+
+// -----------------------------------------------------------------------------
+
 // Rewrite applies multiple replacers on a word.
-func Rewrite(word string, reps ...Replacer) []string {
+func Rewrite(word string, reps ...Replacer) (string, *Replaced) {
+	replaced := NewReplaced(word)
+
 	for _, rep := range reps {
 		var buf strings.Builder
 
 		offset := 0
 		for _, r := range rep.Replacements(word) {
+			// TODO(sublee): Support multiple replacements.
+			repl := r.repls[0]
+
+			replaced.Mark(r.start, r.stop, len(repl))
+
 			buf.WriteString(word[offset:r.start])
-			buf.WriteString(r.repls[0])
+			buf.WriteString(repl)
 			offset = r.stop
 		}
 		buf.WriteString(word[offset:])
@@ -34,7 +86,7 @@ func Rewrite(word string, reps ...Replacer) []string {
 		word = buf.String()
 	}
 
-	return []string{word}
+	return word, replaced
 }
 
 // -----------------------------------------------------------------------------
