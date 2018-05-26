@@ -66,17 +66,17 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	word = h.normalize(word, ch)
 
 	reps := h.spec.Replacers()
-	word, replaced := Rewrite(word, reps...)
+	word, replaced := Rewrite(word, reps, nil)
 
-	fmt.Println(replaced)
+	fmt.Println(FormatFlags(replaced))
 
 	// 	word = h.normalize(word, ch)
 	// 	word = h.rewrite(word, ch)
 	// 	word, _ = h.transcribe(word, ch)
 
-	mask := [10000]bool{}
+	// mask := [10000]bool{}
 
-	word = h.removeMarkers(word, mask[:], ch)
+	// word = h.removeMarkers(word, mask[:], ch)
 
 	word = AssembleJamo(word, ch)
 	return word

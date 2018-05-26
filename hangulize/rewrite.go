@@ -25,20 +25,30 @@ type Replacer interface {
 
 // -----------------------------------------------------------------------------
 
-// Replaced is an indicator which letters have been replaced.
-type Replaced struct {
+type ReplacedBuilder struct {
 	flags []bool
 }
 
-func NewReplaced(word string) *Replaced {
-	flags := make([]bool, len(word))
-	return &Replaced{flags}
+func (b *ReplacedBuilder) Flags() []bool {
+	return b.flags
 }
 
-func (r Replaced) String() string {
+func (b *ReplacedBuilder) Write(flag bool, length int) {
+	for i := 0; i < length; i++ {
+		b.flags = append(b.flags, flag)
+	}
+}
+
+func (b *ReplacedBuilder) WriteFrom(flags []bool, start, stop int) {
+	for i := start; i < stop; i++ {
+		b.flags = append(b.flags, flags[i])
+	}
+}
+
+func FormatFlags(flags []bool) string {
 	var buf strings.Builder
 
-	for _, flag := range r.flags {
+	for _, flag := range flags {
 		if flag {
 			buf.WriteRune('#')
 		} else {
@@ -49,41 +59,38 @@ func (r Replaced) String() string {
 	return buf.String()
 }
 
-func (r *Replaced) Mark(start, stop, length int) {
-	left := r.flags[:start]
-	right := r.flags[stop:]
-
-	mid := make([]bool, length)
-	for i := 0; i < length; i++ {
-		mid[i] = true
-	}
-
-	r.flags = append(left, append(mid, right...)...)
-}
-
 // -----------------------------------------------------------------------------
 
 // Rewrite applies multiple replacers on a word.
-func Rewrite(word string, reps ...Replacer) (string, *Replaced) {
-	replaced := NewReplaced(word)
+func Rewrite(word string, reps []Replacer, replaced []bool) (string, []bool) {
+	if replaced == nil {
+		replaced = make([]bool, len(word))
+	} else if len(replaced) != len(word) {
+		panic("length of replaced different with word's length")
+	}
 
 	for _, rep := range reps {
 		var buf strings.Builder
+		var rbuf ReplacedBuilder
 
 		offset := 0
 		for _, r := range rep.Replacements(word) {
 			// TODO(sublee): Support multiple replacements.
 			repl := r.repls[0]
 
-			replaced.Mark(r.start, r.stop, len(repl))
-
 			buf.WriteString(word[offset:r.start])
+			rbuf.WriteFrom(replaced, offset, r.start)
+
 			buf.WriteString(repl)
+			rbuf.Write(true, len(repl))
+
 			offset = r.stop
 		}
 		buf.WriteString(word[offset:])
+		rbuf.WriteFrom(replaced, offset, len(word))
 
 		word = buf.String()
+		replaced = rbuf.Flags()
 	}
 
 	return word, replaced

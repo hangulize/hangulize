@@ -20,7 +20,7 @@ func rewrite(word string, fromExpr string, toExpr string) string {
 		newPattern(fromExpr, spec),
 		newRPattern(toExpr, spec),
 	)
-	word, _ = Rewrite(word, r)
+	word, _ = Rewrite(word, []Replacer{r}, nil)
 	return word
 }
 
@@ -55,8 +55,8 @@ func TestRewrite(t *testing.T) {
 	rep1 := &replacer1{}
 	rep2 := &replacer2{}
 
-	word, replaced := Rewrite("hello", rep1, rep2)
+	word, replaced := Rewrite("hello?", []Replacer{rep1, rep2}, nil)
 
-	assert.Equal(t, "122", word)
-	assert.Equal(t, "###", replaced.String())
+	assert.Equal(t, "122?", word)
+	assert.Equal(t, "###_", FormatFlags(replaced))
 }
