@@ -16,11 +16,11 @@ func rewrite(word string, fromExpr string, toExpr string) string {
 	macros:
 		"@" = "<vowels>"
 	`)
-	r := rewriteRule{
-		from: newPattern(fromExpr, spec),
-		to:   []*RPattern{newRPattern(toExpr, spec)},
-	}
-	return r.rewrite(word, nil)
+	r := NewRule(
+		newPattern(fromExpr, spec),
+		newRPattern(toExpr, spec),
+	)
+	return Rewrite(word, r)[0]
 }
 
 func TestVarToVar(t *testing.T) {
@@ -32,4 +32,23 @@ func TestVarToVar(t *testing.T) {
 
 func TestCaret(t *testing.T) {
 	assert.Equal(t, "baa", rewrite("aaa", "^a", "b"))
+}
+
+// -----------------------------------------------------------------------------
+
+type replacer1 struct{}
+type replacer2 struct{}
+
+func (*replacer1) Replacements(word string) []Replacement {
+	return []Replacement{Replacement{0, 1, []string{"1"}}}
+}
+
+func (*replacer2) Replacements(word string) []Replacement {
+	return []Replacement{Replacement{1, 2, []string{"2"}}}
+}
+
+func TestRewrite(t *testing.T) {
+	rep1 := &replacer1{}
+	rep2 := &replacer2{}
+	assert.Equal(t, "12llo", Rewrite("hello", rep1, rep2)[0])
 }

@@ -59,14 +59,32 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 	}
 	trace(ch, word, "", "input")
 
+	// mask := h.newMask(word)
+	// fmt.Println(word, mask)
+
 	word = h.normalize(word, ch)
-	word = h.rewrite(word, ch)
-	word = h.transcribe(word, ch)
+
+	reps := h.spec.Replacers()
+	words := Rewrite(word, reps...)
+	word = words[0]
+
+	// 	word = h.normalize(word, ch)
+	// 	word = h.rewrite(word, ch)
+	// 	word, _ = h.transcribe(word, ch)
+
+	mask := [10000]bool{}
+
+	word = h.removeMarkers(word, mask[:], ch)
 
 	word = AssembleJamo(word, ch)
-	word = h.removeMarkers(word, ch)
-
 	return word
+}
+
+// -----------------------------------------------------------------------------
+
+func (h *Hangulizer) newMask(word string) []bool {
+	text := []rune(word)
+	return make([]bool, len(text))
 }
 
 // -----------------------------------------------------------------------------
@@ -96,21 +114,32 @@ func (h *Hangulizer) normalize(word string, ch chan<- Trace) string {
 	return word
 }
 
-func (h *Hangulizer) rewrite(word string, ch chan<- Trace) string {
-	return h.spec.rewrite.Rewrite(word, ch)
-}
-
-func (h *Hangulizer) transcribe(word string, ch chan<- Trace) string {
-	return h.spec.transcribe.Rewrite(word, ch)
-}
-
-func (h *Hangulizer) removeMarkers(word string, ch chan<- Trace) string {
+func (h *Hangulizer) removeMarkers(
+	word string, mask []bool, ch chan<- Trace,
+) string {
 	orig := word
 
 	markers := h.spec.Config.Markers
-	for _, marker := range markers {
-		word = strings.Replace(word, string(marker), "", -1)
+
+	args := make([]string, len(markers)*2)
+	for i, marker := range markers {
+		args[i*2] = string(marker)
+		args[i*2+1] = ""
 	}
+	rep := strings.NewReplacer(args...)
+
+	var buf strings.Builder
+
+	for i, ch := range []rune(word) {
+		if mask[i] {
+			// keep letter.
+			buf.WriteRune(ch)
+		} else {
+			rep.WriteString(&buf, string(ch))
+		}
+	}
+
+	word = buf.String()
 
 	trace(ch, word, orig, "remove-markers")
 	return word

@@ -18,14 +18,31 @@ type Spec struct {
 	vars      map[string][]string
 	normalize map[string][]string
 
-	rewrite    *Rewriter
-	transcribe *Rewriter
+	rewrite    []*Rule
+	transcribe []*Rule
 
 	Test []hgl.Pair
 }
 
 func (s *Spec) String() string {
 	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
+}
+
+func (s *Spec) Replacers() []Replacer {
+	reps := make([]Replacer, len(s.rewrite)+len(s.transcribe))
+	i := 0
+
+	for _, rule := range s.rewrite {
+		reps[i] = rule
+		i++
+	}
+
+	for _, rule := range s.transcribe {
+		reps[i] = rule
+		i++
+	}
+
+	return reps
 }
 
 // ParseSpec parses a Spec from an HGL source.
@@ -90,25 +107,23 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// rewrite
-	var rewrite *Rewriter
 	var rewritePairs []hgl.Pair
 	if sec, ok := h["rewrite"]; ok {
 		rewritePairs = sec.(*hgl.ListSection).Array()
 	}
 
-	rewrite, err = NewRewriter(rewritePairs, macros, vars)
+	rewrite, err := newRules(rewritePairs, macros, vars)
 	if err != nil {
 		return nil, err
 	}
 
 	// transcribe
-	var transcribe *Rewriter
 	var transcribePairs []hgl.Pair
 	if sec, ok := h["transcribe"]; ok {
 		transcribePairs = sec.(*hgl.ListSection).Array()
 	}
 
-	transcribe, err = NewRewriter(transcribePairs, macros, vars)
+	transcribe, err := newRules(transcribePairs, macros, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -196,4 +211,34 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 		Markers: markers,
 	}
 	return &config, nil
+}
+
+// -----------------------------------------------------------------------------
+
+func newRules(
+	pairs []hgl.Pair,
+
+	macros map[string]string,
+	vars map[string][]string,
+
+) ([]*Rule, error) {
+
+	rules := make([]*Rule, len(pairs))
+
+	for i, pair := range pairs {
+		from, err := NewPattern(pair.Left(), macros, vars)
+		if err != nil {
+			return nil, err
+		}
+
+		right := pair.Right()
+		to := make([]*RPattern, len(right))
+		for j, expr := range right {
+			to[j] = NewRPattern(expr, macros, vars)
+		}
+
+		rules[i] = NewRule(from, to...)
+	}
+
+	return rules, nil
 }

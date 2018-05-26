@@ -1,68 +1,70 @@
 package hangulize
 
 import (
-	"fmt"
-
-	"github.com/sublee/hangulize2/hgl"
+	"strings"
 )
 
-// Rewriter is a container of sequential rewriting rules.
-type Rewriter struct {
-	rules []rewriteRule
+// Replacement lets Rewrite know which letters should be replaced.
+type Replacement struct {
+	start int
+	stop  int
+	repls []string
 }
 
-// NewRewriter creates a Rewriter from HGL pairs which are read from a spec.
-func NewRewriter(
-	pairs []hgl.Pair,
-
-	macros map[string]string,
-	vars map[string][]string,
-
-) (*Rewriter, error) {
-
-	rules := make([]rewriteRule, len(pairs))
-
-	for i, pair := range pairs {
-		from, err := NewPattern(pair.Left(), macros, vars)
-		if err != nil {
-			return nil, err
-		}
-
-		right := pair.Right()
-		to := make([]*RPattern, len(right))
-
-		for j, expr := range right {
-			to[j] = NewRPattern(expr, macros, vars)
-		}
-
-		rules[i] = rewriteRule{from, to}
-	}
-
-	return &Rewriter{rules}, nil
-}
-
-// Rewrite performs rewriting for every rules sequentially.  Each rewriting
-// result will be the input for the next rewriting rule.
-func (r *Rewriter) Rewrite(word string, ch chan<- Trace) string {
-	for _, rule := range r.rules {
-		word = rule.rewrite(word, ch)
-	}
-	return word
+// Replacer determines replacements.
+type Replacer interface {
+	Replacements(string) []Replacement
 }
 
 // -----------------------------------------------------------------------------
 
-// rewriteRule represents a rewriting rule.  It describes how a word should be
-// rewritten.
-type rewriteRule struct {
+// Rewrite applies multiple replacers on a word.
+func Rewrite(word string, reps ...Replacer) []string {
+	for _, rep := range reps {
+		var buf strings.Builder
+
+		offset := 0
+		for _, r := range rep.Replacements(word) {
+			buf.WriteString(word[offset:r.start])
+			buf.WriteString(r.repls[0])
+			offset = r.stop
+		}
+		buf.WriteString(word[offset:])
+
+		word = buf.String()
+	}
+
+	return []string{word}
+}
+
+// -----------------------------------------------------------------------------
+
+// Rule is a replacer based on Pattern and RPatterns.
+type Rule struct {
 	from *Pattern
 	to   []*RPattern
 }
 
-// rewrite rewrites a word for a rule.
-func (r *rewriteRule) rewrite(word string, ch chan<- Trace) string {
-	orig := word
-	word = r.from.Replace(word, r.to, -1)[0]
-	trace(ch, word, orig, fmt.Sprintf("%s->%s", r.from, r.to[0]))
-	return word
+// NewRule creates a Rule.
+func NewRule(from *Pattern, to ...*RPattern) *Rule {
+	return &Rule{from, to}
+}
+
+// Replacements determines which letters should be replaced
+// based on Pattern and RPatterns.
+func (r *Rule) Replacements(word string) []Replacement {
+	rs := make([]Replacement, 0)
+
+	for _, m := range r.from.Find(word, -1) {
+		start, stop := m[0], m[1]
+
+		repls := make([]string, len(r.to))
+		for i, rp := range r.to {
+			repls[i] = rp.Interpolate(r.from, word, m)
+		}
+
+		rs = append(rs, Replacement{start, stop, repls})
+	}
+
+	return rs
 }
