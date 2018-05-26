@@ -101,3 +101,12 @@ func inSet(val string, set []string) bool {
 	i := sort.SearchStrings(set, val)
 	return i < len(set) && set[i] == val
 }
+
+// trueFlags generates [true...] for the given length.
+func trueFlags(length int) []bool {
+	flags := make([]bool, length)
+	for i := 0; i < length; i++ {
+		flags[i] = true
+	}
+	return flags
+}
