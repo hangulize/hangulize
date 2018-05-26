@@ -65,7 +65,7 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 
 	word = h.normalize(word, ch)
 
-	chunks := []Chunk{Chunk{word, 0}}
+	chunks := h.start(word)
 
 	chunks = h.rewrite(chunks)
 	fmt.Println("rewrite", chunks)
@@ -84,6 +84,11 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 }
 
 // -----------------------------------------------------------------------------
+// Hangulize pipeline
+
+func (h *Hangulizer) start(word string) []Chunk {
+	return []Chunk{Chunk{word, 0}}
+}
 
 // Rewrite applies multiple replacers on a word.
 func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
@@ -91,9 +96,9 @@ func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
 
 	for _, chunk := range chunks {
 		word := chunk.word
-		age := chunk.age
+		level := chunk.level
 
-		rep := NewChunkedReplacer(word, age, 0)
+		rep := NewChunkedReplacer(word, level, 1)
 
 		for _, rule := range h.spec.rewrite {
 			for _, r := range rule.Replacements(word) {
@@ -102,7 +107,7 @@ func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
 			word = rep.String()
 		}
 
-		buf.Put(rep.Chunks())
+		buf.Put(rep.Chunks()...)
 	}
 
 	return buf.Chunks()
@@ -113,10 +118,10 @@ func (h *Hangulizer) transcribe(chunks []Chunk) []Chunk {
 
 	for _, chunk := range chunks {
 		word := chunk.word
-		age := chunk.age
+		level := chunk.level
 
-		rep := NewChunkedReplacer(word, age)
-		dummy := NewChunkedReplacer(word, age)
+		rep := NewChunkedReplacer(word, level, 2)
+		dummy := NewChunkedReplacer(word, 0, 0)
 
 		for _, rule := range h.spec.transcribe {
 			for _, r := range rule.Replacements(word) {
@@ -129,7 +134,17 @@ func (h *Hangulizer) transcribe(chunks []Chunk) []Chunk {
 			word = dummy.String()
 		}
 
-		buf.Put(rep.Chunks())
+		buf.Put(rep.Chunks()...)
+	}
+
+	chunks = buf.Chunks()
+	buf.Reset()
+
+	for _, chunk := range chunks {
+		if chunk.level == 1 {
+			continue
+		}
+		buf.Put(chunk)
 	}
 
 	return buf.Chunks()
@@ -142,7 +157,7 @@ func (h *Hangulizer) assembleJamo(chunks []Chunk) string {
 	for _, chunk := range chunks {
 		// Don't touch age=0 chunks.
 		// They have never rewritten or transcribed.
-		if chunk.age == 0 {
+		if chunk.level == 0 {
 			buf.WriteString(AssembleJamo(jamoBuf.String()))
 			jamoBuf.Reset()
 
