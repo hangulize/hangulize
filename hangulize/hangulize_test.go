@@ -74,3 +74,32 @@ func TestHyphen(t *testing.T) {
 	`)
 	assert.Equal(t, "엑스", hangulize(spec, "ex"))
 }
+
+func TestTrail(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"x"  -> "xx"
+		"ex" -> "k"
+
+	transcribe:
+		"k" -> "ㄱ"
+		"x" -> "-ㄱㅅ"
+	`)
+	// e x !
+	//   │       x->xx
+	//   ├─┐
+	// e x x !
+	// ├─┘       ex->k
+	// │
+	// k x !
+	// │         k->ㄱ
+	// │
+	// ㄱx !
+	//   │       x->-ㄱㅅ
+	//   ├─┬─┐
+	// ㄱ- ㄱㅅ!
+	// ├─┴─┘ │   jamo
+	// │ ┌───┘
+	// 극스!
+	assert.Equal(t, "극스!", hangulize(spec, "ex!"))
+}
