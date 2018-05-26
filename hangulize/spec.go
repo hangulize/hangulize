@@ -28,23 +28,6 @@ func (s *Spec) String() string {
 	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
 }
 
-func (s *Spec) Replacers() []Replacer {
-	reps := make([]Replacer, len(s.rewrite)+len(s.transcribe))
-	i := 0
-
-	for _, rule := range s.rewrite {
-		reps[i] = rule
-		i++
-	}
-
-	for _, rule := range s.transcribe {
-		reps[i] = rule
-		i++
-	}
-
-	return reps
-}
-
 // ParseSpec parses a Spec from an HGL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
 	var err error
@@ -232,12 +215,9 @@ func newRules(
 		}
 
 		right := pair.Right()
-		to := make([]*RPattern, len(right))
-		for j, expr := range right {
-			to[j] = NewRPattern(expr, macros, vars)
-		}
+		to := NewRPattern(right[0], macros, vars)
 
-		rules[i] = NewRule(from, to...)
+		rules[i] = &Rule{from, to}
 	}
 
 	return rules, nil
