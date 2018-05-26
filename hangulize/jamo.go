@@ -14,9 +14,7 @@ const none = rune(0)
 // A decomposed Jamo word looks like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ".  A Jaeum
 // after a hyphen becomes a tail (Moeum).
 //
-func AssembleJamo(word string, ch chan<- Trace) string {
-	orig := word
-
+func AssembleJamo(word string) string {
 	r := bufio.NewReader(strings.NewReader(word))
 	var buf strings.Builder
 
@@ -102,7 +100,5 @@ func AssembleJamo(word string, ch chan<- Trace) string {
 		writeLetter()
 	}
 
-	word = buf.String()
-	trace(ch, word, orig, "complete-hangul")
-	return word
+	return buf.String()
 }

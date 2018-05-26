@@ -76,6 +76,18 @@ func TestHyphen(t *testing.T) {
 	assert.Equal(t, "엑스야!", hangulize(spec, "ex야!"))
 }
 
+func TestDifferentAges(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"x" -> "xx"
+
+	transcribe:
+		"xx" -> "-ㄱㅅ"
+		"e" -> "ㅔ"
+	`)
+	assert.Equal(t, "엑스야!", hangulize(spec, "ex야!"))
+}
+
 func TestKeepAndCleanup(t *testing.T) {
 	spec := parseSpec(`
 	rewrite:

@@ -67,27 +67,93 @@ func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
 
 	chunks := []Chunk{Chunk{word, 0}}
 
-	chunks = Rewrite(chunks, h.spec.rewrite)
+	chunks = h.rewrite(chunks)
 	fmt.Println("rewrite", chunks)
 
-	chunks = Replace(chunks, h.spec.transcribe)
+	chunks = h.transcribe(chunks)
 	fmt.Println("transcribe", chunks)
 
-	for i, chunk := range chunks {
-		if chunk.age != 0 {
-			chunk.word = AssembleJamo(chunk.word, ch)
-			chunks[i] = chunk
+	word = h.assembleJamo(chunks)
+	fmt.Println("jamo", word)
+
+	// word = NewChunkBuilder(chunks).String()
+	// fmt.Println("join", word)
+
+	// word = h.cleanUp(word)
+	return word
+}
+
+// -----------------------------------------------------------------------------
+
+// Rewrite applies multiple replacers on a word.
+func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
+	var buf ChunkBuilder
+
+	for _, chunk := range chunks {
+		word := chunk.word
+		age := chunk.age
+
+		rep := NewChunkedReplacer(word, age, 0)
+
+		for _, rule := range h.spec.rewrite {
+			for _, r := range rule.Replacements(word) {
+				rep.Replace(r.start, r.stop, r.word)
+			}
+			word = rep.String()
 		}
+
+		buf.Put(rep.Chunks())
 	}
 
-	fmt.Println("jamo", chunks)
+	return buf.Chunks()
+}
 
-	word = NewChunkBuilder(chunks).String()
+func (h *Hangulizer) transcribe(chunks []Chunk) []Chunk {
+	var buf ChunkBuilder
 
-	fmt.Println("join", word)
+	for _, chunk := range chunks {
+		word := chunk.word
+		age := chunk.age
 
-	word = h.cleanUp(word)
-	return word
+		rep := NewChunkedReplacer(word, age)
+		dummy := NewChunkedReplacer(word, age)
+
+		for _, rule := range h.spec.transcribe {
+			for _, r := range rule.Replacements(word) {
+				rep.Replace(r.start, r.stop, r.word)
+
+				nulls := strings.Repeat("\x00", len(r.word))
+				dummy.Replace(r.start, r.stop, nulls)
+			}
+			rep.flush()
+			word = dummy.String()
+		}
+
+		buf.Put(rep.Chunks())
+	}
+
+	return buf.Chunks()
+}
+
+func (h *Hangulizer) assembleJamo(chunks []Chunk) string {
+	var buf strings.Builder
+	var jamoBuf strings.Builder
+
+	for _, chunk := range chunks {
+		// Don't touch age=0 chunks.
+		// They have never rewritten or transcribed.
+		if chunk.age == 0 {
+			buf.WriteString(AssembleJamo(jamoBuf.String()))
+			jamoBuf.Reset()
+
+			buf.WriteString(chunk.word)
+			continue
+		}
+		jamoBuf.WriteString(chunk.word)
+	}
+	buf.WriteString(jamoBuf.String())
+
+	return buf.String()
 }
 
 // -----------------------------------------------------------------------------
