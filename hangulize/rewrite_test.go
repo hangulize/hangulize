@@ -16,11 +16,11 @@ func rewrite(word string, fromExpr string, toExpr string) string {
 	macros:
 		"@" = "<vowels>"
 	`)
-	r := RewriteRule{
+	r := rewriteRule{
 		from: newPattern(fromExpr, spec),
 		to:   []*RPattern{newRPattern(toExpr, spec)},
 	}
-	return r.Rewrite(word, nil)
+	return r.rewrite(word, nil)
 }
 
 func TestVarToVar(t *testing.T) {
