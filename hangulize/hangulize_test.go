@@ -9,6 +9,11 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func hangulize(spec *Spec, word string) string {
+	h := NewHangulizer(spec)
+	return h.Hangulize(word)
+}
+
 // TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
 	for _, lang := range ListLangs() {
@@ -59,10 +64,13 @@ func TestSlash(t *testing.T) {
 }
 
 func TestHyphen(t *testing.T) {
-	// config:
-	// 	markers = "-"
+	spec := parseSpec(`
+	config:
+		markers = "-"
 
-	// transcribe:
-	// 	"x" -> "-ㄱㅅ"
-	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
+	transcribe:
+		"e" -> "ㅔ"
+		"x" -> "-ㄱㅅ"
+	`)
+	assert.Equal(t, "엑스", hangulize(spec, "ex"))
 }
