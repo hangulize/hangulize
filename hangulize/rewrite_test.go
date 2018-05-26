@@ -45,13 +45,18 @@ func (*replacer1) Replacements(word string) []Replacement {
 }
 
 func (*replacer2) Replacements(word string) []Replacement {
-	return []Replacement{Replacement{1, 2, []string{"2"}}}
+	return []Replacement{
+		Replacement{1, 3, []string{"2"}},
+		Replacement{3, 5, []string{"2"}},
+	}
 }
 
 func TestRewrite(t *testing.T) {
 	rep1 := &replacer1{}
 	rep2 := &replacer2{}
+
 	word, replaced := Rewrite("hello", rep1, rep2)
-	assert.Equal(t, "12llo", word)
-	assert.Equal(t, "##___", replaced.String())
+
+	assert.Equal(t, "122", word)
+	assert.Equal(t, "###", replaced.String())
 }
