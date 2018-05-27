@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+import argparse
 from collections import defaultdict
 import io
 import sys
@@ -75,14 +76,15 @@ class Section(object):
         return buf.getvalue().encode('utf-8')
 
 
-def main(argv):
-    try:
-        code = argv[1]
-    except IndexError:
-        print('Usage 1to2.py LANG')
-        raise SystemExit(2)
+cli = argparse.ArgumentParser(description='Hangulize language spec migrator')
+cli.add_argument('lang', metavar='LANG')
+cli.add_argument('--author', metavar="'NAME <EMAIL>'", default='???')
 
-    lang = hangulize.get_lang(code)
+
+def main(argv):
+    args = cli.parse_args()
+
+    lang = hangulize.get_lang(args.lang)
     locale = babel.Locale(lang.iso639_1)
 
     # detect normalize
@@ -137,7 +139,7 @@ def main(argv):
             rewrite.append((pattern, rpattern))
 
     # find test
-    test_module = getattr(__import__('tests.%s' % code), code)
+    test_module = getattr(__import__('tests.%s' % args.lang), args.lang)
     for attr, val in vars(test_module).items():
         if attr.endswith('TestCase') and not attr.startswith('Hangulize'):
             break
@@ -147,7 +149,7 @@ def main(argv):
     # render
 
     sec = Section('lang')
-    sec.put('id', code)
+    sec.put('id', args.lang)
     sec.put('codes', lang.iso639_1, lang.iso639_3)
     sec.put('english', locale.get_language_name('en_US'))
     sec.put('korean', locale.get_language_name('ko_KR'))
@@ -155,7 +157,7 @@ def main(argv):
     print(sec.draw('='), end='')
 
     sec = Section('config')
-    sec.put('author', '???')
+    sec.put('author', args.author)
     sec.put('stage', 'draft')
     if lang.__tmp__:
         sec.put('markers', *lang.__tmp__)
