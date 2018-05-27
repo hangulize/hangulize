@@ -176,7 +176,7 @@ func expandEdges(expr string) string {
 		case ``:
 			return ``
 		case `^`:
-			// "/" is a zero-width space which is inserted by an RPattern.
+			// "/" is a zero-width space which is injected by an RPattern.
 			return `(?:^|\s+|/)`
 		default:
 			// ^^...
@@ -188,7 +188,7 @@ func expandEdges(expr string) string {
 		case ``:
 			return ``
 		case `$`:
-			// "/" is a zero-width space which is inserted by an RPattern.
+			// "/" is a zero-width space which is injected by an RPattern.
 			return `(?:$|\s+|/)`
 		default:
 			// $$...

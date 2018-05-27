@@ -216,7 +216,10 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	swBuf.Reset()
 
 	for _, sw := range subwords {
-		if sw.level == 1 && !isSpace(sw.word) {
+		if sw.level == 1 {
+			if hasSpace(sw.word) {
+				swBuf.Append(subword{" ", 1})
+			}
 			continue
 		}
 		swBuf.Append(sw)
