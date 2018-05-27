@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"regexp"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 // Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
@@ -53,7 +55,7 @@ func NewPattern(
 
 	reExpr, negExpr, err := expandLookaround(reExpr)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
 
 	reExpr = expandEdges(reExpr)
@@ -66,16 +68,23 @@ func NewPattern(
 	letters = set(letters)
 
 	// Compile regexp.
-	re := regexp.MustCompile(reExpr)
-	neg := regexp.MustCompile(negExpr)
+	re, err := regexp.Compile(reExpr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+	}
+
+	neg, err := regexp.Compile(negExpr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+	}
 
 	p := &Pattern{expr, re, neg, letters, usedVars}
 	return p, nil
 }
 
-// ExplainPattern shows the HRE expression with
+// Explain shows the HRE expression with
 // the underlying standard regexp patterns.
-func ExplainPattern(p *Pattern) string {
+func (p *Pattern) Explain() string {
 	if p == nil {
 		return fmt.Sprintf("%#v", nil)
 	}

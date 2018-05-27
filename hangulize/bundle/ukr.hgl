@@ -6,9 +6,8 @@ lang:
     script  = "roman"
 
 config:
-    author  = "Brian Jongseong Park <iceager@gmail.com>"
-    stage   = "draft"
-    markers = ",", ";"
+    author = "Brian Jongseong Park <iceager@gmail.com>"
+    stage  = "draft"
 
 macros:
     "@" = "<vowels>"
@@ -54,7 +53,7 @@ normalize:
     "і" = "І"
 
 rewrite:
-    "-"                    -> "/"
+    "-"                    -> "{}"
     "{ж|з|ц|ч|ш|щ}ь{@}"    -> ""
     "ьа"                   -> "я"
     "йа"                   -> "я"

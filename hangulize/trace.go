@@ -14,16 +14,16 @@ func (t *Trace) String() string {
 	return fmt.Sprintf("[%s] %#v %s", t.step, t.word, t.why)
 }
 
-type Tracer struct {
+type tracer struct {
 	traces   []Trace
 	lastWord string
 }
 
-func (tr *Tracer) Traces() []Trace {
+func (tr *tracer) Traces() []Trace {
 	return tr.traces
 }
 
-func (tr *Tracer) trace(step, why, word string) {
+func (tr *tracer) trace(step, why, word string) {
 	if word == tr.lastWord {
 		return
 	}
@@ -31,17 +31,18 @@ func (tr *Tracer) trace(step, why, word string) {
 	tr.lastWord = word
 }
 
-func (tr *Tracer) TraceWord(step, why, word string) {
+func (tr *tracer) TraceWord(step, why, word string) {
 	if tr == nil {
 		return
 	}
 	tr.trace(step, why, word)
 }
 
-func (tr *Tracer) TraceSubwords(step, why string, subwords []Subword) {
+func (tr *tracer) TraceSubwords(step, why string, subwords []subword) {
 	if tr == nil {
 		return
 	}
-	word := NewSubwordsBuilder(subwords).String()
+	b := subwordsBuilder{subwords}
+	word := b.String()
 	tr.trace(step, why, word)
 }

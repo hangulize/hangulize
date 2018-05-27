@@ -1,6 +1,6 @@
 lang:
     id      = "hbs"
-    codes   = "", "hbs"
+    codes   = "sh", "hbs"
     english = "Serbo-Croatian"
     korean  = "세르보크로아트어"
     script  = "roman"

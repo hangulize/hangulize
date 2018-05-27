@@ -78,14 +78,14 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 				"%s",
 				word,
 				drawUnderline(m[0], m[1]),
-				ExplainPattern(p))
+				p.Explain())
 			continue
 		}
 
 		// Must match.
 		if !ok {
 			assert.Failf(t, "must match but not matched",
-				"must MATCH with %#v\n%s", word, ExplainPattern(p))
+				"must MATCH with %#v\n%s", word, p.Explain())
 		}
 
 		if i == len(scenario) {
@@ -122,6 +122,6 @@ func assertMatch(t *testing.T, p *Pattern, scenario []string) {
 			"%s",
 			word, underline[3:],
 			word, drawUnderline(m[0], m[1]),
-			ExplainPattern(p))
+			p.Explain())
 	}
 }

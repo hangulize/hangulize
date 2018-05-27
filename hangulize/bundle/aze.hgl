@@ -6,9 +6,8 @@ lang:
     script  = "roman"
 
 config:
-    author  = "Brian Jongseong Park <iceager@gmail.com>"
-    stage   = "draft"
-    markers = ",", ";"
+    author = "Brian Jongseong Park <iceager@gmail.com>"
+    stage  = "draft"
 
 macros:
     "@" = "<vowels>"
@@ -53,7 +52,7 @@ normalize:
     "ü" = "Ü", "ү", "Ү"
 
 rewrite:
-    "-"            -> "/"
+    "-"            -> "{}"
     "ə"            -> "A"
     "ç"            -> "C"
     "ğ"            -> "G"
