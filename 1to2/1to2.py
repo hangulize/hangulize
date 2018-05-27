@@ -85,7 +85,13 @@ def main(argv):
     args = cli.parse_args()
 
     lang = hangulize.get_lang(args.lang)
-    locale = babel.Locale(lang.iso639_1)
+    try:
+        locale = babel.Locale(lang.iso639_1)
+    except babel.core.UnknownLocaleError:
+        locale = None
+        print('failed to find locale for lang (%s, %s, %s)'
+              '' % (lang.iso639_1, lang.iso639_2, lang.iso639_3),
+              file=sys.stderr)
 
     # detect normalize
     additional_of_normalize_roman = {}
@@ -112,6 +118,9 @@ def main(argv):
         script = 'roman'
     else:
         script = '???'
+        print('failed to detect script of lang (%s, %s, %s)'
+              '' % (lang.iso639_1, lang.iso639_2, lang.iso639_3),
+              file=sys.stderr)
 
     # find vars
     vars_ = []
@@ -151,8 +160,12 @@ def main(argv):
     sec = Section('lang')
     sec.put('id', args.lang)
     sec.put('codes', lang.iso639_1, lang.iso639_3)
-    sec.put('english', locale.get_language_name('en_US'))
-    sec.put('korean', locale.get_language_name('ko_KR'))
+    if locale is None:
+        sec.put('english', '???')
+        sec.put('korean', '???')
+    else:
+        sec.put('english', locale.get_language_name('en_US'))
+        sec.put('korean', locale.get_language_name('ko_KR'))
     sec.put('script', script)
     print(sec.draw('='), end='')
 
