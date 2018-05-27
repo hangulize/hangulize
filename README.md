@@ -53,9 +53,11 @@ bel      draft    Belarusian           벨라루스어
 bul      draft    Bulgarian            불가리아어
 cat      draft    Catalan              카탈로니아어
 ces      draft    Czech                체코어
+cym      draft    Welsh                웨일스어
 deu      draft    German               독일어
 ell      draft    Greek                그리스어
 epo      draft    Esperanto            에스페란토어
+fin      draft    Finnish              핀란드어
 grc      draft    Greek (Ancient)      고대 그리스어
 hbs      draft    Serbo-Croatian       세르보크로아트어
 hun      draft    Hungarian            헝가리어
@@ -68,6 +70,7 @@ lat      draft    Latin                라틴어
 lav      draft    Latvian              라트비아어
 lit      draft    Lithuanian           리투아니아어
 mkd      draft    Macedonian           마케도니아어
+nld      draft    Dutch                네덜란드어
 pol      draft    Polish               폴란드어
 por      draft    Portuguese           포르투갈어
 por-br   draft    Portuguese (Brazil)  브라질 포르투갈어
@@ -80,6 +83,7 @@ swe      draft    Swedish              스웨덴어
 tur      draft    Turkish              터키어
 ukr      draft    Ukrainian            우크라이나어
 vie      draft    Vietnamese           베트남어
+wlm      draft    Middle Welsh         웨일스어(중세)
 ```
 
 ## 만든이
