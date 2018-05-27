@@ -62,6 +62,7 @@ func hangulize(spec *Spec, word string) string {
 // so the result was "글로르이아" instead of "글로르/이아".
 func TestSlash(t *testing.T) {
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
+	assert.Equal(t, "글로르{}이아", Hangulize("ita", "glor{}ia"))
 }
 
 func TestSpecials(t *testing.T) {
@@ -139,7 +140,7 @@ func TestSpace(t *testing.T) {
 func TestZeroWidthSpace(t *testing.T) {
 	spec := parseSpec(`
 	rewrite:
-		"a b" -> "a/b"
+		"a b" -> "a{}b"
 		"^b"  -> "v"
 
 	transcribe:

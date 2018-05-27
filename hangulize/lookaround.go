@@ -19,7 +19,7 @@ var (
 		\{
 
 	--- inside of brace
-		( [^}]* )
+		( [^}]+ )
 
 	--- close brace
 		\}
@@ -38,7 +38,7 @@ var (
 	--- zero-width
 		(?:
 			\{
-			( [^}]* )
+			( [^}]+ )
 			\}
 		)?
 	`)
@@ -50,7 +50,7 @@ var (
 	--- zero-width
 		(?:
 			\{
-			( [^}]* )
+			( [^}]+ )
 			\}
 		)?
 
@@ -176,8 +176,8 @@ func expandEdges(expr string) string {
 		case ``:
 			return ``
 		case `^`:
-			// "/" is a zero-width space which is injected by an RPattern.
-			return `(?:^|\s+|/)`
+			// "{}" is a zero-width space which is injected by an RPattern.
+			return `(?:^|\s+|{})`
 		default:
 			// ^^...
 			return `^`
@@ -188,8 +188,8 @@ func expandEdges(expr string) string {
 		case ``:
 			return ``
 		case `$`:
-			// "/" is a zero-width space which is injected by an RPattern.
-			return `(?:$|\s+|/)`
+			// "{}" is a zero-width space which is injected by an RPattern.
+			return `(?:$|\s+|{})`
 		default:
 			// $$...
 			return `$`
