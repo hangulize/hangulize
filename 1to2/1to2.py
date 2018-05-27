@@ -87,10 +87,12 @@ def main(argv):
 
     # detect normalize
     additional_of_normalize_roman = {}
+    normalize_roman_called = []
 
     def hacked_normalize_roman(string, additional=None):
         if additional:
             additional_of_normalize_roman.update(additional)
+        normalize_roman_called.append(1)
 
     normalize_f = lang.normalize.__func__
     normalize_f.__globals__['normalize_roman'] = hacked_normalize_roman
@@ -102,6 +104,12 @@ def main(argv):
         if src == dst:
             continue
         normalize[dst].add(src)
+
+    # detect script
+    if normalize_roman_called:
+        script = 'roman'
+    else:
+        script = '???'
 
     # find vars
     vars_ = []
@@ -143,7 +151,7 @@ def main(argv):
     sec.put('codes', lang.iso639_1, lang.iso639_3)
     sec.put('english', locale.get_language_name('en_US'))
     sec.put('korean', locale.get_language_name('ko_KR'))
-    sec.put('script', '???')
+    sec.put('script', script)
     print(sec.draw('='), end='')
 
     sec = Section('config')
