@@ -9,12 +9,13 @@ import (
 
 const none = rune(0)
 
-// AssembleJamo makes a complete Hangul word from a decomposed Jamo word.
+// ComposeHangul converts decomposed Jamo phonemes to composed Hangul
+// syllables.
 //
-// A decomposed Jamo word looks like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ".  A Jaeum
-// after a hyphen becomes a tail (Moeum).
+// Decomposed Jamo phonemes look like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ".  A Jaeum
+// after a hyphen ("-ㄴ") means that it is a Jongseong (tail).
 //
-func AssembleJamo(word string) string {
+func ComposeHangul(word string) string {
 	r := bufio.NewReader(strings.NewReader(word))
 	var buf strings.Builder
 
