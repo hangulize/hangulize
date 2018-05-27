@@ -141,3 +141,7 @@ func regexpLetters(reExpr string) string {
 func isSpace(word string) bool {
 	return strings.TrimSpace(word) == ""
 }
+
+func hasSpace(word string) bool {
+	return reSpace.MatchString(word)
+}
