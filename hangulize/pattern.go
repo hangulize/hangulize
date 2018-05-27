@@ -73,9 +73,9 @@ func NewPattern(
 	return p, nil
 }
 
-// ExplainPattern shows the HRE expression with
+// Explain shows the HRE expression with
 // the underlying standard regexp patterns.
-func ExplainPattern(p *Pattern) string {
+func (p *Pattern) Explain() string {
 	if p == nil {
 		return fmt.Sprintf("%#v", nil)
 	}

@@ -38,11 +38,11 @@ func (tr *tracer) TraceWord(step, why, word string) {
 	tr.trace(step, why, word)
 }
 
-func (tr *tracer) TraceSubwords(step, why string, subwords []Subword) {
+func (tr *tracer) TraceSubwords(step, why string, subwords []subword) {
 	if tr == nil {
 		return
 	}
-	b := SubwordsBuilder{subwords}
+	b := subwordsBuilder{subwords}
 	word := b.String()
 	tr.trace(step, why, word)
 }
