@@ -11,11 +11,6 @@ type Subword struct {
 	level int
 }
 
-// Concat makes a new subword whose word is the underlying word + given word.
-func (s *Subword) Concat(word string) *Subword {
-	return &Subword{s.word + word, s.level}
-}
-
 // -----------------------------------------------------------------------------
 
 // SubwordsBuilder is a buffer to build a []Subword array.
