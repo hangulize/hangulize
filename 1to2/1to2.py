@@ -114,6 +114,20 @@ def main(argv):
     if lang.vowels:
         vars_.append('vowels')
 
+    # group rewrite/transcribe
+    rewrite = []
+    transcribe = []
+    for x, rule in enumerate(lang.notation.rules):
+        pattern = rule[0]
+        rpattern = rule[1:]
+        # some rpattern is 2d tuple redundantly.
+        if isinstance(rpattern[0], tuple):
+            rpattern = rpattern[0]
+        if isinstance(rpattern[0], hangulize.Phoneme):
+            transcribe.append((pattern, rpattern))
+        else:
+            rewrite.append((pattern, rpattern))
+
     # find test
     test_module = getattr(__import__('tests.%s' % code), code)
     for attr, val in vars(test_module).items():
@@ -155,21 +169,13 @@ def main(argv):
     print(sec.draw('=', quote_keys=True), end='')
 
     sec = Section('rewrite')
-    for x, rule in enumerate(lang.notation.rules):
-        pattern = rule[0]
-        repl = rule[1:]
-        if isinstance(repl[0], tuple):
-            repl = repl[0]
-        if isinstance(repl[0], hangulize.Phoneme):
-            break
-        sec.put(pattern, repl)
+    for pattern, rpattern in rewrite:
+        sec.put(pattern, rpattern)
     print(sec.draw('->', quote_keys=True), end='')
 
-    sec = Section('hangulize')
-    for rule in lang.notation.rules[x:]:
-        pattern = rule[0]
-        repl = rule[1:]
-        sec.put(pattern, repl)
+    sec = Section('transcribe')
+    for pattern, rpattern in transcribe:
+        sec.put(pattern, rpattern)
     print(sec.draw('->', quote_keys=True), end='')
 
     sec = Section('test')
