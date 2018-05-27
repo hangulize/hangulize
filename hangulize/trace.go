@@ -42,6 +42,7 @@ func (tr *Tracer) TraceSubwords(step, why string, subwords []Subword) {
 	if tr == nil {
 		return
 	}
-	word := NewSubwordsBuilder(subwords).String()
+	b := SubwordsBuilder{subwords}
+	word := b.String()
 	tr.trace(step, why, word)
 }
