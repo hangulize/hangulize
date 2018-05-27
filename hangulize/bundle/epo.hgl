@@ -6,7 +6,7 @@ lang:
     script  = "roman"
 
 config:
-    author = "Brian Jongseong Park <iceager@gmail.com>"
+    author = "Yunwon Jeong"
     stage  = "draft"
 
 macros:
