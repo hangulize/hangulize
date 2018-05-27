@@ -122,7 +122,7 @@ func (p *pipeline) group(word string) []subword {
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, p.h.spec.letters) {
+		if inSet(let, p.h.spec.letters) || isSpace(let) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
@@ -216,7 +216,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	swBuf.Reset()
 
 	for _, sw := range subwords {
-		if sw.level == 1 {
+		if sw.level == 1 && !isSpace(sw.word) {
 			continue
 		}
 		swBuf.Append(sw)

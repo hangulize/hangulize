@@ -133,3 +133,7 @@ func regexpLetters(reExpr string) string {
 
 	return letters
 }
+
+func isSpace(word string) bool {
+	return strings.TrimSpace(word) == ""
+}
