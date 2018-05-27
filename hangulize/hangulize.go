@@ -95,29 +95,12 @@ func (h *Hangulizer) trace() {
 
 // 1. Normalize input word.
 func (h *Hangulizer) normalize(word string) string {
-	// Apply a custom normalization table.
-	args := make([]string, 0)
-	for to, froms := range h.spec.normalize {
-		for _, from := range froms {
-			args = append(args, from, to)
-		}
-	}
-	rep := strings.NewReplacer(args...)
-	word = rep.Replace(word)
+	word = h.spec.normReplacer.Replace(word)
 
-	// Find a normalizer for the script.
-	norm, ok := GetNormalizer(h.spec.Lang.Script)
-	if !ok {
-		return word
-	}
-
-	// Collect exception letters.  The normalizer will skip the letters.
-	except := make([]string, 0)
-	for to := range h.spec.normalize {
-		except = append(except, to)
-	}
-
+	norm := h.spec.norm
+	except := h.spec.normLetters
 	word = Normalize(word, norm, except)
+
 	return word
 }
 

@@ -11,6 +11,10 @@ import (
 // "normalization".  It takes a normalizer which normalizes a letter.  It
 // doesn't normalize letters in array keep.
 func Normalize(word string, norm Normalizer, keep []string) string {
+	if norm == nil {
+		return word
+	}
+
 	// Sort letters to keep.
 	keepSet := set(keep)
 

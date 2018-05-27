@@ -3,6 +3,7 @@ package hangulize
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"github.com/pkg/errors"
 
@@ -11,17 +12,26 @@ import (
 
 // Spec represents a transactiption specification for a language.
 type Spec struct {
+	// Meta information sections.
 	Lang   Language
 	Config Config
 
+	// Helper setting sections.
 	macros    map[string]string
 	vars      map[string][]string
 	normalize map[string][]string
 
+	// Rewrite/Transcribe
 	rewrite    []*Rule
 	transcribe []*Rule
 
+	// Test examples.
 	Test []hgl.Pair
+
+	// Normalization stuffs. (need to be pre-warmed)
+	normReplacer *strings.Replacer
+	normLetters  []string
+	norm         Normalizer
 }
 
 func (s *Spec) String() string {
@@ -38,6 +48,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		return nil, errors.Wrap(err, "failed to parse HGL source")
 	}
 
+	// -------------------------------------------------------------------------
 	// Every sections are optional.  An empty HGL source is also valid spec.
 
 	// lang
@@ -117,15 +128,48 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		test = sec.(*hgl.ListSection).Array()
 	}
 
+	// -------------------------------------------------------------------------
+
+	// custom normalization
+	args := make([]string, 0)
+	for to, froms := range normalize {
+		for _, from := range froms {
+			args = append(args, from, to)
+		}
+	}
+	normReplacer := strings.NewReplacer(args...)
+
+	// letters in normalize
+	normLetters := make([]string, 0)
+	for to := range normalize {
+		normLetters = append(normLetters, to)
+	}
+
+	// canonical normalizer
+	norm, ok := GetNormalizer(lang.Script)
+	_ = ok
+	// if !ok {
+	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
+	// }
+
+	// -------------------------------------------------------------------------
+
 	spec := Spec{
 		lang,
 		config,
+
 		macros,
 		vars,
 		normalize,
+
 		rewrite,
 		transcribe,
+
 		test,
+
+		normReplacer,
+		normLetters,
+		norm,
 	}
 	return &spec, nil
 }
