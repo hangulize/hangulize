@@ -15,6 +15,7 @@ Post by Brian: http://iceager.egloos.com/2610028
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -69,6 +70,18 @@ func (h *Hangulizer) Hangulize(word string) string {
 	// trace(ch, word, word3, "jamo")
 
 	return word
+}
+
+// Trace is emitted when a replacement occurs.  It is used for tracing of
+// Hangulize pipeline internal.
+type Trace struct {
+	why  string
+	from string
+	to   string
+}
+
+func (e *Trace) String() string {
+	return fmt.Sprintf("%#v %s", e.to, e.why)
 }
 
 func (h *Hangulizer) trace() {
