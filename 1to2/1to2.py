@@ -108,7 +108,6 @@ def main(argv):
 
     normalize = defaultdict(set)
     for src, dst in additional_of_normalize_roman.items():
-        assert dst == dst.lower()
         if src == dst:
             continue
         normalize[dst].add(src)
