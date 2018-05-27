@@ -13,7 +13,7 @@ $ go get -u github.com/gobuffalo/packr/...
 
 ```console
 $ pushd ../hangulize; packr; popd
-$ gopherjs build .
+$ gopherjs build -o hangulize.js
 ```
 
 ## Trying It
