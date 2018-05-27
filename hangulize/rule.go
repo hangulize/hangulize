@@ -1,9 +1,15 @@
 package hangulize
 
+import "fmt"
+
 // Rule is a pair of Pattern and RPattern.
 type Rule struct {
 	from *Pattern
 	to   *RPattern
+}
+
+func (r *Rule) String() string {
+	return fmt.Sprintf("%s -> %s", r.from, r.to)
 }
 
 // Replacements indicates which ranges should be replaced.
