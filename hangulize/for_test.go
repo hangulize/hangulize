@@ -19,7 +19,7 @@ func parseSpec(hgl string) *Spec {
 }
 
 func newPattern(expr string, spec *Spec) *Pattern {
-	p, err := NewPattern(expr, spec.macros, spec.vars)
+	p, err := NewPattern(expr, spec.Macros, spec.Vars)
 	if err != nil {
 		panic(err)
 	}
@@ -27,7 +27,7 @@ func newPattern(expr string, spec *Spec) *Pattern {
 }
 
 func newRPattern(expr string, spec *Spec) *RPattern {
-	p := NewRPattern(expr, spec.macros, spec.vars)
+	p := NewRPattern(expr, spec.Macros, spec.Vars)
 	return p
 }
 
