@@ -136,6 +136,21 @@ func TestSpace(t *testing.T) {
 	assert.Equal(t, "반고흐", hangulize(spec, "van gogh"))
 }
 
+func TestZeroWidthSpace(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"a b" -> "a/b"
+		"^b"  -> "v"
+
+	transcribe:
+		"a" -> "ㅇ"
+		"b" -> "ㅂ"
+		"v" -> "ㅍ"
+		"c" -> "ㅊ"
+	`)
+	assert.Equal(t, "으프 츠", hangulize(spec, "a b c"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
