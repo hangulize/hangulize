@@ -104,30 +104,14 @@ func (h *Hangulizer) normalize(word string) string {
 	return word
 }
 
+// 2.
 func (h *Hangulizer) draft(word string) []Subword {
-	// Detect letters used in patterns except markers.
-	rules := append(h.spec.rewrite, h.spec.transcribe...)
-	markers := set(h.spec.Config.Markers)
-
-	letters := make([]string, 0)
-
-	for _, rule := range rules {
-		for _, let := range rule.from.letters {
-			if inSet(let, markers) {
-				continue
-			}
-			letters = append(letters, let)
-		}
-	}
-
-	letters = set(letters)
-
 	// Split the word by their letters.
 	rep := NewSubwordReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, letters) {
+		if inSet(let, h.spec.letters) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
