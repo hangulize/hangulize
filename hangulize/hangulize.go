@@ -39,44 +39,42 @@ func Hangulize(lang string, word string) string {
 // Hangulizer ...
 type Hangulizer struct {
 	spec *Spec
+	// ch   chan<- Trace
 }
 
 // NewHangulizer ...
-func NewHangulizer(spec *Spec) *Hangulizer {
-	return &Hangulizer{spec}
+func NewHangulizer(spec *Spec /*, ch chan<- Trace*/) *Hangulizer {
+	return &Hangulizer{spec /*, ch*/}
 }
 
 // Hangulize transcribes a loanword into Hangul.
 func (h *Hangulizer) Hangulize(word string) string {
-	return h.HangulizeTrace(word, nil)
-}
-
-// HangulizeTrace transcribes a loanword into Hangul.  During
-// transcribing, it sends internal traces to the given channel.
-func (h *Hangulizer) HangulizeTrace(word string, ch chan<- Trace) string {
-	if ch != nil {
-		defer close(ch)
-	}
-	trace(ch, word, "", "input")
+	// trace(h.ch, word, "", "input")
 
 	word = h.normalize(word)
 
-	chunks := h.begin(word)
-	word1 := NewChunkBuilder(chunks).String()
-	trace(ch, word1, word, "start")
+	subwords := h.draft(word)
+	// word1 := NewSubwordsBuilder(subwords).String()
+	// trace(ch, word1, word, "start")
 
-	chunks = h.rewrite(chunks)
-	word2 := NewChunkBuilder(chunks).String()
-	trace(ch, word2, word1, "rewrite")
+	subwords = h.rewrite(subwords)
+	// word2 := NewSubwordsBuilder(subwords).String()
+	// trace(ch, word2, word1, "rewrite")
 
-	chunks = h.transcribe(chunks)
-	word3 := NewChunkBuilder(chunks).String()
-	trace(ch, word3, word2, "transcribe")
+	subwords = h.transcribe(subwords)
+	// word3 := NewSubwordsBuilder(subwords).String()
+	// trace(ch, word3, word2, "transcribe")
 
-	word = h.assembleJamo(chunks)
-	trace(ch, word, word3, "jamo")
+	word = h.assembleJamo(subwords)
+	// trace(ch, word, word3, "jamo")
 
 	return word
+}
+
+func (h *Hangulizer) trace() {
+	// if h.ch == nil {
+	// 	return
+	// }
 }
 
 // -----------------------------------------------------------------------------
@@ -105,7 +103,7 @@ func (h *Hangulizer) normalize(word string) string {
 	return word
 }
 
-func (h *Hangulizer) begin(word string) []Chunk {
+func (h *Hangulizer) draft(word string) []Subword {
 	// Detect letters used in patterns except markers.
 	rules := append(h.spec.rewrite, h.spec.transcribe...)
 	markers := set(h.spec.Config.Markers)
@@ -124,7 +122,7 @@ func (h *Hangulizer) begin(word string) []Chunk {
 	letters = set(letters)
 
 	// Split the word by their letters.
-	rep := NewChunkedReplacer(word, 0, 1)
+	rep := NewSubwordReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
@@ -133,18 +131,18 @@ func (h *Hangulizer) begin(word string) []Chunk {
 		}
 	}
 
-	return rep.Chunks()
+	return rep.Subwords()
 }
 
 // Rewrite applies multiple replacers on a word.
-func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
-	var buf ChunkBuilder
+func (h *Hangulizer) rewrite(subwords []Subword) []Subword {
+	var swBuf SubwordsBuilder
 
-	for _, chunk := range chunks {
-		word := chunk.word
-		level := chunk.level
+	for _, subword := range subwords {
+		word := subword.word
+		level := subword.level
 
-		rep := NewChunkedReplacer(word, level, 1)
+		rep := NewSubwordReplacer(word, level, 1)
 
 		for _, rule := range h.spec.rewrite {
 			for _, r := range rule.Replacements(word) {
@@ -153,21 +151,21 @@ func (h *Hangulizer) rewrite(chunks []Chunk) []Chunk {
 			word = rep.String()
 		}
 
-		buf.Put(rep.Chunks()...)
+		swBuf.Append(rep.Subwords()...)
 	}
 
-	return buf.Chunks()
+	return swBuf.Subwords()
 }
 
-func (h *Hangulizer) transcribe(chunks []Chunk) []Chunk {
-	var buf ChunkBuilder
+func (h *Hangulizer) transcribe(subwords []Subword) []Subword {
+	var swBuf SubwordsBuilder
 
-	for _, chunk := range chunks {
-		word := chunk.word
-		level := chunk.level
+	for _, subword := range subwords {
+		word := subword.word
+		level := subword.level
 
-		rep := NewChunkedReplacer(word, level, 2)
-		dummy := NewChunkedReplacer(word, 0, 0)
+		rep := NewSubwordReplacer(word, level, 2)
+		dummy := NewSubwordReplacer(word, 0, 0)
 
 		for _, rule := range h.spec.transcribe {
 			for _, r := range rule.Replacements(word) {
@@ -180,37 +178,37 @@ func (h *Hangulizer) transcribe(chunks []Chunk) []Chunk {
 			word = dummy.String()
 		}
 
-		buf.Put(rep.Chunks()...)
+		swBuf.Append(rep.Subwords()...)
 	}
 
-	chunks = buf.Chunks()
-	buf.Reset()
+	subwords = swBuf.Subwords()
+	swBuf.Reset()
 
-	for _, chunk := range chunks {
-		if chunk.level == 1 {
+	for _, subword := range subwords {
+		if subword.level == 1 {
 			continue
 		}
-		buf.Put(chunk)
+		swBuf.Append(subword)
 	}
 
-	return buf.Chunks()
+	return swBuf.Subwords()
 }
 
-func (h *Hangulizer) assembleJamo(chunks []Chunk) string {
+func (h *Hangulizer) assembleJamo(subwords []Subword) string {
 	var buf strings.Builder
 	var jamoBuf strings.Builder
 
-	for _, chunk := range chunks {
-		// Don't touch age=0 chunks.
+	for _, subword := range subwords {
+		// Don't touch age=0 subwords.
 		// They have never rewritten or transcribed.
-		if chunk.level == 0 {
+		if subword.level == 0 {
 			buf.WriteString(AssembleJamo(jamoBuf.String()))
 			jamoBuf.Reset()
 
-			buf.WriteString(chunk.word)
+			buf.WriteString(subword.word)
 			continue
 		}
-		jamoBuf.WriteString(chunk.word)
+		jamoBuf.WriteString(subword.word)
 	}
 	buf.WriteString(AssembleJamo(jamoBuf.String()))
 
