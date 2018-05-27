@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"strings"
+	"unicode"
 
 	"golang.org/x/text/unicode/norm"
 )
@@ -31,19 +32,30 @@ type Normalizer interface {
 	Normalize(rune) rune
 }
 
+var normalizers = map[string]Normalizer{
+	"roman": &RomanNormalizer{},
+	"kana":  &KanaNormalizer{},
+}
+
+// GetNormalizer chooses a normalizer by the script name.
+func GetNormalizer(script string) (Normalizer, bool) {
+	norm, ok := normalizers[script]
+	return norm, ok
+}
+
 // -----------------------------------------------------------------------------
 
 // RomanNormalizer is a normalizer for Laion or Roman script.
 type RomanNormalizer struct{}
 
-// Normalize converts a Roman letter into ISO basic Latin alphabet [a-zA-Z].
+// Normalize converts a Roman letter into ISO basic Latin lower alphabet [a-z].
 func (RomanNormalizer) Normalize(ch rune) rune {
 	props := norm.NFD.PropertiesString(string(ch))
 	bin := props.Decomposition()
-	if len(bin) == 0 {
-		return ch
+	if len(bin) != 0 {
+		ch = rune(bin[0])
 	}
-	return rune(bin[0])
+	return unicode.ToLower(ch)
 }
 
 // -----------------------------------------------------------------------------
