@@ -124,6 +124,18 @@ func TestKeepAndCleanup(t *testing.T) {
 	assert.Equal(t, "ㅋ윽그스!", hangulize(spec, "ㅋ𐌄𐌗!"))
 }
 
+func TestSpace(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"van " -> "van/"
+
+	transcribe:
+		"van"  -> "반"
+		"gogh" -> "고흐"
+	`)
+	assert.Equal(t, "반고흐", hangulize(spec, "van gogh"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
