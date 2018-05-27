@@ -157,13 +157,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	letters := make([]string, 0)
 
 	rules := append(rewrite, transcribe...)
-	markers := set(config.Markers)
 
 	for _, rule := range rules {
 		for _, let := range rule.from.letters {
-			if inSet(let, markers) {
-				continue
-			}
 			letters = append(letters, let)
 		}
 	}
@@ -237,24 +233,12 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 type Config struct {
 	Authors []string
 	Stage   string
-	Markers []string
 }
 
 func newConfig(dict *hgl.DictSection) (*Config, error) {
-	// A marker must be 1-character.
-	markers := dict.All("markers")
-
-	for _, marker := range markers {
-		if len(marker) != 1 {
-			err := fmt.Errorf("marker %#v must be 1-character", marker)
-			return nil, err
-		}
-	}
-
 	config := Config{
 		Authors: dict.All("authors"),
 		Stage:   dict.One("stage"),
-		Markers: markers,
 	}
 	return &config, nil
 }
