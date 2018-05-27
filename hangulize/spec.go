@@ -17,13 +17,13 @@ type Spec struct {
 	Config Config
 
 	// Helper setting sections.
-	macros    map[string]string
-	vars      map[string][]string
-	normalize map[string][]string
+	Macros    map[string]string
+	Vars      map[string][]string
+	Normalize map[string][]string
 
 	// Rewrite/Transcribe
-	rewrite    []*Rule
-	transcribe []*Rule
+	Rewrite    []*Rule
+	Transcribe []*Rule
 
 	// Test examples.
 	Test []hgl.Pair
