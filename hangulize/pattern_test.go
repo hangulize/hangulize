@@ -320,7 +320,7 @@ func TestComplexLookaround(t *testing.T) {
 
 func TestMalformedPattern(t *testing.T) {
 	p, err := NewPattern(`{a} {b} {c}`, nil, nil)
-	assert.Error(t, err, ExplainPattern(p))
+	assert.Error(t, err, p.Explain())
 }
 
 func TestBugs(t *testing.T) {
