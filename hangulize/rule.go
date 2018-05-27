@@ -1,19 +1,6 @@
 package hangulize
 
-import "fmt"
-
-// Replacement ...
-type Replacement struct {
-	start int
-	stop  int
-	word  string
-}
-
-func (r Replacement) String() string {
-	return fmt.Sprintf(`%d-%d -> %s`, r.start, r.stop, r.word)
-}
-
-// Rule is a replacer based on Pattern and RPatterns.
+// Rule is a pair of Pattern and RPattern.
 type Rule struct {
 	from *Pattern
 	to   *RPattern

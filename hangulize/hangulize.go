@@ -158,9 +158,8 @@ func (h *Hangulizer) rewrite(subwords []Subword) []Subword {
 		rep := NewSubwordReplacer(word, level, 1)
 
 		for _, rule := range h.spec.rewrite {
-			for _, r := range rule.Replacements(word) {
-				rep.Replace(r.start, r.stop, r.word)
-			}
+			repls := rule.Replacements(word)
+			rep.ReplaceBy(repls...)
 			word = rep.String()
 		}
 
@@ -178,15 +177,21 @@ func (h *Hangulizer) transcribe(subwords []Subword) []Subword {
 		level := subword.level
 
 		rep := NewSubwordReplacer(word, level, 2)
+
+		// transcribe is not rewrite.  A result of a replacement is not the
+		// input of the next replacement.  dummy marks the replaced subwords
+		// with NULL characters.
 		dummy := NewSubwordReplacer(word, 0, 0)
 
 		for _, rule := range h.spec.transcribe {
-			for _, r := range rule.Replacements(word) {
-				rep.Replace(r.start, r.stop, r.word)
+			repls := rule.Replacements(word)
+			rep.ReplaceBy(repls...)
 
-				nulls := strings.Repeat("\x00", len(r.word))
-				dummy.Replace(r.start, r.stop, nulls)
+			for _, repl := range repls {
+				nulls := strings.Repeat("\x00", len(repl.word))
+				dummy.Replace(repl.start, repl.stop, nulls)
 			}
+
 			rep.flush()
 			word = dummy.String()
 		}

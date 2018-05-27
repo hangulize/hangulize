@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -78,6 +79,19 @@ func (b *SubwordsBuilder) Subwords() []Subword {
 
 // -----------------------------------------------------------------------------
 
+// Replacement is a deferred subword replacement.
+type Replacement struct {
+	start int
+	stop  int
+	word  string
+}
+
+func (r Replacement) String() string {
+	return fmt.Sprintf(`[%d-%d] %#v`, r.start, r.stop, r.word)
+}
+
+// -----------------------------------------------------------------------------
+
 // SubwordReplacer remembers replacements in a buffer.  Finally, it applies the
 // replacements and splits the result in several subwords.
 type SubwordReplacer struct {
@@ -106,7 +120,12 @@ func NewSubwordReplacer(word string, prevLevel, nextLevel int) *SubwordReplacer 
 
 // Replace buffers a replacement.
 func (r *SubwordReplacer) Replace(start, stop int, word string) {
-	r.repls = append(r.repls, Replacement{start, stop, word})
+	r.ReplaceBy(Replacement{start, stop, word})
+}
+
+// ReplaceBy buffers multiple replacements.
+func (r *SubwordReplacer) ReplaceBy(repls ...Replacement) {
+	r.repls = append(r.repls, repls...)
 }
 
 // flush applies the buffered replacements to the SubwordReplacer internal.
