@@ -8,10 +8,8 @@ import (
 )
 
 var rootCmd = &cobra.Command{
-	Use:   "hangulize",
-	Short: "Hangulize tools",
-	Run: func(cmd *cobra.Command, args []string) {
-	},
+	Use:   "hangulize2",
+	Short: "Hangulize 2 tools",
 }
 
 func Execute() {
