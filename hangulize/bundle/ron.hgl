@@ -3,11 +3,11 @@ lang:
     codes   = "ro", "ron"
     english = "Romanian"
     korean  = "루마니아어"
-    script  = "???"
+    script  = "roman"
 
 config:
-    author = "???"
-    stage  = "???"
+    author = "Brian Jongseong Park <iceager@gmail.com>"
+    stage  = "draft"
 
 macros:
     "@" = "<vowels>"

@@ -3,11 +3,11 @@ lang:
     codes   = "is", "isl"
     english = "Icelandic"
     korean  = "아이슬란드어"
-    script  = "???"
+    script  = "roman"
 
 config:
-    author  = "???"
-    stage   = "???"
+    author  = "Brian Jongseong Park <iceager@gmail.com>"
+    stage   = "draft"
     markers = ",", ";", "%"
 
 macros:
