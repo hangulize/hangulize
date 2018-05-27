@@ -14,10 +14,6 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func init() {
-	rootCmd.AddCommand(listCmd)
-}
-
 func Execute() {
 	err := rootCmd.Execute()
 
