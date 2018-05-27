@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import print_function, unicode_literals
 
+import argparse
 from collections import defaultdict
 import io
 import sys
@@ -75,22 +76,31 @@ class Section(object):
         return buf.getvalue().encode('utf-8')
 
 
-def main(argv):
-    try:
-        code = argv[1]
-    except IndexError:
-        print('Usage 1to2.py LANG')
-        raise SystemExit(2)
+cli = argparse.ArgumentParser(description='Hangulize language spec migrator')
+cli.add_argument('lang', metavar='LANG')
+cli.add_argument('--author', metavar="'NAME <EMAIL>'", default='???')
 
-    lang = hangulize.get_lang(code)
-    locale = babel.Locale(lang.iso639_1)
+
+def main(argv):
+    args = cli.parse_args()
+
+    lang = hangulize.get_lang(args.lang)
+    try:
+        locale = babel.Locale(lang.iso639_1)
+    except babel.core.UnknownLocaleError:
+        locale = None
+        print('failed to find locale for lang (%s, %s, %s)'
+              '' % (lang.iso639_1, lang.iso639_2, lang.iso639_3),
+              file=sys.stderr)
 
     # detect normalize
     additional_of_normalize_roman = {}
+    normalize_roman_called = []
 
     def hacked_normalize_roman(string, additional=None):
         if additional:
             additional_of_normalize_roman.update(additional)
+        normalize_roman_called.append(1)
 
     normalize_f = lang.normalize.__func__
     normalize_f.__globals__['normalize_roman'] = hacked_normalize_roman
@@ -98,10 +108,18 @@ def main(argv):
 
     normalize = defaultdict(set)
     for src, dst in additional_of_normalize_roman.items():
-        assert dst == dst.lower()
         if src == dst:
             continue
         normalize[dst].add(src)
+
+    # detect script
+    if normalize_roman_called:
+        script = 'roman'
+    else:
+        script = '???'
+        print('failed to detect script of lang (%s, %s, %s)'
+              '' % (lang.iso639_1, lang.iso639_2, lang.iso639_3),
+              file=sys.stderr)
 
     # find vars
     vars_ = []
@@ -120,16 +138,25 @@ def main(argv):
     for x, rule in enumerate(lang.notation.rules):
         pattern = rule[0]
         rpattern = rule[1:]
+
         # some rpattern is 2d tuple redundantly.
         if isinstance(rpattern[0], tuple):
             rpattern = rpattern[0]
+
         if isinstance(rpattern[0], hangulize.Phoneme):
             transcribe.append((pattern, rpattern))
-        else:
-            rewrite.append((pattern, rpattern))
+            continue
+
+        if rpattern[0] is None:
+            if transcribe:
+                transcribe.append((pattern, rpattern))
+                continue
+
+        rewrite.append((pattern, rpattern))
 
     # find test
-    test_module = getattr(__import__('tests.%s' % code), code)
+    test_modname = args.lang.replace('.', '_')
+    test_module = getattr(__import__('tests.%s' % test_modname), test_modname)
     for attr, val in vars(test_module).items():
         if attr.endswith('TestCase') and not attr.startswith('Hangulize'):
             break
@@ -139,16 +166,20 @@ def main(argv):
     # render
 
     sec = Section('lang')
-    sec.put('id', code)
+    sec.put('id', args.lang)
     sec.put('codes', lang.iso639_1, lang.iso639_3)
-    sec.put('english', locale.get_language_name('en_US'))
-    sec.put('korean', locale.get_language_name('ko_KR'))
-    sec.put('script', '???')
+    if locale is None:
+        sec.put('english', '???')
+        sec.put('korean', '???')
+    else:
+        sec.put('english', locale.get_language_name('en_US'))
+        sec.put('korean', locale.get_language_name('ko_KR'))
+    sec.put('script', script)
     print(sec.draw('='), end='')
 
     sec = Section('config')
-    sec.put('author', '???')
-    sec.put('stage', '???')
+    sec.put('author', args.author)
+    sec.put('stage', 'draft')
     if lang.__tmp__:
         sec.put('markers', *lang.__tmp__)
     print(sec.draw('='), end='')

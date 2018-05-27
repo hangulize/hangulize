@@ -3,11 +3,11 @@ lang:
     codes   = "es", "spa"
     english = "Spanish"
     korean  = "스페인어"
-    script  = "???"
+    script  = "roman"
 
 config:
-    author  = "???"
-    stage   = "???"
+    author  = "Brian Jongseong Park <iceager@gmail.com>"
+    stage   = "draft"
     markers = "X"
 
 macros:
@@ -69,8 +69,8 @@ rewrite:
     "ss"            -> "s"
     "tt"            -> "t"
     "vv"            -> "v"
-    "^m"             -> "P"
-    "^n"             -> "Q"
+    "^m"            -> "P"
+    "^n"            -> "Q"
 
 transcribe:
     "b"              -> "ㅂ"
