@@ -19,11 +19,6 @@ type SubwordsBuilder struct {
 	subwords []Subword
 }
 
-// NewSubwordsBuilder creates a SubwordsBuilder.
-func NewSubwordsBuilder(subwords []Subword) *SubwordsBuilder {
-	return &SubwordsBuilder{subwords}
-}
-
 // String() concatenates buffered subwords to assemble the full word.
 func (b *SubwordsBuilder) String() string {
 	var buf strings.Builder
