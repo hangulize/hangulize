@@ -15,7 +15,6 @@ Post by Brian: http://iceager.egloos.com/2610028
 package hangulize
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -40,58 +39,54 @@ func Hangulize(lang string, word string) string {
 // Hangulizer ...
 type Hangulizer struct {
 	spec *Spec
-	// ch   chan<- Trace
 }
 
 // NewHangulizer ...
-func NewHangulizer(spec *Spec /*, ch chan<- Trace*/) *Hangulizer {
-	return &Hangulizer{spec /*, ch*/}
+func NewHangulizer(spec *Spec) *Hangulizer {
+	return &Hangulizer{spec}
 }
 
 // Hangulize transcribes a loanword into Hangul.
 func (h *Hangulizer) Hangulize(word string) string {
-	// trace(h.ch, word, "", "input")
-
-	word = h.normalize(word)
-
-	subwords := h.draft(word)
-	// word1 := NewSubwordsBuilder(subwords).String()
-	// trace(ch, word1, word, "start")
-
-	subwords = h.rewrite(subwords)
-	// word2 := NewSubwordsBuilder(subwords).String()
-	// trace(ch, word2, word1, "rewrite")
-
-	subwords = h.transcribe(subwords)
-	// word3 := NewSubwordsBuilder(subwords).String()
-	// trace(ch, word3, word2, "transcribe")
-
-	word = h.composeHangul(subwords)
-	// trace(ch, word, word3, "jamo")
-
-	return word
+	p := pipeline{h, nil}
+	return p.forward(word)
 }
 
-// Trace is emitted when a replacement occurs.  It is used for tracing of
-// Hangulize pipeline internal.
-type Trace struct {
-	why  string
-	from string
-	to   string
-}
+// HangulizeTrace transcribes a loanword into Hangul
+// and returns the traced internal events too.
+func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
+	var tr Tracer
+	p := pipeline{h, &tr}
 
-func (e *Trace) String() string {
-	return fmt.Sprintf("%#v %s", e.to, e.why)
-}
+	word = p.forward(word)
 
-func (h *Hangulizer) trace() {
-	// if h.ch == nil {
-	// 	return
-	// }
+	return word, tr.Traces()
 }
 
 // -----------------------------------------------------------------------------
 // The Hangulize Pipeline
+
+type pipeline struct {
+	h  *Hangulizer
+	tr *Tracer
+}
+
+// forward runs the Hangulize pipeline for a word.
+func (p *pipeline) forward(word string) string {
+	p.input(word)
+	word = p.normalize(word)
+	subwords := p.group(word)
+	subwords = p.rewrite(subwords)
+	subwords = p.transcribe(subwords)
+	word = p.composeHangul(subwords)
+	return word
+}
+
+// 0. Just recording beginning (Word)
+//
+func (p *pipeline) input(word string) {
+	p.tr.WordToWord("input", "", "", word)
+}
 
 // 1. Normalize (Word -> Word)
 //
@@ -99,11 +94,11 @@ func (h *Hangulizer) trace() {
 //
 // For example, "Hello" in Roman script will be normalized to "hello".
 //
-func (h *Hangulizer) normalize(word string) string {
-	word = h.spec.normReplacer.Replace(word)
+func (p *pipeline) normalize(word string) string {
+	word = p.h.spec.normReplacer.Replace(word)
 
-	norm := h.spec.norm
-	except := h.spec.normLetters
+	norm := p.h.spec.norm
+	except := p.h.spec.normLetters
 	word = Normalize(word, norm, except)
 
 	return word
@@ -118,12 +113,12 @@ func (h *Hangulizer) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 //
-func (h *Hangulizer) draft(word string) []Subword {
+func (p *pipeline) group(word string) []Subword {
 	rep := NewSubwordReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, h.spec.letters) {
+		if inSet(let, p.h.spec.letters) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
@@ -145,7 +140,7 @@ func (h *Hangulizer) draft(word string) []Subword {
 // from the spelling.  But it can be too hard for some script systems, such as
 // English or Franch.
 //
-func (h *Hangulizer) rewrite(subwords []Subword) []Subword {
+func (p *pipeline) rewrite(subwords []Subword) []Subword {
 	var swBuf SubwordsBuilder
 
 	for _, subword := range subwords {
@@ -154,7 +149,7 @@ func (h *Hangulizer) rewrite(subwords []Subword) []Subword {
 
 		rep := NewSubwordReplacer(word, level, 1)
 
-		for _, rule := range h.spec.Rewrite {
+		for _, rule := range p.h.spec.Rewrite {
 			repls := rule.Replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
@@ -176,7 +171,7 @@ func (h *Hangulizer) rewrite(subwords []Subword) []Subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 //
-func (h *Hangulizer) transcribe(subwords []Subword) []Subword {
+func (p *pipeline) transcribe(subwords []Subword) []Subword {
 	var swBuf SubwordsBuilder
 
 	for _, subword := range subwords {
@@ -190,7 +185,7 @@ func (h *Hangulizer) transcribe(subwords []Subword) []Subword {
 		// with NULL characters.
 		dummy := NewSubwordReplacer(word, 0, 0)
 
-		for _, rule := range h.spec.Transcribe {
+		for _, rule := range p.h.spec.Transcribe {
 			repls := rule.Replacements(word)
 			rep.ReplaceBy(repls...)
 
@@ -227,7 +222,7 @@ func (h *Hangulizer) transcribe(subwords []Subword) []Subword {
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (h *Hangulizer) composeHangul(subwords []Subword) string {
+func (p *pipeline) composeHangul(subwords []Subword) string {
 	var buf strings.Builder
 	var jamoBuf strings.Builder
 

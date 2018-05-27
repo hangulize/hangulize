@@ -9,11 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func hangulize(spec *Spec, word string) string {
-	h := NewHangulizer(spec)
-	return h.Hangulize(word)
-}
-
 // TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
 	for _, lang := range ListLangs() {
@@ -28,10 +23,7 @@ func TestLang(t *testing.T) {
 			expected := testCase.Right()[0]
 
 			t.Run(lang+"/"+loanword, func(t *testing.T) {
-				// ch := make(chan Trace, 1000)
-				// got := h.HangulizeTrace(loanword, ch)
-				got := h.Hangulize(loanword)
-
+				got, tr := h.HangulizeTrace(loanword)
 				if got == expected {
 					return
 				}
@@ -47,15 +39,22 @@ func TestLang(t *testing.T) {
 				fmt.Fprintf(f, `word: %#v`, loanword)
 				fmt.Fprintln(f)
 				fmt.Fprintln(f, hr)
-				// for e := range ch {
-				// 	fmt.Fprintln(f, e.String())
-				// }
+				for _, t := range tr {
+					fmt.Fprintln(f, t.String())
+				}
 				fmt.Fprintln(f, hr)
 
 				assert.Equal(t, expected, got, f.String())
 			})
 		}
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+func hangulize(spec *Spec, word string) string {
+	h := NewHangulizer(spec)
+	return h.Hangulize(word)
 }
 
 // TestSlash tests "/" in input word.  The original Hangulize removes the "/"
