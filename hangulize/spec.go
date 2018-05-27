@@ -28,10 +28,11 @@ type Spec struct {
 	// Test examples.
 	Test []hgl.Pair
 
-	// Normalization stuffs. (need to be pre-warmed)
+	// Prepared stuffs.
 	normReplacer *strings.Replacer
 	normLetters  []string
 	norm         Normalizer
+	letters      []string
 }
 
 func (s *Spec) String() string {
@@ -152,6 +153,23 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
 	// }
 
+	// unique/sorted letters in rewrite/transcribe
+	letters := make([]string, 0)
+
+	rules := append(rewrite, transcribe...)
+	markers := set(config.Markers)
+
+	for _, rule := range rules {
+		for _, let := range rule.from.letters {
+			if inSet(let, markers) {
+				continue
+			}
+			letters = append(letters, let)
+		}
+	}
+
+	letters = set(letters)
+
 	// -------------------------------------------------------------------------
 
 	spec := Spec{
@@ -170,6 +188,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		normReplacer,
 		normLetters,
 		norm,
+		letters,
 	}
 	return &spec, nil
 }
