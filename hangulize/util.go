@@ -114,16 +114,20 @@ func trueFlags(length int) []bool {
 var (
 	reQuoted = regexp.MustCompile(`\\.`)
 	reSpace  = regexp.MustCompile(`\s`)
+	reMeta   = regexp.MustCompile(`/`)
 )
 
 func regexpLetters(reExpr string) string {
 	letters := reExpr
 
-	// Remove escaped letters.
-	letters = reQuoted.ReplaceAllString(letters, ``)
-
 	// Remove spaces.
 	letters = reSpace.ReplaceAllString(letters, ``)
+
+	// Remove meta characters.
+	letters = reMeta.ReplaceAllString(letters, ``)
+
+	// Remove escaped letters.
+	letters = reQuoted.ReplaceAllString(letters, ``)
 
 	// Quote Regexp meta letters.
 	letters = regexp.QuoteMeta(letters)
