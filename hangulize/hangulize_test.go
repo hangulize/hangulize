@@ -51,6 +51,7 @@ func TestLang(t *testing.T) {
 }
 
 // -----------------------------------------------------------------------------
+// Edge cases
 
 func hangulize(spec *Spec, word string) string {
 	h := NewHangulizer(spec)
@@ -121,4 +122,18 @@ func TestKeepAndCleanup(t *testing.T) {
 	//   │ ┌┘┌┘
 	// ㅋ윽그스!
 	assert.Equal(t, "ㅋ윽그스!", hangulize(spec, "ㅋ𐌄𐌗!"))
+}
+
+// -----------------------------------------------------------------------------
+// Benchmarks
+
+func BenchmarkGloria(b *testing.B) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.Hangulize("GLORIA")
+	}
 }
