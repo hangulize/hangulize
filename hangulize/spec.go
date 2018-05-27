@@ -131,6 +131,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 }
 
 // -----------------------------------------------------------------------------
+// "lang" section
 
 // Language identifies a natural language.
 type Language struct {
@@ -167,6 +168,7 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 }
 
 // -----------------------------------------------------------------------------
+// "config" section
 
 // Config keeps some configurations for a transactiption specification.
 type Config struct {
@@ -195,6 +197,7 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 }
 
 // -----------------------------------------------------------------------------
+// "rewrite"/"transcribe" section
 
 func newRules(
 	pairs []hgl.Pair,
