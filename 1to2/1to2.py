@@ -138,13 +138,21 @@ def main(argv):
     for x, rule in enumerate(lang.notation.rules):
         pattern = rule[0]
         rpattern = rule[1:]
+
         # some rpattern is 2d tuple redundantly.
         if isinstance(rpattern[0], tuple):
             rpattern = rpattern[0]
+
         if isinstance(rpattern[0], hangulize.Phoneme):
             transcribe.append((pattern, rpattern))
-        else:
-            rewrite.append((pattern, rpattern))
+            continue
+
+        if rpattern[0] is None:
+            if transcribe:
+                transcribe.append((pattern, rpattern))
+                continue
+
+        rewrite.append((pattern, rpattern))
 
     # find test
     test_module = getattr(__import__('tests.%s' % args.lang), args.lang)
