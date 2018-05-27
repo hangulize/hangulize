@@ -1,7 +1,7 @@
 lang:
     id      = "grc"
     codes   = "", "grc"
-    english = "Greek (Ancient)"
+    english = "Ancient Greek"
     korean  = "고대 그리스어"
     script  = "roman"
 
