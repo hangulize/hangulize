@@ -71,9 +71,6 @@ func TestSpecials(t *testing.T) {
 
 func TestHyphen(t *testing.T) {
 	spec := parseSpec(`
-	config:
-		markers = "-"
-
 	transcribe:
 		"x" -> "-ㄱㅅ"
 		"e-" -> "ㅣ"
