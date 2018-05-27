@@ -155,7 +155,8 @@ def main(argv):
         rewrite.append((pattern, rpattern))
 
     # find test
-    test_module = getattr(__import__('tests.%s' % args.lang), args.lang)
+    test_modname = args.lang.replace('.', '_')
+    test_module = getattr(__import__('tests.%s' % test_modname), test_modname)
     for attr, val in vars(test_module).items():
         if attr.endswith('TestCase') and not attr.startswith('Hangulize'):
             break
