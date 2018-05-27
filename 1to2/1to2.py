@@ -156,7 +156,7 @@ def main(argv):
 
     sec = Section('config')
     sec.put('author', '???')
-    sec.put('stage', '???')
+    sec.put('stage', 'draft')
     if lang.__tmp__:
         sec.put('markers', *lang.__tmp__)
     print(sec.draw('='), end='')
