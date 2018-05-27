@@ -53,7 +53,7 @@ func (b *subwordsBuilder) Subwords() []subword {
 	mergingLevel := -1
 
 	for _, sw := range b.subwords {
-		if sw.level != mergingLevel {
+		if sw.level != mergingLevel && mergingLevel != -1 {
 			// Keep the merged sw.
 			merged := &subword{buf.String(), mergingLevel}
 			subwords = append(subwords, *merged)
