@@ -51,6 +51,7 @@ func TestLang(t *testing.T) {
 }
 
 // -----------------------------------------------------------------------------
+// Edge cases
 
 func hangulize(spec *Spec, word string) string {
 	h := NewHangulizer(spec)
@@ -61,6 +62,7 @@ func hangulize(spec *Spec, word string) string {
 // so the result was "글로르이아" instead of "글로르/이아".
 func TestSlash(t *testing.T) {
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
+	assert.Equal(t, "글로르{}이아", Hangulize("ita", "glor{}ia"))
 }
 
 func TestSpecials(t *testing.T) {
@@ -69,9 +71,6 @@ func TestSpecials(t *testing.T) {
 
 func TestHyphen(t *testing.T) {
 	spec := parseSpec(`
-	config:
-		markers = "-"
-
 	transcribe:
 		"x" -> "-ㄱㅅ"
 		"e-" -> "ㅣ"
@@ -121,4 +120,45 @@ func TestKeepAndCleanup(t *testing.T) {
 	//   │ ┌┘┌┘
 	// ㅋ윽그스!
 	assert.Equal(t, "ㅋ윽그스!", hangulize(spec, "ㅋ𐌄𐌗!"))
+}
+
+func TestSpace(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"van " -> "van/"
+
+	transcribe:
+		"van"  -> "반"
+		"gogh" -> "고흐"
+	`)
+	assert.Equal(t, "반고흐", hangulize(spec, "van gogh"))
+}
+
+func TestZeroWidthSpace(t *testing.T) {
+	spec := parseSpec(`
+	rewrite:
+		"a b" -> "a{}b"
+		"^b"  -> "v"
+
+	transcribe:
+		"a" -> "ㅇ"
+		"b" -> "ㅂ"
+		"v" -> "ㅍ"
+		"c" -> "ㅊ"
+	`)
+	assert.Equal(t, "으프 츠", hangulize(spec, "a b c"))
+}
+
+// -----------------------------------------------------------------------------
+// Benchmarks
+
+func BenchmarkGloria(b *testing.B) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.Hangulize("GLORIA")
+	}
 }

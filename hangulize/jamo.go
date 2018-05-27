@@ -32,6 +32,10 @@ func ComposeHangul(word string) string {
 	isTail := false
 
 	writeLetter := func() {
+		if lmt[0] == none && lmt[1] == none && lmt[2] == none {
+			return
+		}
+
 		// Fill missing Jamo.
 		if lmt[0] == none {
 			lmt[0] = 'ㅇ'
@@ -72,26 +76,46 @@ func ComposeHangul(word string) string {
 			continue
 		}
 
-		// Classify Jamo.
-		if hangul.IsJaeum(ch) {
-			if isTail {
-				score = tail
-			} else {
-				score = lead
-			}
-		} else if hangul.IsMoeum(ch) {
-			score = medial
-		}
+		isJaeum := hangul.IsJaeum(ch)
+		isMoeum := hangul.IsMoeum(ch)
 
-		// Write a letter.
-		if score <= prevScore {
+		if !isJaeum && !isMoeum {
+			// Composed Hangul.
 			writeLetter()
-			prevScore = -1
+
+			lmt[0], lmt[1], lmt[2] = hangul.Split(ch)
+
+			if lmt[2] == none {
+				score = medial
+			} else {
+				score = tail
+			}
+		} else {
+			// Decomposed Jamo.
+			if isJaeum {
+				if isTail {
+					score = tail
+				} else {
+					score = lead
+				}
+			} else if isMoeum {
+				score = medial
+			} else {
+				// never reaches.
+				panic("neither Jaeum nor Moeum")
+			}
+
+			// Write a letter.
+			if score <= prevScore {
+				writeLetter()
+				prevScore = -1
+			}
+
+			if score != -1 {
+				lmt[score] = ch
+			}
 		}
 
-		if score != -1 {
-			lmt[score] = ch
-		}
 		prevScore = score
 		isTail = false
 	}

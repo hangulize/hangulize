@@ -55,7 +55,7 @@ func (h *Hangulizer) Hangulize(word string) string {
 // HangulizeTrace transcribes a loanword into Hangul
 // and returns the traced internal events too.
 func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
-	var tr Tracer
+	var tr tracer
 	p := pipeline{h, &tr}
 
 	word = p.forward(word)
@@ -68,7 +68,7 @@ func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
 
 type pipeline struct {
 	h  *Hangulizer
-	tr *Tracer
+	tr *tracer
 }
 
 // forward runs the Hangulize pipeline for a word.
@@ -117,12 +117,12 @@ func (p *pipeline) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 //
-func (p *pipeline) group(word string) []Subword {
-	rep := NewSubwordReplacer(word, 0, 1)
+func (p *pipeline) group(word string) []subword {
+	rep := newSubwordReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, p.h.spec.letters) {
+		if inSet(let, p.h.spec.letters) || isSpace(let) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
@@ -144,17 +144,17 @@ func (p *pipeline) group(word string) []Subword {
 // from the spelling.  But it can be too hard for some script systems, such as
 // English or Franch.
 //
-func (p *pipeline) rewrite(subwords []Subword) []Subword {
-	var swBuf SubwordsBuilder
+func (p *pipeline) rewrite(subwords []subword) []subword {
+	var swBuf subwordsBuilder
 
-	for _, subword := range subwords {
-		word := subword.word
-		level := subword.level
+	for _, sw := range subwords {
+		word := sw.word
+		level := sw.level
 
-		rep := NewSubwordReplacer(word, level, 1)
+		rep := newSubwordReplacer(word, level, 1)
 
 		for _, rule := range p.h.spec.Rewrite {
-			repls := rule.Replacements(word)
+			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
 		}
@@ -180,22 +180,22 @@ func (p *pipeline) rewrite(subwords []Subword) []Subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 //
-func (p *pipeline) transcribe(subwords []Subword) []Subword {
-	var swBuf SubwordsBuilder
+func (p *pipeline) transcribe(subwords []subword) []subword {
+	var swBuf subwordsBuilder
 
-	for _, subword := range subwords {
-		word := subword.word
-		level := subword.level
+	for _, sw := range subwords {
+		word := sw.word
+		level := sw.level
 
-		rep := NewSubwordReplacer(word, level, 2)
+		rep := newSubwordReplacer(word, level, 2)
 
 		// transcribe is not rewrite.  A result of a replacement is not the
 		// input of the next replacement.  dummy marks the replaced subwords
 		// with NULL characters.
-		dummy := NewSubwordReplacer(word, 0, 0)
+		dummy := newSubwordReplacer(word, 0, 0)
 
 		for _, rule := range p.h.spec.Transcribe {
-			repls := rule.Replacements(word)
+			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 
 			for _, repl := range repls {
@@ -215,11 +215,14 @@ func (p *pipeline) transcribe(subwords []Subword) []Subword {
 	subwords = swBuf.Subwords()
 	swBuf.Reset()
 
-	for _, subword := range subwords {
-		if subword.level == 1 {
+	for _, sw := range subwords {
+		if sw.level == 1 {
+			if hasSpace(sw.word) {
+				swBuf.Append(subword{" ", 1})
+			}
 			continue
 		}
-		swBuf.Append(subword)
+		swBuf.Append(sw)
 	}
 
 	subwords = swBuf.Subwords()
@@ -236,21 +239,21 @@ func (p *pipeline) transcribe(subwords []Subword) []Subword {
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) composeHangul(subwords []Subword) string {
+func (p *pipeline) composeHangul(subwords []subword) string {
 	var buf strings.Builder
 	var jamoBuf strings.Builder
 
-	for _, subword := range subwords {
+	for _, sw := range subwords {
 		// Don't touch level=0 subwords.  They just have passed through the
 		// pipeline, because they are meaningless.
-		if subword.level == 0 {
+		if sw.level == 0 {
 			buf.WriteString(ComposeHangul(jamoBuf.String()))
 			jamoBuf.Reset()
 
-			buf.WriteString(subword.word)
+			buf.WriteString(sw.word)
 			continue
 		}
-		jamoBuf.WriteString(subword.word)
+		jamoBuf.WriteString(sw.word)
 	}
 	buf.WriteString(ComposeHangul(jamoBuf.String()))
 

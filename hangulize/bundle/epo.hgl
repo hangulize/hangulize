@@ -6,9 +6,8 @@ lang:
     script  = "roman"
 
 config:
-    author  = "Brian Jongseong Park <iceager@gmail.com>"
-    stage   = "draft"
-    markers = ",", ";"
+    author = "Yunwon Jeong"
+    stage  = "draft"
 
 macros:
     "@" = "<vowels>"
@@ -26,7 +25,7 @@ normalize:
     "ĝ" = "Ĝ"
 
 rewrite:
-    "-"           -> "/"
+    "-"           -> "{}"
     "cx"          -> "ĉ"
     "gx"          -> "ĝ"
     "hx"          -> "ĥ"

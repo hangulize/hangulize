@@ -8,7 +8,11 @@ import (
 	"github.com/sublee/hangulize2/hangulize"
 )
 
-var listCmd = &cobra.Command{
+func init() {
+	rootCmd.AddCommand(lsCmd)
+}
+
+var lsCmd = &cobra.Command{
 	Use:   "ls",
 	Short: "List of bundled lang specs",
 	Run: func(cmd *cobra.Command, args []string) {
