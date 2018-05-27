@@ -85,7 +85,7 @@ func (p *pipeline) forward(word string) string {
 // 0. Just recording beginning (Word)
 //
 func (p *pipeline) input(word string) {
-	p.tr.WordToWord("input", "", "", word)
+	p.tr.TraceWord("input", "", word)
 }
 
 // 1. Normalize (Word -> Word)
@@ -97,9 +97,13 @@ func (p *pipeline) input(word string) {
 func (p *pipeline) normalize(word string) string {
 	word = p.h.spec.normReplacer.Replace(word)
 
+	p.tr.TraceWord("normalize", "custom", word)
+
 	norm := p.h.spec.norm
 	except := p.h.spec.normLetters
 	word = Normalize(word, norm, except)
+
+	p.tr.TraceWord("normalize", p.h.spec.Lang.Script, word)
 
 	return word
 }
@@ -158,7 +162,11 @@ func (p *pipeline) rewrite(subwords []Subword) []Subword {
 		swBuf.Append(rep.Subwords()...)
 	}
 
-	return swBuf.Subwords()
+	subwords = swBuf.Subwords()
+
+	p.tr.TraceSubwords("rewrite", "", subwords)
+
+	return subwords
 }
 
 // 4. Transcribe (Subwords -> Subwords[level=2])

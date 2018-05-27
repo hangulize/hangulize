@@ -7,57 +7,41 @@ import "fmt"
 type Trace struct {
 	step string
 	why  string
-	from string
-	to   string
+	word string
 }
 
 func (t *Trace) String() string {
-	return fmt.Sprintf("[%s] %#v %s", t.step, t.to, t.why)
+	return fmt.Sprintf("[%s] %#v %s", t.step, t.word, t.why)
 }
 
 type Tracer struct {
-	traces []Trace
+	traces   []Trace
+	lastWord string
 }
 
 func (tr *Tracer) Traces() []Trace {
 	return tr.traces
 }
 
-func (tr *Tracer) wordToWord(step, why string, from, to string) {
-	if from == to {
+func (tr *Tracer) trace(step, why, word string) {
+	if word == tr.lastWord {
 		return
 	}
-	tr.traces = append(tr.traces, Trace{step, why, from, to})
+	tr.traces = append(tr.traces, Trace{step, why, word})
+	tr.lastWord = word
 }
 
-func (tr *Tracer) WordToWord(step, why string, from, to string) {
+func (tr *Tracer) TraceWord(step, why, word string) {
 	if tr == nil {
 		return
 	}
-	tr.wordToWord(step, why, from, to)
+	tr.trace(step, why, word)
 }
 
-func (tr *Tracer) WordToSubwords(step, why string, from string, to []Subword) {
+func (tr *Tracer) TraceSubwords(step, why string, subwords []Subword) {
 	if tr == nil {
 		return
 	}
-	toWord := NewSubwordsBuilder(to).String()
-	tr.wordToWord(step, why, from, toWord)
-}
-
-func (tr *Tracer) SubwordsToWord(step, why string, from []Subword, to string) {
-	if tr == nil {
-		return
-	}
-	fromWord := NewSubwordsBuilder(from).String()
-	tr.wordToWord(step, why, fromWord, to)
-}
-
-func (tr *Tracer) SubwordsToSubwords(step, why string, from, to []Subword) {
-	if tr == nil {
-		return
-	}
-	fromWord := NewSubwordsBuilder(from).String()
-	toWord := NewSubwordsBuilder(to).String()
-	tr.wordToWord(step, why, fromWord, toWord)
+	word := NewSubwordsBuilder(subwords).String()
+	tr.trace(step, why, word)
 }
