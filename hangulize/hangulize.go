@@ -164,6 +164,7 @@ func (p *pipeline) rewrite(subwords []Subword) []Subword {
 
 	subwords = swBuf.Subwords()
 
+	// TODO(sublee): per-rule tracing
 	p.tr.TraceSubwords("rewrite", "", subwords)
 
 	return subwords
@@ -221,7 +222,12 @@ func (p *pipeline) transcribe(subwords []Subword) []Subword {
 		swBuf.Append(subword)
 	}
 
-	return swBuf.Subwords()
+	subwords = swBuf.Subwords()
+
+	// TODO(sublee): per-rule tracing
+	p.tr.TraceSubwords("transcribe", "", subwords)
+
+	return subwords
 }
 
 // 5. Compose Hangul (Subwords -> Word)
@@ -248,5 +254,9 @@ func (p *pipeline) composeHangul(subwords []Subword) string {
 	}
 	buf.WriteString(ComposeHangul(jamoBuf.String()))
 
-	return buf.String()
+	word := buf.String()
+
+	p.tr.TraceWord("compose hangul", "", word)
+
+	return word
 }
