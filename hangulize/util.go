@@ -88,7 +88,7 @@ func set(vals []string) []string {
 		unique[val] = true
 	}
 
-	set := make([]string, 0)
+	var set []string
 	for val := range unique {
 		set = append(set, val)
 	}
@@ -112,9 +112,10 @@ func trueFlags(length int) []bool {
 }
 
 var (
-	reQuoted = regexp.MustCompile(`\\.`)
 	reSpace  = regexp.MustCompile(`\s`)
+	reGroup  = regexp.MustCompile(`\(\?(:|P<.+?>)`)
 	reMeta   = regexp.MustCompile(`/`)
+	reQuoted = regexp.MustCompile(`\\.`)
 )
 
 func regexpLetters(reExpr string) string {
@@ -122,6 +123,9 @@ func regexpLetters(reExpr string) string {
 
 	// Remove spaces.
 	letters = reSpace.ReplaceAllString(letters, ``)
+
+	// Remove group starters "(?:", "(?P<...>".
+	letters = reGroup.ReplaceAllString(letters, ``)
 
 	// Remove meta characters.
 	letters = reMeta.ReplaceAllString(letters, ``)

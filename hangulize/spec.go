@@ -132,7 +132,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// -------------------------------------------------------------------------
 
 	// custom normalization
-	args := make([]string, 0)
+	var args []string
 	for to, froms := range normalize {
 		for _, from := range froms {
 			args = append(args, from, to)
@@ -141,7 +141,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	normLetters := make([]string, 0)
+	var normLetters []string
 	for to := range normalize {
 		normLetters = append(normLetters, to)
 	}
@@ -154,12 +154,12 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// }
 
 	// unique/sorted letters in rewrite/transcribe
-	letters := make([]string, 0)
+	var letters []string
 
 	rules := append(rewrite, transcribe...)
 
 	for _, rule := range rules {
-		for _, let := range rule.from.letters {
+		for _, let := range rule.From.letters {
 			letters = append(letters, let)
 		}
 	}
@@ -257,13 +257,13 @@ func newRules(
 	rules := make([]*Rule, len(pairs))
 
 	for i, pair := range pairs {
-		from, err := NewPattern(pair.Left(), macros, vars)
+		from, err := newPattern(pair.Left(), macros, vars)
 		if err != nil {
 			return nil, err
 		}
 
 		right := pair.Right()
-		to := NewRPattern(right[0], macros, vars)
+		to := newRPattern(right[0], macros, vars)
 
 		rules[i] = &Rule{from, to}
 	}

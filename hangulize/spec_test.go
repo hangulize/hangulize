@@ -7,6 +7,6 @@ import (
 )
 
 func TestEmptySpec(t *testing.T) {
-	spec := parseSpec(``)
+	spec := mustParseSpec(``)
 	assert.Equal(t, "", spec.Lang.ID)
 }

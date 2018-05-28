@@ -70,7 +70,7 @@ func TestSpecials(t *testing.T) {
 }
 
 func TestHyphen(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	transcribe:
 		"x" -> "-ㄱㅅ"
 		"e-" -> "ㅣ"
@@ -80,7 +80,7 @@ func TestHyphen(t *testing.T) {
 }
 
 func TestDifferentAges(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"x" -> "xx"
 
@@ -92,7 +92,7 @@ func TestDifferentAges(t *testing.T) {
 }
 
 func TestKeepAndCleanup(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"𐌗"  -> "𐌗𐌗"
 		"𐌄𐌗" -> "𐌊-"
@@ -123,7 +123,7 @@ func TestKeepAndCleanup(t *testing.T) {
 }
 
 func TestSpace(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"van " -> "van/"
 
@@ -135,7 +135,7 @@ func TestSpace(t *testing.T) {
 }
 
 func TestZeroWidthSpace(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"a b" -> "a{}b"
 		"^b"  -> "v"
@@ -161,4 +161,36 @@ func BenchmarkGloria(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		h.Hangulize("GLORIA")
 	}
+}
+
+// -----------------------------------------------------------------------------
+// Examples
+
+func Example() {
+	// Person names from http://iceager.egloos.com/2610028
+	fmt.Println(Hangulize("ron", "Cătălin Moroşanu"))
+	fmt.Println(Hangulize("nld", "Jerrel Venetiaan"))
+	fmt.Println(Hangulize("por", "Vítor Constâncio"))
+	// Output:
+	// 커털린 모로샤누
+	// 예럴 페네티안
+	// 비토르 콘스탄시우
+}
+
+func ExampleHangulize_gloria() {
+	fmt.Println(Hangulize("ita", "gloria"))
+	// Output: 글로리아
+}
+
+func ExampleHangulize_nietzsche() {
+	fmt.Println(Hangulize("deu", "Friedrich Wilhelm Nietzsche"))
+	// Output: 프리드리히 빌헬름 니체
+}
+
+func ExampleNewHangulizer() {
+	spec, _ := LoadSpec("nld")
+	h := NewHangulizer(spec)
+
+	fmt.Println(h.Hangulize("Vincent van Gogh"))
+	// Output: 빈센트 반고흐
 }

@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
-// RPattern is used for dynamic replacement.  "R" of RPattern means
-// "replacement" or "right-side".
+// RPattern is a dynamic replacement pattern.
 //
 // Some expressions in RPattern have special meaning:
 //
-// - "/" - zero-width edge of chunk
-// - "<var>" - ...
+//  "{}"    // zero-width space
+//  "<var>" // ...
+//
+// "R" in the name means "replacement" or "right-side".
 //
 type RPattern struct {
 	expr string
@@ -43,8 +44,8 @@ type rPart struct {
 
 // -----------------------------------------------------------------------------
 
-// NewRPattern parses the given expression and creates an RPattern.
-func NewRPattern(expr string,
+// newRPattern parses the given expression and creates an RPattern.
+func newRPattern(expr string,
 
 	macros map[string]string,
 	vars map[string][]string,
@@ -56,7 +57,7 @@ func NewRPattern(expr string,
 	// Split expr into several parts.
 	// Adjoining 2 parts have different token with each other.
 	offset := 0
-	parts := make([]rPart, 0)
+	var parts []rPart
 
 	for _, m := range reVar.FindAllStringSubmatchIndex(_expr, -1) {
 		// Keep plain text before var.
