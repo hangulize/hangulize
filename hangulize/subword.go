@@ -41,7 +41,7 @@ func (b *subwordsBuilder) Reset() {
 // Subwords builds the buffered subwords into a []Subword array.  It merges
 // adjoin subwords if they share the same level.
 func (b *subwordsBuilder) Subwords() []subword {
-	subwords := make([]subword, 0)
+	var subwords []subword
 
 	if len(b.subwords) == 0 {
 		// No subwords buffered.
@@ -103,7 +103,7 @@ type subwordReplacer struct {
 
 // newSubwordReplacer creates a SubwordReplacer for a word.
 func newSubwordReplacer(word string, prevLevel, nextLevel int) *subwordReplacer {
-	repls := make([]replacement, 0)
+	var repls []replacement
 
 	levels := make([]int, len(word))
 	for i := 0; i < len(levels); i++ {
@@ -126,7 +126,7 @@ func (r *subwordReplacer) ReplaceBy(repls ...replacement) {
 // flush applies the buffered replacements to the SubwordReplacer internal.
 func (r *subwordReplacer) flush() {
 	var buf strings.Builder
-	levels := make([]int, 0)
+	var levels []int
 
 	offset := 0
 	for _, repl := range r.repls {
@@ -166,7 +166,7 @@ func (r *subwordReplacer) String() string {
 func (r *subwordReplacer) Subwords() []subword {
 	r.flush()
 
-	subwords := make([]subword, 0)
+	var subwords []subword
 
 	if len(r.levels) == 0 {
 		return subwords

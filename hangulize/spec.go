@@ -132,7 +132,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// -------------------------------------------------------------------------
 
 	// custom normalization
-	args := make([]string, 0)
+	var args []string
 	for to, froms := range normalize {
 		for _, from := range froms {
 			args = append(args, from, to)
@@ -141,7 +141,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	normLetters := make([]string, 0)
+	var normLetters []string
 	for to := range normalize {
 		normLetters = append(normLetters, to)
 	}
@@ -154,7 +154,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// }
 
 	// unique/sorted letters in rewrite/transcribe
-	letters := make([]string, 0)
+	var letters []string
 
 	rules := append(rewrite, transcribe...)
 

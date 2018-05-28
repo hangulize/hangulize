@@ -14,13 +14,13 @@ func (r *Rule) String() string {
 
 // replacements indicates which ranges should be replaced.
 func (r *Rule) replacements(word string) []replacement {
-	rs := make([]replacement, 0)
+	var repls []replacement
 
 	for _, m := range r.From.Find(word, -1) {
 		start, stop := m[0], m[1]
 		repl := r.To.Interpolate(r.From, word, m)
-		rs = append(rs, replacement{start, stop, repl})
+		repls = append(repls, replacement{start, stop, repl})
 	}
 
-	return rs
+	return repls
 }

@@ -57,7 +57,7 @@ func newRPattern(expr string,
 	// Split expr into several parts.
 	// Adjoining 2 parts have different token with each other.
 	offset := 0
-	parts := make([]rPart, 0)
+	var parts []rPart
 
 	for _, m := range reVar.FindAllStringSubmatchIndex(_expr, -1) {
 		// Keep plain text before var.
