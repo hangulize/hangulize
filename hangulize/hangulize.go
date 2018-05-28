@@ -1,15 +1,33 @@
 /*
-Package hangulize provides an automatic transcriber into Hangul for non-Korean
-words.
+Package hangulize provides an automatic Hangul transcriber for non-Korean
+words.  Transcription means that the systematic representation of language in
+written form.
 
-Originally, Hangulize was implemented in Python in 2010.  This implementation
-is a reboot with attractive feature improvements.
+ https://en.wikipedia.org/wiki/Transcription_(linguistics)
 
-Original implementation: https://github.com/sublee/hangulize
+Originally, the Hangulize was invented with Python in 2010
+(https://github.com/sublee/hangulize).  It has been provided at
+http://hangulize.org/ for Korean translators.  Brian Jongseong Park proposed
+the seed idea of the Hangulize on his Blog.
 
-Brian Jongseong Park proposed the seed idea of Hangulize on his Blog.
+ http://iceager.egloos.com/2610028
 
-Post by Brian: http://iceager.egloos.com/2610028
+This Go re-implementation will be a reboot of the Hangulize with attractive
+feature improvements.
+
+Hangulize Pipeline
+
+When we transcribe, the word goes through Hangulize's procedural pipeline.  The
+pipeline has 5 steps: "normalize", "group", "rewrite", "transcribe", and
+"compose Hangul".  If we can transcribe "Hello!" in English into "헬로!"
+(actually, English is not supported yet), the pipeline world work like:
+
+ 0. input       "Hello!"
+ 1. normalize   "hello!"
+ 2. group       "hello", "!"
+ 3. rewrite     "heˈlō", "!"
+ 4. transcribe  "ㅎㅔ-ㄹㄹㅗ", "!"
+ 5. compose H.  "헬로!"
 
 */
 package hangulize
@@ -18,11 +36,9 @@ import (
 	"strings"
 )
 
-// Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
-//
-//    Hangulize("ita", "gloria")
-//    // Output: "글로리아"
-//
+// Hangulize is the most simple and useful API of thie package.  It transcribes
+// a non-Korean word into Hangul, which is the Korean alphabet.  For example,
+// it will transcribe "Владивосто́к" in Russian into "블라디보스토크".
 func Hangulize(lang string, word string) string {
 	spec, ok := LoadSpec(lang)
 	if !ok {
@@ -36,14 +52,19 @@ func Hangulize(lang string, word string) string {
 
 // -----------------------------------------------------------------------------
 
-// Hangulizer ...
+// Hangulizer provides the transcription logic for the underlying spec.
 type Hangulizer struct {
 	spec *Spec
 }
 
-// NewHangulizer ...
+// NewHangulizer creates a Hangulizer for a spec.
 func NewHangulizer(spec *Spec) *Hangulizer {
 	return &Hangulizer{spec}
+}
+
+// Spec returns the underlying spec.
+func (h *Hangulizer) Spec() *Spec {
+	return h.spec
 }
 
 // Hangulize transcribes a loanword into Hangul.

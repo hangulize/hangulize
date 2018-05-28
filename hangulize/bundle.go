@@ -50,7 +50,7 @@ func LoadSpec(lang string) (*Spec, bool) {
 // ListLangs returns the language name list of bundled specs.
 // The bundled spec can be loaded by LoadSpec.
 func ListLangs() []string {
-	langs := make([]string, 0)
+	var langs []string
 
 	for _, filename := range bundle.List() {
 		if strings.HasSuffix(filename, ext) {

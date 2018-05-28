@@ -1,13 +1,14 @@
 package hangulize
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func fixturePattern(expr string) *Pattern {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	vars:
 		vowels = "a", "e", "i", "o", "u"
 		abc    = "a", "b", "c"
@@ -16,7 +17,7 @@ func fixturePattern(expr string) *Pattern {
 	macros:
 		"@" = "<vowels>"
 	`)
-	return newPattern(expr, spec)
+	return mustNewPattern(expr, spec)
 }
 
 func TestMetaPatterns(t *testing.T) {
@@ -319,7 +320,7 @@ func TestComplexLookaround(t *testing.T) {
 }
 
 func TestMalformedPattern(t *testing.T) {
-	p, err := NewPattern(`{a} {b} {c}`, nil, nil)
+	p, err := newPattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, p.Explain())
 }
 
@@ -336,4 +337,19 @@ func TestBugs(t *testing.T) {
 		o, "inJazio",
 		"    ^     ",
 	})
+}
+
+// -----------------------------------------------------------------------------
+// Examples
+
+func ExamplePattern_Letters() {
+	p, _ := newPattern("^hello{,}", nil, nil)
+	fmt.Println(p.Letters())
+	// Output: [, e h l o]
+}
+
+func ExamplePattern_Find() {
+	p, _ := newPattern("^he(l+o){,}", nil, nil)
+	fmt.Println(p.Find("hello, helo, hellllo", -1))
+	// Output: [[0 5 2 5] [7 11 9 11]]
 }

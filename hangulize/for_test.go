@@ -10,7 +10,7 @@ import (
 // -----------------------------------------------------------------------------
 // create or panic
 
-func parseSpec(hgl string) *Spec {
+func mustParseSpec(hgl string) *Spec {
 	spec, err := ParseSpec(strings.NewReader(hgl))
 	if err != nil {
 		panic(err)
@@ -18,16 +18,16 @@ func parseSpec(hgl string) *Spec {
 	return spec
 }
 
-func newPattern(expr string, spec *Spec) *Pattern {
-	p, err := NewPattern(expr, spec.Macros, spec.Vars)
+func mustNewPattern(expr string, spec *Spec) *Pattern {
+	p, err := newPattern(expr, spec.Macros, spec.Vars)
 	if err != nil {
 		panic(err)
 	}
 	return p
 }
 
-func newRPattern(expr string, spec *Spec) *RPattern {
-	p := NewRPattern(expr, spec.Macros, spec.Vars)
+func mustNewRPattern(expr string, spec *Spec) *RPattern {
+	p := newRPattern(expr, spec.Macros, spec.Vars)
 	return p
 }
 

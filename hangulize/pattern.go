@@ -9,17 +9,31 @@ import (
 )
 
 // Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
-// It is used for the rewrite of Hangulize.
+//
+// The transcription logic includes several rewriting rules.  A rule has a
+// Pattern and an RPattern.  A sub-word which is matched with the Pattern, will
+// be rewritten by the RPattern.
+//
+//  rewrite:
+//      "'"        -> ""
+//      "^gli$"    -> "li"
+//      "^glia$"   -> "g.lia"
+//      "^glioma$" -> "g.lioma"
+//      "^gli{@}"  -> "li"
+//      "{@}gli"   -> "li"
+//      "gn{@}"    -> "nJ"
+//      "gn"       -> "n"
 //
 // Some expressions in Pattern have special meaning:
 //
-// - "^" - start of chunk
-// - "^^" - start of string
-// - "$" - end of chunk
-// - "$$" - end of string
-// - "{...}" - zero-width match
-// - "{~...}" - zero-width negative match
-// - "<var>" - one of var values (defined in spec)
+//  "^"      // start of chunk
+//  "^^"     // start of string
+//  "$"      // end of chunk
+//  "$$"     // end of string
+//  "{...}"  // zero-width match
+//  "{~...}" // zero-width negative match
+//  "{}"     // zero-width space
+//  "<var>"  // one of var values (defined in spec)
 //
 type Pattern struct {
 	expr string
@@ -38,8 +52,8 @@ func (p *Pattern) String() string {
 	return fmt.Sprintf(`/%s/`, p.expr)
 }
 
-// NewPattern compiles an HRE pattern from an expression.
-func NewPattern(
+// newPattern compiles an HRE pattern from an expression.
+func newPattern(
 	expr string,
 
 	macros map[string]string,
@@ -61,7 +75,7 @@ func NewPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	letters := make([]string, 0)
+	var letters []string
 	for _, ch := range regexpLetters(reExpr + negExpr) {
 		letters = append(letters, string(ch))
 	}
@@ -82,6 +96,12 @@ func NewPattern(
 	return p, nil
 }
 
+// Letters returns the set of natural letters used in the expression in
+// ascending order.
+func (p *Pattern) Letters() []string {
+	return p.letters
+}
+
 // Explain shows the HRE expression with
 // the underlying standard regexp patterns.
 func (p *Pattern) Explain() string {
@@ -93,9 +113,10 @@ func (p *Pattern) Explain() string {
 
 // -----------------------------------------------------------------------------
 
-// Find searches up to n matches in the word.
+// Find searches up to n matches in the word.  If n is -1, it will search all
+// matches.  The result is an array of submatch locations.
 func (p *Pattern) Find(word string, n int) [][]int {
-	matches := make([][]int, 0)
+	var matches [][]int
 	offset := 0
 
 	for n < 0 || len(matches) < n {
@@ -150,31 +171,4 @@ func (p *Pattern) Find(word string, n int) [][]int {
 	}
 
 	return matches
-}
-
-// Replace searches up to n matches in the word and replaces them with the
-// RPattern list.
-func (p *Pattern) Replace(word string, rpatterns []*RPattern, n int) []string {
-	var buf strings.Builder
-	offset := 0
-
-	for _, m := range p.Find(word, n) {
-		start, stop := m[0], m[1]
-
-		buf.WriteString(word[offset:start])
-
-		// TODO(sublee): Support multiple targets.
-		rp := rpatterns[0]
-
-		fmt.Println(start, stop, rp)
-
-		// Write replacement instead of the match.
-		buf.WriteString(rp.Interpolate(p, word, m))
-
-		offset = stop
-	}
-
-	buf.WriteString(word[offset:])
-
-	return []string{buf.String()}
 }

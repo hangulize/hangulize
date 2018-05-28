@@ -11,7 +11,7 @@ var reVar = re(`<(.+?)>`)
 
 // expandVars replaces <var> to corresponding content regexp such as (a|b|c).
 func expandVars(expr string, vars map[string][]string) (string, [][]string) {
-	usedVars := make([][]string, 0)
+	var usedVars [][]string
 
 	expr = reVar.ReplaceAllStringFunc(expr, func(varExpr string) string {
 		// Retrieve variable name and values.
