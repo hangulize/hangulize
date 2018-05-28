@@ -1,15 +1,19 @@
 /*
-Package hangulize provides an automatic transcriber into Hangul for non-Korean
-words.
+Package hangulize provides an automatic Hangul transcriber for non-Korean
+words.  Transcription means that the systematic representation of language in
+written form.
 
-Originally, Hangulize was implemented in Python in 2010.  This implementation
-is a reboot with attractive feature improvements.
+ https://en.wikipedia.org/wiki/Transcription_(linguistics)
 
-Original implementation: https://github.com/sublee/hangulize
+Originally, the Hangulize was invented with Python in 2010
+(https://github.com/sublee/hangulize).  It has been provided at
+http://hangulize.org/ for Korean translators.  Brian Jongseong Park proposed
+the seed idea of the Hangulize on his Blog.
 
-Brian Jongseong Park proposed the seed idea of Hangulize on his Blog.
+ http://iceager.egloos.com/2610028
 
-Post by Brian: http://iceager.egloos.com/2610028
+This Go re-implementation will be a reboot of the Hangulize with attractive
+feature improvements.
 
 */
 package hangulize
