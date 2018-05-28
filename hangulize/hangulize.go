@@ -15,6 +15,20 @@ the seed idea of the Hangulize on his Blog.
 This Go re-implementation will be a reboot of the Hangulize with attractive
 feature improvements.
 
+Hangulize Pipeline
+
+When we transcribe, the word goes through Hangulize's procedural pipeline.  The
+pipeline has 5 steps: "normalize", "group", "rewrite", "transcribe", and
+"compose Hangul".  If we can transcribe "Hello!" in English into "헬로!"
+(actually, English is not supported yet), the pipeline world work like:
+
+ 0. input       "Hello!"
+ 1. normalize   "hello!"
+ 2. group       "hello", "!"
+ 3. rewrite     "heˈlō", "!"
+ 4. transcribe  "ㅎㅔ-ㄹㄹㅗ", "!"
+ 5. compose H.  "헬로!"
+
 */
 package hangulize
 
