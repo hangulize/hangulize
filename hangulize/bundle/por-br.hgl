@@ -1,7 +1,7 @@
 lang:
     id      = "por-br"
     codes   = "pt", "por"
-    english = "Portuguese (Brazil)"
+    english = "Brazilian Portuguese"
     korean  = "브라질 포르투갈어"
     script  = "roman"
 

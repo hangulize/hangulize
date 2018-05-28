@@ -1,8 +1,8 @@
 lang:
     id      = "kat-2"
     codes   = "ka", "kat"
-    english = "Georgian 2nd scheme"
-    korean  = "조지아어 제2안"
+    english = "Georgian (2nd scheme)"
+    korean  = "조지아어(제2안)"
     script  = "roman"
 
 config:
