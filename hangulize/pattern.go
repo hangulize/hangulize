@@ -38,8 +38,8 @@ func (p *Pattern) String() string {
 	return fmt.Sprintf(`/%s/`, p.expr)
 }
 
-// NewPattern compiles an HRE pattern from an expression.
-func NewPattern(
+// newPattern compiles an HRE pattern from an expression.
+func newPattern(
 	expr string,
 
 	macros map[string]string,

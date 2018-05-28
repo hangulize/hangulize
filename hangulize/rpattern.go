@@ -43,8 +43,8 @@ type rPart struct {
 
 // -----------------------------------------------------------------------------
 
-// NewRPattern parses the given expression and creates an RPattern.
-func NewRPattern(expr string,
+// newRPattern parses the given expression and creates an RPattern.
+func newRPattern(expr string,
 
 	macros map[string]string,
 	vars map[string][]string,

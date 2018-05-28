@@ -159,7 +159,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	rules := append(rewrite, transcribe...)
 
 	for _, rule := range rules {
-		for _, let := range rule.from.letters {
+		for _, let := range rule.From.letters {
 			letters = append(letters, let)
 		}
 	}
@@ -257,13 +257,13 @@ func newRules(
 	rules := make([]*Rule, len(pairs))
 
 	for i, pair := range pairs {
-		from, err := NewPattern(pair.Left(), macros, vars)
+		from, err := newPattern(pair.Left(), macros, vars)
 		if err != nil {
 			return nil, err
 		}
 
 		right := pair.Right()
-		to := NewRPattern(right[0], macros, vars)
+		to := newRPattern(right[0], macros, vars)
 
 		rules[i] = &Rule{from, to}
 	}

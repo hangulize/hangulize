@@ -7,7 +7,7 @@ import (
 )
 
 func fixturePattern(expr string) *Pattern {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	vars:
 		vowels = "a", "e", "i", "o", "u"
 		abc    = "a", "b", "c"
@@ -16,7 +16,7 @@ func fixturePattern(expr string) *Pattern {
 	macros:
 		"@" = "<vowels>"
 	`)
-	return newPattern(expr, spec)
+	return mustNewPattern(expr, spec)
 }
 
 func TestMetaPatterns(t *testing.T) {
@@ -319,7 +319,7 @@ func TestComplexLookaround(t *testing.T) {
 }
 
 func TestMalformedPattern(t *testing.T) {
-	p, err := NewPattern(`{a} {b} {c}`, nil, nil)
+	p, err := newPattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, p.Explain())
 }
 
