@@ -70,7 +70,7 @@ func TestSpecials(t *testing.T) {
 }
 
 func TestHyphen(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	transcribe:
 		"x" -> "-ㄱㅅ"
 		"e-" -> "ㅣ"
@@ -80,7 +80,7 @@ func TestHyphen(t *testing.T) {
 }
 
 func TestDifferentAges(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"x" -> "xx"
 
@@ -92,7 +92,7 @@ func TestDifferentAges(t *testing.T) {
 }
 
 func TestKeepAndCleanup(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"𐌗"  -> "𐌗𐌗"
 		"𐌄𐌗" -> "𐌊-"
@@ -123,7 +123,7 @@ func TestKeepAndCleanup(t *testing.T) {
 }
 
 func TestSpace(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"van " -> "van/"
 
@@ -135,7 +135,7 @@ func TestSpace(t *testing.T) {
 }
 
 func TestZeroWidthSpace(t *testing.T) {
-	spec := parseSpec(`
+	spec := mustParseSpec(`
 	rewrite:
 		"a b" -> "a{}b"
 		"^b"  -> "v"
