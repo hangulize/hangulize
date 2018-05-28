@@ -166,6 +166,17 @@ func BenchmarkGloria(b *testing.B) {
 // -----------------------------------------------------------------------------
 // Examples
 
+func Example() {
+	// Person names from http://iceager.egloos.com/2610028
+	fmt.Println(Hangulize("ron", "Cătălin Moroşanu"))
+	fmt.Println(Hangulize("nld", "Jerrel Venetiaan"))
+	fmt.Println(Hangulize("por", "Vítor Constâncio"))
+	// Output:
+	// 커털린 모로샤누
+	// 예럴 페네티안
+	// 비토르 콘스탄시우
+}
+
 func ExampleHangulize_gloria() {
 	fmt.Println(Hangulize("ita", "gloria"))
 	// Output: 글로리아
