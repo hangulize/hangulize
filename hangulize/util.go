@@ -88,7 +88,7 @@ func set(vals []string) []string {
 		unique[val] = true
 	}
 
-	set := make([]string, 0)
+	var set []string
 	for val := range unique {
 		set = append(set, val)
 	}

@@ -75,7 +75,7 @@ func newPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	letters := make([]string, 0)
+	var letters []string
 	for _, ch := range regexpLetters(reExpr + negExpr) {
 		letters = append(letters, string(ch))
 	}
@@ -116,7 +116,7 @@ func (p *Pattern) Explain() string {
 // Find searches up to n matches in the word.  If n is -1, it will search all
 // matches.  The result is an array of submatch locations.
 func (p *Pattern) Find(word string, n int) [][]int {
-	matches := make([][]int, 0)
+	var matches [][]int
 	offset := 0
 
 	for n < 0 || len(matches) < n {
