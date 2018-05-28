@@ -139,6 +139,9 @@ def main(argv):
         pattern = rule[0]
         rpattern = rule[1:]
 
+        # ZWSP "/" has been changed with "{}".
+        pattern = pattern.replace('/', '{}')
+
         # some rpattern is 2d tuple redundantly.
         if isinstance(rpattern[0], tuple):
             rpattern = rpattern[0]
@@ -151,7 +154,9 @@ def main(argv):
             if transcribe:
                 transcribe.append((pattern, rpattern))
                 continue
-
+        else:
+            # "/" -> "{}" here too.
+            rpattern = rpattern[0].replace('/', '{}')
         rewrite.append((pattern, rpattern))
 
     # find test
