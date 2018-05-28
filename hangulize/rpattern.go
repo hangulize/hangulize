@@ -5,13 +5,14 @@ import (
 	"strings"
 )
 
-// RPattern is used for dynamic replacement.  "R" of RPattern means
-// "replacement" or "right-side".
+// RPattern is a dynamic replacement pattern.
 //
 // Some expressions in RPattern have special meaning:
 //
-// - "/" - zero-width edge of chunk
-// - "<var>" - ...
+//  "{}"    // zero-width space
+//  "<var>" // ...
+//
+// "R" in the name means "replacement" or "right-side".
 //
 type RPattern struct {
 	expr string

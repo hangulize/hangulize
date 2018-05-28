@@ -24,7 +24,7 @@ func Normalize(word string, norm Normalizer, keep []string) string {
 		if inSet(string(ch), keepSet) {
 			buf.WriteRune(ch)
 		} else {
-			buf.WriteRune(norm.Normalize(ch))
+			buf.WriteRune(norm.normalize(ch))
 		}
 	}
 
@@ -33,7 +33,7 @@ func Normalize(word string, norm Normalizer, keep []string) string {
 
 // Normalizer normalizes a letter.
 type Normalizer interface {
-	Normalize(rune) rune
+	normalize(rune) rune
 }
 
 var normalizers = map[string]Normalizer{
@@ -49,11 +49,11 @@ func GetNormalizer(script string) (Normalizer, bool) {
 
 // -----------------------------------------------------------------------------
 
-// RomanNormalizer is a normalizer for Laion or Roman script.
+// RomanNormalizer is a normalizer for Latin or Roman script.
 type RomanNormalizer struct{}
 
-// Normalize converts a Roman letter into ISO basic Latin lower alphabet [a-z].
-func (RomanNormalizer) Normalize(ch rune) rune {
+// normalize converts a Roman letter into ISO basic Latin lower alphabet [a-z].
+func (RomanNormalizer) normalize(ch rune) rune {
 	props := norm.NFD.PropertiesString(string(ch))
 	bin := props.Decomposition()
 	if len(bin) != 0 {
@@ -70,8 +70,8 @@ func (RomanNormalizer) Normalize(ch rune) rune {
 // KanaNormalizer is a normalizer for Kana script which is used in Japan.
 type KanaNormalizer struct{}
 
-// Normalize converts Hiragana to Katakana.
-func (KanaNormalizer) Normalize(ch rune) rune {
+// normalize converts Hiragana to Katakana.
+func (KanaNormalizer) normalize(ch rune) rune {
 	const (
 		hiraganaMin = rune(0x3040)
 		hiraganaMax = rune(0x309f)

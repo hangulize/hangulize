@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -336,4 +337,19 @@ func TestBugs(t *testing.T) {
 		o, "inJazio",
 		"    ^     ",
 	})
+}
+
+// -----------------------------------------------------------------------------
+// Examples
+
+func ExamplePattern_Letters() {
+	p, _ := newPattern("^hello{,}", nil, nil)
+	fmt.Println(p.Letters())
+	// Output: [, e h l o]
+}
+
+func ExamplePattern_Find() {
+	p, _ := newPattern("^he(l+o){,}", nil, nil)
+	fmt.Println(p.Find("hello, helo, hellllo", -1))
+	// Output: [[0 5 2 5] [7 11 9 11]]
 }
