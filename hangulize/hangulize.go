@@ -18,11 +18,9 @@ import (
 	"strings"
 )
 
-// Hangulize transcribes a non-Korean word into Hangul, the Korean alphabet:
-//
-//    Hangulize("ita", "gloria")
-//    // Output: "글로리아"
-//
+// Hangulize is the most simple and useful API of thie package.  It transcribes
+// a non-Korean word into Hangul, which is the Korean alphabet.  For example,
+// it will transcribe "Владивосто́к" in Russian into "블라디보스토크".
 func Hangulize(lang string, word string) string {
 	spec, ok := LoadSpec(lang)
 	if !ok {
@@ -36,14 +34,19 @@ func Hangulize(lang string, word string) string {
 
 // -----------------------------------------------------------------------------
 
-// Hangulizer ...
+// Hangulizer provides the transcription logic for the underlying spec.
 type Hangulizer struct {
 	spec *Spec
 }
 
-// NewHangulizer ...
+// NewHangulizer creates a Hangulizer for a spec.
 func NewHangulizer(spec *Spec) *Hangulizer {
 	return &Hangulizer{spec}
+}
+
+// Spec returns the underlying spec.
+func (h *Hangulizer) Spec() *Spec {
+	return h.spec
 }
 
 // Hangulize transcribes a loanword into Hangul.

@@ -162,3 +162,24 @@ func BenchmarkGloria(b *testing.B) {
 		h.Hangulize("GLORIA")
 	}
 }
+
+// -----------------------------------------------------------------------------
+// Examples
+
+func ExampleHangulize_gloria() {
+	fmt.Println(Hangulize("ita", "gloria"))
+	// Output: 글로리아
+}
+
+func ExampleHangulize_nietzsche() {
+	fmt.Println(Hangulize("deu", "Friedrich Wilhelm Nietzsche"))
+	// Output: 프리드리히 빌헬름 니체
+}
+
+func ExampleNewHangulizer() {
+	spec, _ := LoadSpec("nld")
+	h := NewHangulizer(spec)
+
+	fmt.Println(h.Hangulize("Vincent van Gogh"))
+	// Output: 빈센트 반고흐
+}
