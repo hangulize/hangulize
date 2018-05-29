@@ -163,6 +163,17 @@ func BenchmarkGloria(b *testing.B) {
 	}
 }
 
+func BenchmarkGloriaTrace(b *testing.B) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.HangulizeTrace("GLORIA")
+	}
+}
+
 // -----------------------------------------------------------------------------
 // Examples
 
