@@ -52,7 +52,7 @@ func (p Pair) Right() []string {
 // Section contains pairs.
 type Section interface {
 	Pairs() []Pair
-	AddPair(string, []string) error
+	addPair(string, []string) error
 }
 
 // ListSection has an ordered list of pairs.
@@ -66,13 +66,13 @@ type DictSection struct {
 	dict map[string][]string
 }
 
-// NewListSection creates an empty list section.
-func NewListSection() *ListSection {
+// newListSection creates an empty list section.
+func newListSection() *ListSection {
 	return &ListSection{make([]Pair, 0)}
 }
 
-// NewDictSection creates an empty dict section.
-func NewDictSection() *DictSection {
+// newDictSection creates an empty dict section.
+func newDictSection() *DictSection {
 	return &DictSection{make(map[string][]string)}
 }
 
@@ -96,15 +96,15 @@ func (s *DictSection) Pairs() []Pair {
 	return pairs
 }
 
-// AddPair adds a pair into a list section.  It never fails.
-func (s *ListSection) AddPair(l string, r []string) error {
+// addPair adds a pair into a list section.  It never fails.
+func (s *ListSection) addPair(l string, r []string) error {
 	s.pairs = append(s.pairs, Pair{l, r})
 	return nil
 }
 
-// AddPair adds a pair into a dict section.  If there's already a pair having
+// addPair adds a pair into a dict section.  If there's already a pair having
 // same left, it will fails.
-func (s *DictSection) AddPair(l string, r []string) error {
+func (s *DictSection) addPair(l string, r []string) error {
 	_, ok := s.dict[l]
 	if ok {
 		return fmt.Errorf("left of pair duplicated: %#v", l)

@@ -5,38 +5,38 @@ import (
 	"io"
 )
 
-// Parser ...
-type Parser struct {
-	lexer *Lexer
+// parser ...
+type parser struct {
+	lexer *lexer
 	buf   struct {
-		token   Token
-		literal string
-		reuse   bool
+		tok   token
+		lit   string
+		reuse bool
 	}
 }
 
-// NewParser ...
-func NewParser(r io.Reader) *Parser {
-	return &Parser{lexer: NewLexer(r)}
+// newParser ...
+func newParser(r io.Reader) *parser {
+	return &parser{lexer: newLexer(r)}
 }
 
-func (p *Parser) scan() (Token, string) {
+func (p *parser) scan() (token, string) {
 	// If unscan() performed, reuses the latest token and literal.
 	if p.buf.reuse {
 		p.buf.reuse = false
-		return p.buf.token, p.buf.literal
+		return p.buf.tok, p.buf.lit
 	}
 
 	// Scan the next one.
-	token, literal := p.lexer.Scan()
+	tok, lit := p.lexer.Scan()
 
 	// Keep the latest token and literal to reuse.
-	p.buf.token, p.buf.literal = token, literal
+	p.buf.tok, p.buf.lit = tok, lit
 
-	return token, literal
+	return tok, lit
 }
 
-func (p *Parser) unscan() error {
+func (p *parser) unscan() error {
 	if p.buf.reuse {
 		return errors.New("already unscanned once")
 	}
@@ -45,38 +45,38 @@ func (p *Parser) unscan() error {
 	return nil
 }
 
-// Parse ...
-func (p *Parser) Parse() (HGL, error) {
+// parse ...
+func (p *parser) parse() (HGL, error) {
 	hgl := make(HGL)
 
 	var lastString string
 	var sectionName string
 
 	for {
-		token, literal := p.scan()
+		tok, lit := p.scan()
 
 		// The common behavior for useless tokens.
-		if token == Illegal {
-			return nil, IllegalError(literal)
-		} else if token == EOF {
+		if tok == Illegal {
+			return nil, illegalError(lit)
+		} else if tok == EOF {
 			break
-		} else if token == Comment {
+		} else if tok == Comment {
 			continue
 		}
 
 		// Remember the last string.  It will be a section name or a key.
-		if token == String {
-			lastString = literal
+		if tok == String {
+			lastString = lit
 			continue
 		}
 
 		// If a colon found, the last string is a section name.
-		if token == Colon {
+		if tok == Colon {
 			sectionName = lastString
 			continue
 		}
 
-		if token == Equal || token == Arrow {
+		if tok == Equal || tok == Arrow {
 			if sectionName == "" {
 				return nil, errors.New("pair found not in section")
 			}
@@ -91,27 +91,27 @@ func (p *Parser) Parse() (HGL, error) {
 
 			// If an equals sign found, the last string is a key in a dict
 			// section.
-			if token == Equal {
+			if tok == Equal {
 				section, ok = hgl[sectionName]
 
 				if !ok {
-					section = NewDictSection()
+					section = newDictSection()
 					hgl[sectionName] = section
 				}
 			}
 
 			// If an arrow sign found, the last string is a left value in a
 			// pairs section.
-			if token == Arrow {
+			if tok == Arrow {
 				section, ok = hgl[sectionName]
 
 				if !ok {
-					section = NewListSection()
+					section = newListSection()
 					hgl[sectionName] = section
 				}
 			}
 
-			section.AddPair(lastString, values)
+			section.addPair(lastString, values)
 			continue
 		}
 	}
@@ -119,33 +119,33 @@ func (p *Parser) Parse() (HGL, error) {
 	return hgl, nil
 }
 
-func (p *Parser) parseValues() ([]string, error) {
+func (p *parser) parseValues() ([]string, error) {
 	values := make([]string, 0)
 
 	for {
-		token, literal := p.scan()
+		tok, lit := p.scan()
 
 		// The common behavior for useless tokens.
-		if token == Illegal {
-			return nil, IllegalError(literal)
-		} else if token == EOF {
+		if tok == Illegal {
+			return nil, illegalError(lit)
+		} else if tok == EOF {
 			break
-		} else if token == Comment {
+		} else if tok == Comment {
 			continue
 		}
 
 		// Collect strings in values.
-		if token == String {
-			values = append(values, literal)
+		if tok == String {
+			values = append(values, lit)
 		}
 
 		// There is a more value.
-		if token == Comma {
+		if tok == Comma {
 			continue
 		}
 
 		// Values cannot be written over multiple lines.
-		if token == Newline {
+		if tok == Newline {
 			break
 		}
 	}
