@@ -14,7 +14,7 @@ import (
 // Pattern and an RPattern.  A sub-word which is matched with the Pattern, will
 // be rewritten by the RPattern.
 //
-//  rewrite:
+//  quantize:
 //      "'"        -> ""
 //      "^gli$"    -> "li"
 //      "^glia$"   -> "g.lia"

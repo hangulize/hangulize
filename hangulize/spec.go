@@ -21,8 +21,8 @@ type Spec struct {
 	Vars      map[string][]string
 	Normalize map[string][]string
 
-	// Rewrite/Transcribe
-	Rewrite    []*Rule
+	// Quantize/Transcribe
+	Quantize   []*Rule
 	Transcribe []*Rule
 
 	// Test examples.
@@ -101,13 +101,13 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		normalize = sec.(*hgl.DictSection).Map()
 	}
 
-	// rewrite
-	var rewritePairs []hgl.Pair
-	if sec, ok := h["rewrite"]; ok {
-		rewritePairs = sec.(*hgl.ListSection).Array()
+	// quantize
+	var quantizePairs []hgl.Pair
+	if sec, ok := h["quantize"]; ok {
+		quantizePairs = sec.(*hgl.ListSection).Array()
 	}
 
-	rewrite, err := newRules(rewritePairs, macros, vars)
+	quantize, err := newRules(quantizePairs, macros, vars)
 	if err != nil {
 		return nil, err
 	}
@@ -153,10 +153,10 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
 	// }
 
-	// unique/sorted letters in rewrite/transcribe
+	// unique/sorted letters in quantize/transcribe
 	var letters []string
 
-	rules := append(rewrite, transcribe...)
+	rules := append(quantize, transcribe...)
 
 	for _, rule := range rules {
 		for _, let := range rule.From.letters {
@@ -176,7 +176,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		vars,
 		normalize,
 
-		rewrite,
+		quantize,
 		transcribe,
 
 		test,
@@ -244,7 +244,7 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 }
 
 // -----------------------------------------------------------------------------
-// "rewrite"/"transcribe" section
+// "quantize"/"transcribe" section
 
 func newRules(
 	pairs []hgl.Pair,

@@ -28,7 +28,7 @@ normalize:
     "ö"  = "Ö"
     "ü"  = "Ü"
 
-rewrite:
+quantize:
     "’"                                                 -> "'"
     " aan "                                             -> "{}aan{}"
     "^aan "                                             -> "aan{}"

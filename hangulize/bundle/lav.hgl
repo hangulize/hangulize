@@ -27,7 +27,7 @@ normalize:
     "ļ" = "Ļ"
     "ž" = "Ž"
 
-rewrite:
+quantize:
     "č"                   -> "C"
     "ģ"                   -> "G"
     "ķ"                   -> "K"

@@ -23,7 +23,7 @@ normalize:
     "œ" = "Œ"
     "ü" = "Ü"
 
-rewrite:
+quantize:
     "æ"          -> "ae"
     "œ"          -> "oe"
     "maior"      -> "maJor"

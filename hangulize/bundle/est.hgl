@@ -24,7 +24,7 @@ normalize:
     "ü" = "Ü"
     "ž" = "Ž"
 
-rewrite:
+quantize:
     "-"            -> "{}"
     "õ"            -> "E"
     "ä"            -> "A"
