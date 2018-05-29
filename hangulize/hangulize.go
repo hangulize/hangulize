@@ -79,10 +79,10 @@ should be replaced.  A replaced word by a rule would become as the input for
 the next rule:
 
 	rewrite:
-	    "^gli$"    -> "li"
-	    "^gli{@}"  -> "li"
-	    "{@}gli"   -> "li"
-	    "gn{@}"    -> "nJ"
+	    "^gli$"   -> "li"
+	    "^gli{@}" -> "li"
+	    "{@}gli"  -> "li"
+	    "gn{@}"   -> "nJ"
 
 Pattern is based on Regular Expression but it has it's own custom syntax.  We
 call it "HRE" which means "Hangulize-specific Regular Expression".  For the
