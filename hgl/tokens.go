@@ -4,12 +4,12 @@ import (
 	"fmt"
 )
 
-// Token represents a meaningful string in HGL format.
-type Token int
+// token represents a meaningful string in HGL format.
+type token int
 
 const (
 	// Illegal represents any string not matched with legal tokens.
-	Illegal Token = iota
+	Illegal token = iota
 
 	// EOF represents the end-of-file.
 	EOF
@@ -39,7 +39,7 @@ const (
 	Arrow
 )
 
-var tokenNames = map[Token]string{
+var tokenNames = map[token]string{
 	Illegal: `Illegal`,
 	EOF:     `EOF`,
 	Space:   `Space`,
@@ -52,14 +52,14 @@ var tokenNames = map[Token]string{
 	Arrow:   `Arrow`,
 }
 
-// FormatTokenLiteral formats return value (token, literal) from Scan() as a
+// formatTokenLiteral formats return value (token, literal) from Scan() as a
 // human-readable string.
-func FormatTokenLiteral(token Token, literal string) string {
-	tokenName := tokenNames[token]
-	return fmt.Sprintf(`<%s: %#v>`, tokenName, literal)
+func formatTokenLiteral(tok token, lit string) string {
+	tokenName := tokenNames[tok]
+	return fmt.Sprintf(`<%s: %#v>`, tokenName, lit)
 }
 
-// IllegalError makes an error for an illegal literal.
-func IllegalError(literal string) error {
-	return fmt.Errorf("unexpected token illegal: %#v", literal)
+// illegalError makes an error for an illegal literal.
+func illegalError(lit string) error {
+	return fmt.Errorf("unexpected token illegal: %#v", lit)
 }
