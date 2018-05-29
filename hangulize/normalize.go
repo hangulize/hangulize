@@ -39,12 +39,24 @@ type Normalizer interface {
 var normalizers = map[string]Normalizer{
 	"roman": &RomanNormalizer{},
 	"kana":  &KanaNormalizer{},
+
+	"cyrillic": &DefaultNormalizer{},
 }
 
 // GetNormalizer chooses a normalizer by the script name.
 func GetNormalizer(script string) (Normalizer, bool) {
 	norm, ok := normalizers[script]
 	return norm, ok
+}
+
+// -----------------------------------------------------------------------------
+
+// DefaultNormalizer is the default normalizer.
+type DefaultNormalizer struct{}
+
+// normalize converts an upper case letter to lower case.
+func (DefaultNormalizer) normalize(ch rune) rune {
+	return unicode.ToLower(ch)
 }
 
 // -----------------------------------------------------------------------------
