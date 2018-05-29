@@ -7,18 +7,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func newParser(src string) *Parser {
-	return NewParser(strings.NewReader(strings.TrimSpace(src)))
+func _newParser(src string) *parser {
+	return newParser(strings.NewReader(strings.TrimSpace(src)))
 }
 
 func TestParseSinglePairList(t *testing.T) {
-	p := newParser(`
+	p := _newParser(`
 	foo:
 		# 코멘트
 		hello -> world
 	`)
 
-	hgl, err := p.Parse()
+	hgl, err := p.parse()
 	if err != nil {
 		t.Error(err)
 	}
@@ -30,13 +30,13 @@ func TestParseSinglePairList(t *testing.T) {
 }
 
 func TestParseSinglePairDict(t *testing.T) {
-	p := newParser(`
+	p := _newParser(`
 	foo:
 		# 코멘트
 		hello = "world"
 	`)
 
-	hgl, err := p.Parse()
+	hgl, err := p.parse()
 	if err != nil {
 		t.Error(err)
 	}

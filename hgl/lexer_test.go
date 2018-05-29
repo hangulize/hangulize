@@ -7,15 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var tok Token
+var tok token
 var lit string
 
-func newLexer(src string) *Lexer {
-	return NewLexer(strings.NewReader(strings.TrimSpace(src)))
+func _newLexer(src string) *lexer {
+	return newLexer(strings.NewReader(strings.TrimSpace(src)))
 }
 
 // scan calls Lexer.Scan() but ignores Space and Newline tokens
-func scan(l *Lexer) (Token, string) {
+func scan(l *lexer) (token, string) {
 	for {
 		tok, lit := l.Scan()
 		if tok != Space && tok != Newline {
@@ -25,7 +25,7 @@ func scan(l *Lexer) (Token, string) {
 }
 
 func TestSingle(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	single = foo_bar_123
 	`)
 
@@ -42,7 +42,7 @@ func TestSingle(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	list = one, "2", "셋"
 	`)
 
@@ -73,7 +73,7 @@ func TestList(t *testing.T) {
 }
 
 func TestEscapedQuote(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	escaped = "\""
 	`)
 
@@ -90,7 +90,7 @@ func TestEscapedQuote(t *testing.T) {
 }
 
 func TestCommentSingleLine(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	# Hello, world!
 	`)
 	tok, lit = scan(s)
@@ -99,7 +99,7 @@ func TestCommentSingleLine(t *testing.T) {
 }
 
 func TestCommentMultipleLines(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	# Hello,
 	# world!
 	`)
@@ -109,7 +109,7 @@ func TestCommentMultipleLines(t *testing.T) {
 }
 
 func TestCommentParagraphs(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	# Hello,
 	# world!
 	#
@@ -134,7 +134,7 @@ func TestCommentParagraphs(t *testing.T) {
 }
 
 func TestSharpInString(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	"#sharp#" # comment
 	`)
 
@@ -148,7 +148,7 @@ func TestSharpInString(t *testing.T) {
 }
 
 func TestSimpleComplete(t *testing.T) {
-	s := newLexer(`
+	s := _newLexer(`
 	section1:
 		hello = world
 		"foo" = "bar baz"

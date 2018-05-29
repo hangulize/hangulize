@@ -8,20 +8,20 @@ import (
 	"unicode"
 )
 
-// Lexer reads a bytes buffer and pops the peak token and literal.
-type Lexer struct {
+// lexer reads a bytes buffer and pops the peak token and literal.
+type lexer struct {
 	r *bufio.Reader
 }
 
-// NewLexer creates a Lexer.
-func NewLexer(r io.Reader) *Lexer {
-	return &Lexer{r: bufio.NewReader(r)}
+// newLexer creates a Lexer.
+func newLexer(r io.Reader) *lexer {
+	return &lexer{r: bufio.NewReader(r)}
 }
 
 const eof = rune(0)
 
 // read reads the rune on the buffer cursor.
-func (l *Lexer) read() rune {
+func (l *lexer) read() rune {
 	ch, _, err := l.r.ReadRune()
 	if err != nil {
 		return eof
@@ -30,13 +30,13 @@ func (l *Lexer) read() rune {
 }
 
 // unread rewinds the buffer cursor once.
-func (l *Lexer) unread() {
+func (l *lexer) unread() {
 	_ = l.r.UnreadRune()
 }
 
 // readWhile reads runes as a string during
 // test function for each rune returns true.
-func (l *Lexer) readWhile(test func(rune) bool) string {
+func (l *lexer) readWhile(test func(rune) bool) string {
 	var buf bytes.Buffer
 
 	for ch := l.read(); ch != eof && test(ch); ch = l.read() {
@@ -53,7 +53,7 @@ func isSpace(ch rune) bool {
 	return ch != '\n' && unicode.IsSpace(ch)
 }
 
-func (l *Lexer) scanSpace() (Token, string) {
+func (l *lexer) scanSpace() (token, string) {
 	return Space, l.readWhile(isSpace)
 }
 
@@ -67,7 +67,7 @@ func isInLine(ch rune) bool {
 	return ch != '\n' && ch != eof
 }
 
-func (l *Lexer) scanComment() (Token, string) {
+func (l *lexer) scanComment() (token, string) {
 	var buf bytes.Buffer
 	nEmpty := 0
 
@@ -118,11 +118,11 @@ func isLetter(ch rune) bool {
 	return isInitialLetter(ch) || unicode.IsDigit(ch)
 }
 
-func (l *Lexer) scanString() (Token, string) {
+func (l *lexer) scanString() (token, string) {
 	return String, l.readWhile(isLetter)
 }
 
-func (l *Lexer) scanQuotedString() (Token, string) {
+func (l *lexer) scanQuotedString() (token, string) {
 	var buf bytes.Buffer
 
 	// discard initial quote
@@ -160,7 +160,7 @@ func (l *Lexer) scanQuotedString() (Token, string) {
 
 // delimiters
 
-func (l *Lexer) scanArrow() (Token, string) {
+func (l *lexer) scanArrow() (token, string) {
 	first := l.read()
 	second := l.read()
 
@@ -172,7 +172,7 @@ func (l *Lexer) scanArrow() (Token, string) {
 }
 
 // Scan reads the buffer and returns the peak token and literal.
-func (l *Lexer) Scan() (Token, string) {
+func (l *lexer) Scan() (token, string) {
 	ch := l.read()
 
 	if ch == eof {
