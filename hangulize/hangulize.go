@@ -53,7 +53,7 @@ about the language at the first:
 Then write about yourself and the stage of this spec:
 
 	config:
-	    author = "Brian Jongseong Park <iceager@gmail.com>"
+	    author = "John Doe <john@example.com>"
 	    stage  = "draft"
 
 We will write many patterns in rewrite/transcribe rules soon.  Some expressions
