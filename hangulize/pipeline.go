@@ -83,16 +83,20 @@ func (p *pipeline) group(word string) []subword {
 func (p *pipeline) rewrite(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
-	for _, sw := range subwords {
+	rtr := p.tr.RuleTracer(subwords)
+
+	for i, sw := range subwords {
 		word := sw.word
 		level := sw.level
 
 		rep := newSubwordReplacer(word, level, 1)
 
-		for _, rule := range p.h.spec.Rewrite {
+		for j, rule := range p.h.spec.Rewrite {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
+
+			rtr.Trace(j, rule, i, word)
 		}
 
 		swBuf.Append(rep.Subwords()...)
@@ -100,8 +104,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	// TODO(sublee): per-rule tracing
-	p.tr.TraceSubwords("rewrite", "", subwords)
+	rtr.Commit("rewrite")
 
 	return subwords
 }
@@ -119,7 +122,9 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 func (p *pipeline) transcribe(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
-	for _, sw := range subwords {
+	rtr := p.tr.RuleTracer(subwords)
+
+	for i, sw := range subwords {
 		word := sw.word
 		level := sw.level
 
@@ -130,7 +135,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 		// with NULL characters.
 		dummy := newSubwordReplacer(word, 0, 0)
 
-		for _, rule := range p.h.spec.Transcribe {
+		for j, rule := range p.h.spec.Transcribe {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 
@@ -141,6 +146,8 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 
 			rep.flush()
 			word = dummy.String()
+
+			rtr.Trace(j, rule, i, rep.word)
 		}
 
 		swBuf.Append(rep.Subwords()...)
@@ -163,8 +170,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	// TODO(sublee): per-rule tracing
-	p.tr.TraceSubwords("transcribe", "", subwords)
+	rtr.Commit("transcribe")
 
 	return subwords
 }
