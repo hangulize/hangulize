@@ -18,16 +18,24 @@ feature improvements.
 Hangulize Pipeline
 
 When we transcribe, the word goes through Hangulize's procedural pipeline.  The
-pipeline has 5 steps: "normalize", "group", "rewrite", "transcribe", and
-"compose Hangul".  If we can transcribe "Hello!" in English into "헬로!"
+pipeline has 5 steps: "Normalize", "Group", "Rewrite", "Transcribe", and
+"Compose Hangul".  If we can transcribe "Hello!" in English into "헬로!"
 (actually, English is not supported yet), the pipeline world work like:
 
- 0. input       "Hello!"
- 1. normalize   "hello!"
- 2. group       "hello", "!"
- 3. rewrite     "heˈlō", "!"
- 4. transcribe  "ㅎㅔ-ㄹㄹㅗ", "!"
- 5. compose H.  "헬로!"
+ 0. Input       "Hello!"
+ 1. Normalize   "hello!"
+ 2. Group       "hello", "!"
+ 3. Rewrite     "heˈlō", "!"
+ 4. Transcribe  "ㅎㅔ-ㄹㄹㅗ", "!"
+ 5. Compose H.  "헬로!"
+
+The "1. Normalize" step eliminates letter case from the word to make the next
+steps work easier.  The "2. Group" step groups letters by their meaningness
+into subwords.  Meaningful letter is the letter which appears in the
+rewrite/transcribe rules.  The "3. Rewrite" step minimizes the gap between
+pronunciation and spelling.  The "4. Transcribe" step determines Hangul
+spelling for the pronunciation.  Finally, the  "5. Compose Hangul" step
+converts decomposed Jamo phonemes to composed Hangul syllables.
 
 */
 package hangulize
