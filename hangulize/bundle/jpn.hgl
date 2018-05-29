@@ -9,7 +9,7 @@ config:
     author = "Heungsub Lee <sub@subl.ee>"
     stage  = "draft"
 
-rewrite:
+quantize:
     "ア|ァ"       -> "a"
     "イ|ィ"       -> "i"
     "ウ|ゥ"       -> "u"

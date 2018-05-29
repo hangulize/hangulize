@@ -27,7 +27,7 @@ normalize:
     "ź" = "Ź"
     "ż" = "Ż"
 
-rewrite:
+quantize:
     "wałęsa"        -> "wałensa"
     "ą{l|ł}"        -> "o"
     "ą"             -> "oN"

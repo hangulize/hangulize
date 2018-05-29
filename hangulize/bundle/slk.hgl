@@ -36,7 +36,7 @@ normalize:
     "ý" = "Ý"
     "ž" = "Ž"
 
-rewrite:
+quantize:
     "á"                                                          -> "A"
     "ä"                                                          -> "P"
     "č"                                                          -> "C"
