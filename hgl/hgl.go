@@ -34,6 +34,6 @@ import (
 
 // Parse parses an HGL formatted text.
 func Parse(r io.Reader) (HGL, error) {
-	p := NewParser(r)
-	return p.Parse()
+	p := newParser(r)
+	return p.parse()
 }
