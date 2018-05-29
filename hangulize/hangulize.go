@@ -15,7 +15,7 @@ the seed idea of the Hangulize on his Blog.
 This Go re-implementation will be a reboot of the Hangulize with attractive
 feature improvements.
 
-Hangulize Pipeline
+Pipeline
 
 When we transcribe, the word goes through Hangulize's procedural pipeline.  The
 pipeline has 5 steps: "Normalize", "Group", "Rewrite", "Transcribe", and
