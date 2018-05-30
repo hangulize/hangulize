@@ -16,11 +16,8 @@ after_success:
   # JavaScript
   - go get -u github.com/gobuffalo/packr/...
   - go get -u github.com/gopherjs/gopherjs
-
   - packr --compress --input ./hangulize
-
-  - gopherjs build ./js -o build/hangulize.js
-  - gopherjs build ./js -o build/hangulize.min.js -m
+  - gopherjs build ./js -o build/hangulize.js -m
 
 deploy:
   provider: releases
