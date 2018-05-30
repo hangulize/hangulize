@@ -3,6 +3,12 @@ language: go
 go:
   - '1.10.2'
 
+install:
+  - go get -t -v ./...
+  - go get github.com/gobuffalo/packr/...
+  - go get github.com/mitchellh/gox
+  - go get github.com/gopherjs/gopherjs
+
 script:
   - set -e
 
@@ -14,11 +20,9 @@ script:
   - mkdir -p build
 
     # pack bundle
-  - go get -u github.com/gobuffalo/packr/...
   - packr --compress --input ./hangulize -v
 
     # executable
-  - go get github.com/mitchellh/gox
   - |
     gox -arch='amd64' \
         -os='linux darwin windows' \
@@ -26,7 +30,6 @@ script:
         -verbose
 
     # js
-  - go get -u github.com/gopherjs/gopherjs
   - gopherjs build ./js -o build/hangulize.js -m -v
   - rm -f build/hangulize.js.map
 
