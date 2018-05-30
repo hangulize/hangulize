@@ -14,7 +14,11 @@ after_success:
   - go build -o build/hangulize
 
   # JavaScript
+  - go get -u github.com/gobuffalo/packr/...
+  - go get -u github.com/gopherjs/gopherjs
+
   - packr --compress --input ./hangulize
+
   - gopherjs build ./js -o build/hangulize.js
   - gopherjs build ./js -o build/hangulize.min.js -m
 
