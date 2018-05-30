@@ -4,6 +4,8 @@ go:
   - '1.10.2'
 
 script:
+  - set -e
+
   # Test
   - go test -v ./hgl
   - go test -v ./hangulize
