@@ -4,10 +4,10 @@ go:
   - '1.10.2'
 
 install:
-  - go get -t -v ./...
-  - go get github.com/gobuffalo/packr/...
-  - go get github.com/mitchellh/gox
-  - go get github.com/gopherjs/gopherjs
+  - go get -v -t ./...
+  - go get -v github.com/gobuffalo/packr/...
+  - go get -v github.com/mitchellh/gox
+  - go get -v github.com/gopherjs/gopherjs
 
 script:
   - set -e
