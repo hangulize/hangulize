@@ -19,7 +19,11 @@ script:
 
     # executable
   - go get github.com/mitchellh/gox
-  - gox -os='linux darwin windows' -arch='amd64' build -o build/hangulize
+  - |
+    gox -arch='amd64' \
+        -os='linux darwin windows' \
+        -output='build/hangulize_{{.OS}}_{{.Arch}}' \
+        -verbose
 
     # js
   - go get -u github.com/gopherjs/gopherjs
