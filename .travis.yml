@@ -6,21 +6,25 @@ go:
 script:
   - set -e
 
-  # Test
+  # Test -----------------------------------------------------------------------
   - go test -v ./hgl
   - go test -v ./hangulize
 
-  # Build
+  # Build ----------------------------------------------------------------------
   - mkdir -p build
 
+    # pack bundle
+  - go get -u github.com/gobuffalo/packr/...
+  - packr --compress --input ./hangulize -v
+
     # executable
-  - go build -o build/hangulize
+  - go get github.com/mitchellh/gox
+  - gox -os='linux darwin windows' -arch='amd64' build -o build/hangulize
 
     # js
-  - go get -u github.com/gobuffalo/packr/...
   - go get -u github.com/gopherjs/gopherjs
-  - packr --compress --input ./hangulize -v
   - gopherjs build ./js -o build/hangulize.js -m -v
+  - rm -f build/hangulize.js.map
 
 deploy:
   provider: releases
