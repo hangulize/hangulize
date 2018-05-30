@@ -4,16 +4,17 @@ go:
   - '1.10.2'
 
 script:
+  # Test
   - go test -v ./hgl
   - go test -v ./hangulize
 
-after_success:
+  # Build
   - mkdir -p build
 
-  # Executable
+    # executable
   - go build -o build/hangulize
 
-  # JavaScript
+    # js
   - go get -u github.com/gobuffalo/packr/...
   - go get -u github.com/gopherjs/gopherjs
   - packr --compress --input ./hangulize -v
