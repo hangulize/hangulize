@@ -36,6 +36,8 @@ script:
 
 deploy:
   provider: releases
+  on:
+    tags: true
 
   skip_cleanup: true
   file: build/*
