@@ -12,11 +12,11 @@ import (
 
 // Spec represents a transactiption specification for a language.
 type Spec struct {
-	// Meta information sections.
+	// Meta information sections
 	Lang   Language
 	Config Config
 
-	// Helper setting sections.
+	// Helper setting sections
 	Macros    map[string]string
 	Vars      map[string][]string
 	Normalize map[string][]string
@@ -25,10 +25,13 @@ type Spec struct {
 	Rewrite    []*Rule
 	Transcribe []*Rule
 
-	// Test examples.
+	// Test examples
 	Test []hgl.Pair
 
-	// Prepared stuffs.
+	// Source code
+	Source string
+
+	// Prepared stuffs
 	normReplacer *strings.Replacer
 	normLetters  []string
 	norm         Normalizer
@@ -42,12 +45,18 @@ func (s *Spec) String() string {
 // ParseSpec parses a Spec from an HGL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
 	var err error
+	var sourceBuf strings.Builder
 
-	h, err := hgl.Parse(r)
+	// Use TeeReader to copy the source while parsing.
+	tee := io.TeeReader(r, &sourceBuf)
+
+	h, err := hgl.Parse(tee)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HGL source")
 	}
+
+	source := sourceBuf.String()
 
 	// -------------------------------------------------------------------------
 	// Every sections are optional.  An empty HGL source is also valid spec.
@@ -180,6 +189,8 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		transcribe,
 
 		test,
+
+		source,
 
 		normReplacer,
 		normLetters,
