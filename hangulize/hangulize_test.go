@@ -81,7 +81,7 @@ func TestHyphen(t *testing.T) {
 
 func TestDifferentAges(t *testing.T) {
 	spec := mustParseSpec(`
-	quantize:
+	rewrite:
 		"x" -> "xx"
 
 	transcribe:
@@ -93,7 +93,7 @@ func TestDifferentAges(t *testing.T) {
 
 func TestKeepAndCleanup(t *testing.T) {
 	spec := mustParseSpec(`
-	quantize:
+	rewrite:
 		"𐌗"  -> "𐌗𐌗"
 		"𐌄𐌗" -> "𐌊-"
 
@@ -102,7 +102,7 @@ func TestKeepAndCleanup(t *testing.T) {
 		"𐌗" -> "ㄱㅅ"
 	`)
 	// ㅋ𐌄 𐌗 !
-	// ----│---------------------- quantize
+	// ----│---------------------- rewrite
 	//     ├─┐        𐌗->𐌗𐌗
 	// ㅋ𐌄 𐌄 𐌗 !
 	//   └┬┘
@@ -124,7 +124,7 @@ func TestKeepAndCleanup(t *testing.T) {
 
 func TestSpace(t *testing.T) {
 	spec := mustParseSpec(`
-	quantize:
+	rewrite:
 		"van " -> "van/"
 
 	transcribe:
@@ -136,7 +136,7 @@ func TestSpace(t *testing.T) {
 
 func TestZeroWidthSpace(t *testing.T) {
 	spec := mustParseSpec(`
-	quantize:
+	rewrite:
 		"a b" -> "a{}b"
 		"^b"  -> "v"
 

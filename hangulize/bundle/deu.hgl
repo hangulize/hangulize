@@ -21,7 +21,7 @@ normalize:
     "ü" = "Ü"
     "ö" = "Ö"
 
-quantize:
+rewrite:
     "y$"                                   -> "i"
     "ä"                                    -> "A"
     "ö"                                    -> "O"

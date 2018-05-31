@@ -29,7 +29,7 @@ normalize:
     "õ" = "Õ"
     "ô" = "Ô"
 
-quantize:
+rewrite:
     "ã"                                    -> "A~"
     "á"                                    -> "A"
     "â"                                    -> "A"
