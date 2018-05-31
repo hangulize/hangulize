@@ -149,6 +149,31 @@ func TestZeroWidthSpace(t *testing.T) {
 	assert.Equal(t, "으프 츠", hangulize(spec, "a b c"))
 }
 
+func TestVarToVar(t *testing.T) {
+	spec := mustParseSpec(`
+	vars:
+		"abc" = "a", "b", "c"
+		"def" = "d", "e", "f"
+		"ghi" = "g", "h", "i"
+
+	rewrite:
+		"<abc><abc>" -> "<def><ghi>"
+
+	transcribe:
+		"a" -> "a"
+		"b" -> "b"
+		"c" -> "c"
+		"d" -> "d"
+		"e" -> "e"
+		"f" -> "f"
+		"g" -> "g"
+		"h" -> "h"
+		"i" -> "i"
+	`)
+	assert.Equal(t, "dg", hangulize(spec, "aa"))
+	assert.Equal(t, "ei", hangulize(spec, "bc"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
