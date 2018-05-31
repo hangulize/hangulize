@@ -1,5 +1,7 @@
 # Hangulize 2
 
+[![Travis CI](https://img.shields.io/travis/sublee/hangulize2/develop.svg?style=flat-square)](https://travis-ci.org/sublee/hangulize2)
+
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
 ![한글라이즈](brand/logo-kor-128px.png)
