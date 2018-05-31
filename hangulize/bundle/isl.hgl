@@ -30,7 +30,7 @@ normalize:
     "ý" = "Ý"
     "þ" = "Þ"
 
-quantize:
+rewrite:
     "ð"                                -> "D"
     "þ"                                -> "T"
     "á"                                -> "A"

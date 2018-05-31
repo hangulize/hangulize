@@ -21,7 +21,7 @@ normalize:
     "ä" = "Ä"
     "ö" = "Ö"
 
-quantize:
+rewrite:
     "å"            -> "o"
     "ä"            -> "A"
     "ö"            -> "O"

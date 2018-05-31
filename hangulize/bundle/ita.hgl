@@ -15,7 +15,7 @@ macros:
 vars:
     "vowels" = "a", "e", "i", "o", "u"
 
-quantize:
+rewrite:
     "'"             -> ""
     "^gli$"         -> "li"
     "^glia$"        -> "g.lia"

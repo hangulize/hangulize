@@ -24,7 +24,7 @@ normalize:
     "ü" = "Ü"
     "·" = "•"
 
-quantize:
+rewrite:
     "felix$"         -> "felics"
     "helix$"         -> "helics"
     "^fix"           -> "fics"

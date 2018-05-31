@@ -24,7 +24,7 @@ normalize:
     "ĵ" = "Ĵ"
     "ĝ" = "Ĝ"
 
-quantize:
+rewrite:
     "-"           -> "{}"
     "cx"          -> "ĉ"
     "gx"          -> "ĝ"

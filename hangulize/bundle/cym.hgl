@@ -24,7 +24,7 @@ normalize:
     "ï" = "Ï"
     "î" = "Î"
 
-quantize:
+rewrite:
     "afon"                         -> "afon-"
     "banc"                         -> "baNc"
     "^ban"                         -> "ban-"
