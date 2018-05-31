@@ -27,17 +27,15 @@ script:
   - |
     gox -arch='amd64' \
         -os='linux darwin windows' \
-        -output='build/hangulize_{{.OS}}_{{.Arch}}' \
+        -output="build/hangulize_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}" \
         -verbose
 
     # js
-  - gopherjs build ./js -o build/hangulize.js -m -v
-  - rm -f build/hangulize.js.map
+  - gopherjs build ./js -o "build/hangulize-${TRAVIS_TAG}.js" -m -v
+  - rm -f build/*.js.map
 
 deploy:
   provider: releases
-  on:
-    branch: ci
 
   skip_cleanup: true
   file: build/*
