@@ -8,13 +8,13 @@ import (
 // Trace is emitted when a replacement occurs.  It is used for tracing of
 // Hangulize pipeline internal.
 type Trace struct {
-	step string
-	why  string
-	word string
+	Step string
+	Why  string
+	Word string
 }
 
 func (t *Trace) String() string {
-	return fmt.Sprintf("[%s] %#v %s", t.step, t.word, t.why)
+	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, t.Why)
 }
 
 type tracer struct {
