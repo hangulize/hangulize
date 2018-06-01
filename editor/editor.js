@@ -10,13 +10,38 @@ let app = new Vue({
     selectedLang: '',
 
     word: '',
+
+    spec: undefined,
+    source: '',
   },
 
   computed: {
     hangulized() {
-      return H.Hangulize(this.selectedLang, this.word);
+      if (this.spec) {
+        let h = H.NewHangulizer(this.spec);
+        return h.Hangulize(this.word);
+      } else {
+        return H.Hangulize(this.selectedLang, this.word);
+      }
     },
   },
+
+  watch: {
+    selectedLang(lang) {
+      let specOK = H.LoadSpec(lang);
+      let spec = specOK[0];
+
+      this.source = spec.Source;
+    },
+
+    source(source) {
+      clearTimeout(this._timeoutParseSpec);
+
+      this._timeoutParseSpec = setTimeout(() => {
+        this.spec = H.ParseSpec(source);
+      }, 500);
+    },
+  }
 
 });
 
