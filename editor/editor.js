@@ -10,7 +10,6 @@ let app = new Vue({
     selectedLang: '',
 
     word: '',
-
     delayedWord: '',
 
     spec: undefined,
@@ -34,19 +33,6 @@ let app = new Vue({
   },
 
   watch: {
-    word(word, oldWord) {
-      let delay = 100;
-      if (word.length < oldWord.length && word.startsWith(oldWord.substr(0, word.length))) {
-        delay = 300;
-      }
- 
-      clearTimeout(this._timeoutWord);
-
-      this._timeoutWord = setTimeout(() => {
-        this.delayedWord = word;
-      }, delay);
-    },
-
     selectedLang(lang) {
       let specOK = H.LoadSpec(lang);
       let spec = specOK[0];
@@ -55,13 +41,23 @@ let app = new Vue({
     },
 
     source(source) {
-      clearTimeout(this._timeoutSpec);
-
-      this._timeoutSpec = setTimeout(() => {
-        this.spec = H.ParseSpec(source);
-      }, 300);
+      this.updateSource(source);
     },
-  }
+
+    word(word) {
+      this.updateWord(word);
+    },
+  },
+
+  methods: {
+    updateSource: _.debounce(function(source) {
+      this.spec = H.ParseSpec(source);
+    }, 300),
+
+    updateWord: _.debounce(function(word) {
+      this.delayedWord = word;
+    }, 300),
+  },
 
 });
 
