@@ -11,20 +11,28 @@ let app = new Vue({
 
     word: '',
     hangulized: '',
+    traces: [],
 
     spec: undefined,
     source: '',
   },
 
   watch: {
-    word() {
+    word(word, oldWord) {
       let h = H.NewHangulizer(this.spec);
 
       clearTimeout(this._timeoutHangulized);
 
+      let delay = 100;
+      if (word.length < oldWord.length && word.startsWith(oldWord.substr(0, word.length))) {
+        delay = 500;
+      }
+ 
       this._timeoutHangulized = setTimeout(() => {
-        this.hangulized = h.Hangulize(this.word);
-      }, 100);
+        let hangulizedTraces = h.HangulizeTrace(word);
+        this.hangulized = hangulizedTraces[0];
+        this.traces = hangulizedTraces[1];
+      }, delay);
     },
 
     selectedLang(lang) {

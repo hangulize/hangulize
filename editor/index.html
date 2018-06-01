@@ -24,6 +24,10 @@
 
 <p class="hangulized">{{ hangulized }}</p>
 
+<ol>
+  <li v-for="trace in traces">{{ trace.Word }} {{ trace.Why }}</li>
+</ol>
+
 <textarea v-model="source" rows="40" cols="160">{{ source }}</textarea>
 
 </div>
