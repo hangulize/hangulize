@@ -10,28 +10,40 @@ let app = new Vue({
     selectedLang: '',
 
     word: '',
-    hangulized: '',
-    traces: [],
+
+    delayedWord: '',
 
     spec: undefined,
     source: '',
   },
 
+  computed: {
+    hangulized() {
+      if (!this.spec) {
+        return {};
+      }
+
+      let h = H.NewHangulizer(this.spec);
+      let hangulizedTraces = h.HangulizeTrace(this.delayedWord);
+
+      return {
+        word:   hangulizedTraces[0],
+        traces: hangulizedTraces[1],
+      };
+    },
+  },
+
   watch: {
     word(word, oldWord) {
-      let h = H.NewHangulizer(this.spec);
-
-      clearTimeout(this._timeoutHangulized);
-
       let delay = 100;
       if (word.length < oldWord.length && word.startsWith(oldWord.substr(0, word.length))) {
-        delay = 500;
+        delay = 300;
       }
  
-      this._timeoutHangulized = setTimeout(() => {
-        let hangulizedTraces = h.HangulizeTrace(word);
-        this.hangulized = hangulizedTraces[0];
-        this.traces = hangulizedTraces[1];
+      clearTimeout(this._timeoutWord);
+
+      this._timeoutWord = setTimeout(() => {
+        this.delayedWord = word;
       }, delay);
     },
 
@@ -47,7 +59,7 @@ let app = new Vue({
 
       this._timeoutSpec = setTimeout(() => {
         this.spec = H.ParseSpec(source);
-      }, 500);
+      }, 300);
     },
   }
 
