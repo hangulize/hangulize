@@ -4,6 +4,7 @@
 <!----------------------------------------------------------------------------->
 
 <title>Hangulize 2 Editor</title>
+<link href="https://fonts.googleapis.com/css?family=IBM+Plex+Mono|Nanum+Gothic+Coding" rel="stylesheet">
 
 <!----------------------------------------------------------------------------->
 </head>
@@ -28,7 +29,9 @@
   <li v-for="trace in hangulized.traces">{{ trace.Word }} {{ trace.Why }}</li>
 </ol>
 
-<textarea v-model="source" rows="40" cols="160">{{ source }}</textarea>
+<!-- <textarea v-model="source" rows="40" cols="160"></textarea> -->
+
+<div id="editor" style="font-family: 'IBM Plex Mono', 'Nanum Gothic Coding', monospace; height: 50em; position: absolute; top: 0; right: 0; width: 50%; height: 100%; font-size: 15px;"></div>
 
 </div>
 
@@ -37,6 +40,7 @@
 <script src="hangulize.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.10/lodash.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="ace.js"></script>
 <script src="editor.js"></script>
 
 </body>

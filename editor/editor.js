@@ -13,7 +13,7 @@ let app = new Vue({
     delayedWord: '',
 
     spec: undefined,
-    source: '',
+    // source: '',
   },
 
   computed: {
@@ -37,12 +37,13 @@ let app = new Vue({
       let specOK = H.LoadSpec(lang);
       let spec = specOK[0];
 
-      this.source = spec.Source;
+      // this.source = spec.Source;
+      editor.session.setValue(spec.Source);
     },
 
-    source(source) {
-      this.updateSource(source);
-    },
+    // source(source) {
+    //   this.updateSource(source);
+    // },
 
     word(word) {
       this.updateWord(word);
@@ -72,3 +73,11 @@ function loadLangs() {
 }
 
 loadLangs();
+
+var editor = ace.edit("editor");
+editor.renderer.setShowGutter(false);
+editor.setTheme("ace/theme/hangulize");
+editor.session.setMode("ace/mode/hgl");
+editor.session.on('change', function(delta) {
+  app.updateSource(editor.getValue());
+});
