@@ -10,21 +10,18 @@ define('ace/mode/hgl_highlight_rules', [
   function HGLHighlightRules() {
     this.$rules = {
       start: [{
-        token: 'comment.number-sign',
-        regex: /#.*/,
-      }, {
-        token: 'storage.type',
+        token: 'storage',
         regex: /(rewrite|transcribe)(?=:)/,
         next: 'rewrite',
       }, {
-        token: 'storage.type',
-        regex: /.+(?=:)/,
+        token: 'storage',
+        regex: /[a-z_]+(?=:)/,
       }, {
         token: 'keyword.operator',
-        regex: /=|->|,|:/,
+        regex: /=|->|,|:($|\s)/,
       }, {
         token: 'variable',
-        regex: /^(?<=\s*)[^"]+(?=\s*(?:\=|->))/,
+        regex: /^(?<=\s*)[^"#]+(?=\s*(?:\=|->))/,
       }, {
         token: 'string.double',
         regex: /"/,
@@ -32,11 +29,24 @@ define('ace/mode/hgl_highlight_rules', [
       }, {
         token: 'string.unquoted',
         regex: /(?<=(?:\=|->|,)\s*)[^\s]+/,
+      }, {
+        token: 'comment',
+        regex: /#.*/,
+      }, {
+        token: 'invalid',
+        regex: /\s+$/,
+      }, {
+        token: 'invalid',
+        regex: /\S+/,
       }],
 
       text: [{
         token: 'string.double',
         regex: /"/,
+        next: 'start',
+      }, {
+        token: 'invalid',
+        regex: /.$/,
         next: 'start',
       }, {
         defaultToken : 'string',
@@ -53,12 +63,25 @@ define('ace/mode/hgl_highlight_rules', [
         token: 'string.double',
         regex: /"/,
         next: 'pattern',
+      }, {
+        token: 'comment',
+        regex: /#.*/,
+      }, {
+        token: 'invalid',
+        regex: /\s+$/,
+      }, {
+        token: 'invalid',
+        regex: /\S+/,
       }],
 
       pattern: [{
         token: 'string.double',
-        regex: /"/,
+        regex: /"|$/,
         next: 'rewrite',
+      }, {
+        token: 'invalid',
+        regex: /.$/,
+        next: 'start',
       }, {
         token: 'string.interpolated',
         regex: /{.+}/,
@@ -71,9 +94,6 @@ define('ace/mode/hgl_highlight_rules', [
       }, {
         token: 'hangul.jungseong',
         regex: /[\u314f-\u3163]/,
-      }, {
-        token: 'hangul',
-        regex: /[\uac00-\ud7a3]/,
       }, {
         defaultToken : 'string',
       }],
@@ -118,6 +138,10 @@ define('ace/mode/hgl', [
   HGLMode.prototype.type = 'hgl';
 
   HGLMode.prototype.getNextLineIndent = function(state, line, tab) {
+    // Indent when section opened.
+    if (/:($|\s|#)/.exec(line)) {
+      return '    ';
+    }
     return this.$getIndent(line);
   };
 
