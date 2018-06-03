@@ -1,21 +1,22 @@
 <template>
   <div id="app">
-    <select name="lang" v-model="selectedLang">
-      <option v-for="lang in langs"
-              v-bind:key="lang.id"
-              v-bind:value="lang.id">
-        {{ lang.id }}
-      </option>
-    </select>
+    <sui-dropdown
+      placeholder="Language"
+      selection
+      :options="langs"
+      v-model="selectedLang"
+    />
 
-    <input name="word" v-model="word" />
+    <sui-input name="word" v-model="word" />
 
-    <p class="hangulized">{{ hangulized.word }}</p>
+    <h1 is="sui-header" class="hangulized">{{ hangulized.word }}</h1>
 
-    <ol>
-      <li v-for="(trace, i) in hangulized.traces"
-          v-bind:key="i">{{ trace.Word }} {{ trace.Why }}</li>
-    </ol>
+    <sui-list>
+      <sui-list-item
+        v-for="(trace, i) in hangulized.traces"
+        v-bind:key="i"
+      >{{ trace.Word }} {{ trace.Why }}</sui-list-item>
+    </sui-list>
 
     <div id="editor"></div>
   </div>
@@ -90,7 +91,7 @@ export default {
 
   created () {
     H.ListLangs().forEach((langID) => {
-      this.langs.push({ id: langID })
+      this.langs.push({ text: langID, value: langID })
 
       if (!this.selectedLang) {
         this.selectedLang = langID
