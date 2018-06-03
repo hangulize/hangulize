@@ -5,7 +5,7 @@ import ace from 'brace';
 import HangulizeTheme from './ace-theme-hangulize';
 import { Mode as HGLMode } from './ace-mode-hgl';
 
-import H from '../hangulize';
+import H from 'hangulize';
 
 const editor = ace.edit('editor');
 editor.renderer.setShowGutter(false);
