@@ -1,9 +1,4 @@
 const path = require('path');
-const requirejs = require('requirejs');
-
-requirejs.config({
-  basePath: './src',
-});
 
 module.exports = {
   entry: {
