@@ -1,3 +1,5 @@
 extends: airbnb-base
-settings:
-  import/external-module-folders: .
+
+rules:
+  import/no-unresolved: off
+  import/extensions: off

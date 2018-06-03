@@ -1,11 +1,10 @@
 import _ from 'lodash';
-import Vue from 'vue/dist/vue.common';
 import ace from 'brace';
+import H from 'hangulize';
+import Vue from 'vue/dist/vue.common';
 
 import HangulizeTheme from './ace-theme-hangulize';
 import { Mode as HGLMode } from './ace-mode-hgl';
-
-import H from 'hangulize';
 
 const editor = ace.edit('editor');
 editor.renderer.setShowGutter(false);
