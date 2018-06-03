@@ -3,3 +3,4 @@ extends: airbnb-base
 rules:
   import/no-unresolved: off
   import/extensions: off
+  no-unused-vars: [error, {args: 'none'}]

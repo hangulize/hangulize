@@ -1,12 +1,9 @@
-import {
-  TextHighlightRules
-} from 'ace-code-editor/lib/ace/mode/text_highlight_rules';
-import {
-  Mode as TextMode
-} from 'ace-code-editor/lib/ace/mode/text';
+import { TextHighlightRules }
+  from 'ace-code-editor/lib/ace/mode/text_highlight_rules';
+import { Mode as TextMode }
+  from 'ace-code-editor/lib/ace/mode/text';
 
 class HGLHighlightRules extends TextHighlightRules {
-
   constructor() {
     super();
     this.$rules = {
@@ -22,14 +19,14 @@ class HGLHighlightRules extends TextHighlightRules {
         regex: /=|->|,|:($|\s)/,
       }, {
         token: 'variable',
-        regex: /^(?<=\s*)[^"#]+(?=\s*(?:\=|->))/,
+        regex: /^\s*[^"#]+(?=\s*(?:=|->))/,
       }, {
         token: 'string.double',
         regex: /"/,
         next: 'text',
       }, {
         token: 'string.unquoted',
-        regex: /(?<=(?:\=|->|,)\s*)[^\s]+/,
+        regex: /(?:=|->|,)\s*[^\s]+/,
       }, {
         token: 'comment',
         regex: /#.*/,
@@ -50,7 +47,7 @@ class HGLHighlightRules extends TextHighlightRules {
         regex: /.$/,
         next: 'start',
       }, {
-        defaultToken : 'string',
+        defaultToken: 'string',
       }],
 
       rewrite: [{
@@ -96,15 +93,13 @@ class HGLHighlightRules extends TextHighlightRules {
         token: 'hangul.jungseong',
         regex: /[\u314f-\u3163]/,
       }, {
-        defaultToken : 'string',
+        defaultToken: 'string',
       }],
     };
   }
-
 }
 
 class HGLMode extends TextMode {
-
   constructor() {
     super();
     this.HighlightRules = HGLHighlightRules;
@@ -119,7 +114,6 @@ class HGLMode extends TextMode {
     }
     return this.$getIndent(line);
   }
-
 }
 
-export let Mode = HGLMode;
+export default HGLMode;
