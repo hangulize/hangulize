@@ -90,8 +90,8 @@ export default {
   },
 
   created () {
-    H.ListLangs().forEach((langID) => {
-      this.langs.push({ text: langID, value: langID })
+    _.forEach(H.Langs, (lang, langID) => {
+      this.langs.push({ text: lang.Korean, value: langID })
 
       if (!this.selectedLang) {
         this.selectedLang = langID
