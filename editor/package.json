@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "lint": "eslint src",
-    "build": "webpack"
+    "build": "webpack",
+    "build-hangulize": "packr --input ../hangulize -v && gopherjs build ../js -o dist/hangulize.js"
   },
   "keywords": [],
   "author": "Heungsub Lee <sub@subl.ee>",
