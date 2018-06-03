@@ -17,8 +17,11 @@
       var $word = $('[name=word]');
       var $p = $('p');
 
-      $(__hangulize__.ListLangs()).each(function(i, lang) {
-        var $opt = $('<option>').val(lang).text(lang);
+      $.each(hangulize.Langs, function(langID, lang) {
+        var $opt = $('<option>');
+        $opt.val(langID);
+        $opt.text('(' + langID + ') ' + lang.Korean);
+
         $lang.append($opt)
       });
 
