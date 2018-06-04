@@ -19,19 +19,27 @@
     </sui-list>
 
     <div id="editor"></div>
+
+    <Transcription :lang="selectedLang" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import H from 'hangulize'
 import ace from 'brace'
 
 import HangulizeTheme from './ace/theme-hangulize'
 import HGLMode from './ace/mode-hgl'
 
+import H from 'hangulize'
+import Transcription from './components/Transcription'
+
 export default {
   name: 'App',
+
+  components: {
+    Transcription
+  },
 
   data () {
     return {
