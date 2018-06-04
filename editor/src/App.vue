@@ -49,8 +49,8 @@ export default {
       word: '',
       delayedWord: '',
 
-      spec: undefined,
-      editor: undefined
+      spec: null,
+      editor: null
     }
   },
 
@@ -60,7 +60,7 @@ export default {
         return {}
       }
 
-      const h = H.NewHangulizer(this.spec)
+      const h = H.hangulizer(this.spec)
       const hangulizedTraces = h.HangulizeTrace(this.delayedWord)
 
       return {
@@ -76,10 +76,9 @@ export default {
         return
       }
 
-      const specOK = H.LoadSpec(lang)
-      const spec = specOK[0]
+      const spec = H.loadSpec(lang)
 
-      this.editor.session.setValue(spec.Source)
+      this.editor.session.setValue(spec.info.source)
     },
 
     word (word) {
@@ -89,7 +88,7 @@ export default {
 
   methods: {
     updateSource: _.debounce(function (source) {
-      this.spec = H.ParseSpec(source)
+      this.spec = H.parseSpec(source)
     }, 300),
 
     updateWord: _.debounce(function (word) {
@@ -98,11 +97,11 @@ export default {
   },
 
   created () {
-    _.forEach(H.Langs, (lang, langID) => {
-      this.langs.push({ text: lang.Korean, value: langID })
+    _.forEach(H.specs, (spec, lang) => {
+      this.langs.push({ text: spec.info.lang.korean, value: lang })
 
       if (!this.selectedLang) {
-        this.selectedLang = langID
+        this.selectedLang = lang
       }
     })
   },
