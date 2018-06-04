@@ -57,19 +57,18 @@ func init() {
 
 func main() {
 	exports := map[string]interface{}{
+		// hangulize is the easiest way to transcribe a loanword into Hangul.
+		// Just call it with a lang ID and word.
 		"hangulize": hangulize.Hangulize,
-		"version":   hangulize.Version,
 
+		// version is the hangulize package version.
+		"version": hangulize.Version,
+
+		// specs is pre-built {"lang": {"spec": ..., "info": ...}} object.
+		// Use it to get a spec by a lang ID.
 		"specs": specs,
 
-		"loadSpec": func(langID string) *js.Object {
-			spec, ok := hangulize.LoadSpec(langID)
-			if !ok {
-				return nil
-			}
-			return packSpec(spec)
-		},
-
+		// parseSpec reads an HGL to pick a spec.
 		"parseSpec": func(source string) *js.Object {
 			r := strings.NewReader(source)
 			spec, err := hangulize.ParseSpec(r)
@@ -79,7 +78,10 @@ func main() {
 			return packSpec(spec)
 		},
 
-		"hangulizer": func(spec *js.Object) *js.Object {
+		// newHangulizer wraps hangulize.NewHangulizer.  The returned object is
+		// same with the Hangulizer struct.  Underlying methods are also Go
+		// style.
+		"newHangulizer": func(spec *js.Object) *js.Object {
 			_spec := spec.Get("spec").Interface().(*hangulize.Spec)
 			h := hangulize.NewHangulizer(_spec)
 			return js.MakeWrapper(h)
