@@ -20,13 +20,13 @@
 
     <div id="editor"></div>
 
-    <Transcription
-      v-for="(_, i) in words"
-      :key="i"
-      :lang="selectedLang"
-      :word="words[i]"
-      @submit="onSubmit"
-    />
+    <template v-for="(_, i) in words">
+      <Transcription
+        :key="i"
+        :lang="selectedLang"
+        @submit="onSubmit"
+      />
+    </template>
   </div>
 </template>
 

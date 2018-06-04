@@ -1,17 +1,22 @@
 <template>
   <form class="transcription" @submit.prevent="onSubmit">
-    <span class="lang">
-      <code>{{ spec.info.lang.id }}</code>
-      {{ spec.info.lang.korean }}
-    </span>
+    <label>
 
-    <input
-      ref="word"
-      v-model="word"
-      :placeholder="example.word"
-    />
+      <span class="lang">
+        <code>{{ spec.info.lang.id }}</code>
+        {{ spec.info.lang.korean }}
+      </span>
 
-    <span class="transcribed">{{ transcribed }}</span>
+      <input
+        ref="word"
+        v-model="word"
+        :placeholder="example.word"
+        :class="'script-' + spec.info.lang.script"
+      />
+
+      <span class="transcribed">{{ transcribed }}</span>
+
+    </label>
   </form>
 </template>
 
@@ -23,7 +28,13 @@ import H from 'hangulize'
 export default {
   name: 'Transcription',
 
-  props: ['lang', 'word'],
+  props: ['lang'],
+
+  data () {
+    return {
+      word: ''
+    }
+  },
 
   computed: {
     spec () {
@@ -57,3 +68,37 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@import url('https://fonts.googleapis.com/css?family=Noto+Sans&subset=cyrillic,greek,vietnamese');
+@import url(//fonts.googleapis.com/earlyaccess/notosansjp.css);
+
+form {
+  background: #fff;
+  margin: 0.5em;
+  display: block;
+  float: left;
+  clear: left;
+}
+
+label {
+  display: block;
+  padding: 0 1em;
+}
+
+input {
+  font-size: 2rem;
+  font-weight: 600;
+  line-height: 2;
+  padding: 0 0.5em;
+  border: none;
+}
+
+input.script-roman, input.script-cyrillic {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+input.script-roman, input.script-kana {
+  font-family: 'Noto Sans JP', sans-serif;
+}
+</style>
