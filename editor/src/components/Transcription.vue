@@ -1,14 +1,18 @@
 <template>
-  <div class="transcription">
+  <form class="transcription" @submit.prevent="onSubmit">
     <span class="lang">
       <code>{{ spec.info.lang.id }}</code>
       {{ spec.info.lang.korean }}
     </span>
 
-    <input v-model="word" :placeholder="example.word" />
+    <input
+      ref="word"
+      v-model="word"
+      :placeholder="example.word"
+    />
 
     <span class="transcribed">{{ transcribed }}</span>
-  </div>
+  </form>
 </template>
 
 <script>
@@ -19,13 +23,7 @@ import H from 'hangulize'
 export default {
   name: 'Transcription',
 
-  props: ['lang'],
-
-  data () {
-    return {
-      word: ''
-    }
-  },
+  props: ['lang', 'word'],
 
   computed: {
     spec () {
@@ -46,6 +44,16 @@ export default {
       const h = H.newHangulizer(this.spec)
       return h.Hangulize(this.word)
     }
+  },
+
+  methods: {
+    onSubmit (e) {
+      this.$emit('submit')
+    }
+  },
+
+  mounted () {
+    this.$refs.word.focus()
   }
 }
 </script>

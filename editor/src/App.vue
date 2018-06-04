@@ -20,7 +20,13 @@
 
     <div id="editor"></div>
 
-    <Transcription :lang="selectedLang" />
+    <Transcription
+      v-for="(_, i) in words"
+      :key="i"
+      :lang="selectedLang"
+      :word="words[i]"
+      @submit="onSubmit"
+    />
   </div>
 </template>
 
@@ -49,6 +55,8 @@ export default {
       word: '',
       delayedWord: '',
 
+      words: [''],
+
       spec: null,
       editor: null
     }
@@ -60,7 +68,7 @@ export default {
         return {}
       }
 
-      const h = H.hangulizer(this.spec)
+      const h = H.newHangulizer(this.spec)
       const hangulizedTraces = h.HangulizeTrace(this.delayedWord)
 
       return {
@@ -92,7 +100,11 @@ export default {
 
     updateWord: _.debounce(function (word) {
       this.delayedWord = word
-    }, 300)
+    }, 300),
+
+    onSubmit () {
+      this.words.push('')
+    }
   },
 
   created () {
