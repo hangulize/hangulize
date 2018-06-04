@@ -1,12 +1,13 @@
 <template>
-  <div class="transcription" tabindex="-1">
-    <span class="flag-icon" :class="'flag-icon-' + country"></span>
+  <div class="transcription">
+    <span class="lang">
+      <code>{{ spec.info.lang.id }}</code>
+      {{ spec.info.lang.korean }}
+    </span>
   </div>
 </template>
 
 <script>
-import 'flag-icon-css/css/flag-icon.css'
-
 import H from 'hangulize'
 
 export default {
@@ -15,9 +16,9 @@ export default {
   props: ['lang'],
 
   computed: {
-    country () {
-      const lang = H.Langs[this.lang]
-      return lang.Codes[0]
+    spec () {
+      console.log(H.specs[this.lang])
+      return H.specs[this.lang]
     }
   }
 }
