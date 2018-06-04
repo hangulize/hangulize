@@ -76,8 +76,7 @@ export default {
         return
       }
 
-      const spec = H.loadSpec(lang)
-
+      const spec = H.specs[lang]
       this.editor.session.setValue(spec.info.source)
     },
 
