@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/pkg/errors"
 
@@ -32,10 +34,10 @@ type Spec struct {
 	Source string
 
 	// Prepared stuffs
+	norm         Normalizer
 	normReplacer *strings.Replacer
 	normLetters  []string
-	norm         Normalizer
-	letters      []string
+	groupLetters []string
 }
 
 func (s *Spec) String() string {
@@ -140,6 +142,13 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 	// -------------------------------------------------------------------------
 
+	// canonical normalizer
+	norm, ok := GetNormalizer(lang.Script)
+	_ = ok
+	// if !ok {
+	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
+	// }
+
 	// custom normalization
 	var args []string
 	for to, froms := range normalize {
@@ -155,25 +164,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		normLetters = append(normLetters, to)
 	}
 
-	// canonical normalizer
-	norm, ok := GetNormalizer(lang.Script)
-	_ = ok
-	// if !ok {
-	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
-	// }
-
 	// unique/sorted letters in rewrite/transcribe
-	var letters []string
-
 	rules := append(rewrite, transcribe...)
-
-	for _, rule := range rules {
-		for _, let := range rule.From.letters {
-			letters = append(letters, let)
-		}
-	}
-
-	letters = set(letters)
+	groupLetters := collectGroupLetters(rules)
 
 	// -------------------------------------------------------------------------
 
@@ -192,12 +185,48 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 		source,
 
+		norm,
 		normReplacer,
 		normLetters,
-		norm,
-		letters,
+		groupLetters,
 	}
 	return &spec, nil
+}
+
+// collectGroupLetters collects letters from rules for the group step in the
+// pipeline.
+//
+// Basically it finds normal letters in the pattern expressions.  Normal letter
+// does not have any special meaning in a regexp.  All letters with category L
+// from patterns survive.  But another letters with category non-L will be
+// discarded if appeared at the above rpatterns.
+//
+// Usually non-L letters are used as intermediate rewriting helpers.  The
+// helpers should be produced and consumed in only rewrite rules.  Input non-L
+// letters should be alive to the transcription result.
+//
+func collectGroupLetters(rules []*Rule) []string {
+	var letters []string
+	rletters := make(map[string]bool)
+
+	for _, rule := range rules {
+		for _, let := range rule.To.letters {
+			rletters[let] = true
+		}
+
+		for _, let := range rule.From.letters {
+			if rletters[let] {
+				ch, _ := utf8.DecodeRuneInString(let)
+				if !unicode.IsLetter(ch) {
+					continue
+				}
+			}
+
+			letters = append(letters, let)
+		}
+	}
+
+	return set(letters)
 }
 
 // -----------------------------------------------------------------------------
