@@ -193,42 +193,6 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	return &spec, nil
 }
 
-// collectGroupLetters collects letters from rules for the group step in the
-// pipeline.
-//
-// Basically it finds normal letters in the pattern expressions.  Normal letter
-// does not have any special meaning in a regexp.  All letters with category L
-// from patterns survive.  But another letters with category non-L will be
-// discarded if appeared at the above rpatterns.
-//
-// Usually non-L letters are used as intermediate rewriting helpers.  The
-// helpers should be produced and consumed in only rewrite rules.  Input non-L
-// letters should be alive to the transcription result.
-//
-func collectGroupLetters(rules []*Rule) []string {
-	var letters []string
-	rletters := make(map[string]bool)
-
-	for _, rule := range rules {
-		for _, let := range rule.To.letters {
-			rletters[let] = true
-		}
-
-		for _, let := range rule.From.letters {
-			if rletters[let] {
-				ch, _ := utf8.DecodeRuneInString(let)
-				if !unicode.IsLetter(ch) {
-					continue
-				}
-			}
-
-			letters = append(letters, let)
-		}
-	}
-
-	return set(letters)
-}
-
 // -----------------------------------------------------------------------------
 // "lang" section
 
@@ -309,4 +273,42 @@ func newRules(
 	}
 
 	return rules, nil
+}
+
+// -----------------------------------------------------------------------------
+
+// collectGroupLetters collects letters from rules for the group step in the
+// pipeline.
+//
+// Basically it finds normal letters in the pattern expressions.  Normal letter
+// does not have any special meaning in a regexp.  All letters with category L
+// from patterns survive.  But another letters with category non-L will be
+// discarded if appeared at the above rpatterns.
+//
+// Usually non-L letters are used as intermediate rewriting helpers.  The
+// helpers should be produced and consumed in only rewrite rules.  Input non-L
+// letters should be alive to the transcription result.
+//
+func collectGroupLetters(rules []*Rule) []string {
+	var letters []string
+	rletters := make(map[string]bool)
+
+	for _, rule := range rules {
+		for _, let := range rule.To.letters {
+			rletters[let] = true
+		}
+
+		for _, let := range rule.From.letters {
+			if rletters[let] {
+				ch, _ := utf8.DecodeRuneInString(let)
+				if !unicode.IsLetter(ch) {
+					continue
+				}
+			}
+
+			letters = append(letters, let)
+		}
+	}
+
+	return set(letters)
 }
