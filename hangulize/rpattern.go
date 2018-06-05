@@ -18,6 +18,9 @@ type RPattern struct {
 	expr string
 
 	parts []rPart
+
+	// Letters used in the regexp.
+	letters []string
 }
 
 func (rp *RPattern) String() string {
@@ -80,7 +83,10 @@ func newRPattern(expr string,
 		parts = append(parts, rPart{plain, plainText, nil})
 	}
 
-	return &RPattern{expr, parts}
+	// Collect letters in the regexp.
+	letters := set(splitLetters(regexpLetters(expr)))
+
+	return &RPattern{expr, parts, letters}
 }
 
 // -----------------------------------------------------------------------------

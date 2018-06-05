@@ -133,6 +133,14 @@ func regexpLetters(reExpr string) string {
 	return letters
 }
 
+func splitLetters(word string) []string {
+	var letters []string
+	for _, ch := range word {
+		letters = append(letters, string(ch))
+	}
+	return letters
+}
+
 func isSpace(word string) bool {
 	return strings.TrimSpace(word) == ""
 }

@@ -75,11 +75,7 @@ func newPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	var letters []string
-	for _, ch := range regexpLetters(reExpr + negExpr) {
-		letters = append(letters, string(ch))
-	}
-	letters = set(letters)
+	letters := set(splitLetters(regexpLetters(reExpr + negExpr)))
 
 	// Compile regexp.
 	re, err := regexp.Compile(reExpr)

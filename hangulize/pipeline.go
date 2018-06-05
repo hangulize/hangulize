@@ -1,6 +1,8 @@
 package hangulize
 
-import "strings"
+import (
+	"strings"
+)
 
 type pipeline struct {
 	h  *Hangulizer
@@ -58,7 +60,7 @@ func (p *pipeline) group(word string) []subword {
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, p.h.spec.letters) || isSpace(let) {
+		if inSet(let, p.h.spec.groupLetters) || isSpace(let) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
