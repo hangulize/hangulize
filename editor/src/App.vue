@@ -112,3 +112,18 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+#app {
+  min-width: 700px;
+  width: 50%;
+  margin: 0 auto;
+}
+</style>
+
+<style>
+body {
+  background: #ece9da;
+  padding: 50px;
+}
+</style>
