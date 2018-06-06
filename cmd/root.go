@@ -28,6 +28,9 @@ var rootCmd = &cobra.Command{
 	},
 }
 
+// Execute runs the root command.  It's the entry point for every sub commands.
+// When the running command returns an error, itt will report that and exit the
+// process with exit code 1.  So just call it in your main function.
 func Execute() {
 	err := rootCmd.Execute()
 
