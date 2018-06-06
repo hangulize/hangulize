@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/sublee/hangulize2.svg?branch=develop)](https://travis-ci.org/sublee/hangulize2)
 [![Go Report Card](https://goreportcard.com/badge/github.com/sublee/hangulize2)](https://goreportcard.com/report/github.com/sublee/hangulize2)
+[![GoDoc](https://godoc.org/github.com/sublee/hangulize2/hangulize?status.svg)](https://godoc.org/github.com/sublee/hangulize2/hangulize)
 
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
