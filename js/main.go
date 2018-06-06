@@ -79,7 +79,7 @@ func main() {
 		// same with the Hangulizer struct.  Underlying methods are also Go
 		// style.
 		"newHangulizer": func(spec *js.Object) *js.Object {
-			_spec := spec.Get("spec").Interface().(*hangulize.Spec)
+			_spec := spec.Get("$spec").Interface().(*hangulize.Spec)
 			h := hangulize.NewHangulizer(_spec)
 			return js.MakeWrapper(h)
 		},
