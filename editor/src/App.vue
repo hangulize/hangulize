@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <Logo />
+
     <sui-dropdown
       placeholder="Language"
       selection
@@ -30,6 +32,8 @@
 import _ from 'lodash'
 
 import H from 'hangulize'
+
+import Logo from './components/Logo'
 import Transcription from './components/Transcription'
 import Editor from './components/Editor'
 
@@ -37,6 +41,7 @@ export default {
   name: 'App',
 
   components: {
+    Logo,
     Transcription,
     Editor
   },
