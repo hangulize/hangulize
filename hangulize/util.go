@@ -5,6 +5,43 @@ import (
 	"strings"
 )
 
+// indexOf finds the index of the given value in a string array.  It returns -1
+// if not found.  The time complexity is O(n).
+func indexOf(val string, vals []string) int {
+	for i, _val := range vals {
+		if _val == val {
+			return i
+		}
+	}
+	return -1
+}
+
+// safeSlice is a safe version of s[start:stop].  When start or stop is
+// invalid, this function returns "" instead of panic().
+func safeSlice(s string, start int, stop int) string {
+	if start < 0 || stop < 0 {
+		return ""
+	}
+	if stop-start > 0 {
+		return s[start:stop]
+	}
+	return ""
+}
+
+// captured returns the captured substring by their group number.
+func captured(s string, m []int, n int) string {
+	i := n * 2
+	return safeSlice(s, m[i], m[i+1])
+}
+
+// noCapture removes capturing groups in a regexp string.
+func noCapture(expr string) string {
+	return strings.Replace(expr, "(", "(?:", -1)
+}
+
+// -----------------------------------------------------------------------------
+// Verbose Regexp
+
 var (
 	// Match with a line starting with "---".
 	reComment = regexp.MustCompile(`---.*`)
@@ -47,43 +84,8 @@ func re(verboseExpr string) *regexp.Regexp {
 	return regexp.MustCompile(expr)
 }
 
-// safeSlice is a safe version of s[start:stop].  When start or stop is
-// invalid, this function returns "" instead of panic().
-func safeSlice(s string, start int, stop int) string {
-	if start < 0 || stop < 0 {
-		return ""
-	}
-	if stop-start > 0 {
-		return s[start:stop]
-	}
-	return ""
-}
-
-// captured returns the captured substring by their group number.
-func captured(s string, m []int, n int) string {
-	i := n * 2
-	return safeSlice(s, m[i], m[i+1])
-}
-
-// noCapture removes capturing groups in a regexp string.
-func noCapture(expr string) string {
-	return strings.Replace(expr, "(", "(?:", -1)
-}
-
 // -----------------------------------------------------------------------------
-
-// indexOf finds the index of the given value in a string array.  It returns -1
-// if not found.  The time complexity is O(n).
-func indexOf(val string, vals []string) int {
-	for i, _val := range vals {
-		if _val == val {
-			return i
-		}
-	}
-	return -1
-}
-
-// -----------------------------------------------------------------------------
+// Finding meaningful letters from Regexp
 
 var (
 	reSpace  = regexp.MustCompile(`\s`)
