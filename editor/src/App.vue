@@ -18,8 +18,8 @@
       >{{ trace.Word }} {{ trace.Why }}</sui-list-item>
     </sui-list>
 
-    <template v-for="(_, i) in words">
-      <Transcription :key="i" :spec="spec" @submit="onSubmit" />
+    <template v-for="(t, i) in transcriptions">
+      <Transcription :key="i" :spec="spec" :lang.sync="t.lang" @submit="onSubmit" />
     </template>
 
     <Editor :source="source" @change="onSourceChange" />
@@ -49,7 +49,7 @@ export default {
       word: '',
       delayedWord: '',
 
-      words: [''],
+      transcriptions: [{lang: 'ita'}],
 
       spec: null,
       source: ''
@@ -93,7 +93,7 @@ export default {
     }, 300),
 
     onSubmit () {
-      this.words.push('')
+      this.transcriptions.push({ lang: 'ita' })
     },
 
     onSourceChange (source) {

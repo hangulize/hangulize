@@ -4,12 +4,9 @@
     :class="{ focused: focused }"
     @submit.prevent="onSubmit"
   >
-    <label>
+    <Language :selected.sync="lang" />
 
-      <span class="lang">
-        <code>{{ spec.lang.id }}</code>
-        {{ spec.lang.korean }}
-      </span>
+    <label>
 
       <input
         ref="word"
@@ -31,10 +28,16 @@ import _ from 'lodash'
 
 import H from 'hangulize'
 
+import Language from './Language'
+
 export default {
   name: 'Transcription',
 
-  props: ['spec'],
+  components: {
+    Language
+  },
+
+  props: ['spec', 'lang'],
 
   data () {
     return {
@@ -56,6 +59,11 @@ export default {
   },
 
   watch: {
+    lang (lang) {
+      this.spec = H.specs[lang]
+      this.$emit('update:lang', lang)
+    },
+
     spec () {
       this.hangulize()
     },
