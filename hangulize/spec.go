@@ -36,8 +36,8 @@ type Spec struct {
 	// Prepared stuffs
 	norm         Normalizer
 	normReplacer *strings.Replacer
-	normLetters  []string
-	groupLetters []string
+	normLetters  stringSet
+	groupLetters stringSet
 }
 
 func (s *Spec) String() string {
@@ -159,9 +159,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	var normLetters []string
+	normLetters := make(stringSet)
 	for to := range normalize {
-		normLetters = append(normLetters, to)
+		normLetters[to] = true
 	}
 
 	// unique/sorted letters in rewrite/transcribe
@@ -280,17 +280,17 @@ func newRules(
 // collectGroupLetters collects letters from rules to be grouped.  The grouping
 // step assorts letters for their meaning to keep meaningless letters until the
 // final result.
-func collectGroupLetters(rules []*Rule) []string {
+func collectGroupLetters(rules []*Rule) stringSet {
 	var letters []string
 	rletters := make(map[string]bool)
 
 	for _, rule := range rules {
 		// Mark letters in RPatterns.
-		for _, let := range rule.To.letters {
+		for let := range rule.To.letters {
 			rletters[let] = true
 		}
 
-		for _, let := range rule.From.letters {
+		for let := range rule.From.letters {
 			// Non-L letters appearing in the above RPatterns should be
 			// discarded.  Bacause they are just hints for rewriting.
 			if rletters[let] {
@@ -304,5 +304,5 @@ func collectGroupLetters(rules []*Rule) []string {
 		}
 	}
 
-	return set(letters)
+	return newStringSet(letters...)
 }

@@ -60,7 +60,7 @@ func (p *pipeline) group(word string) []subword {
 
 	for i, ch := range word {
 		let := string(ch)
-		if inSet(let, p.h.spec.groupLetters) || isSpace(let) {
+		if p.h.spec.groupLetters.Has(let) || isSpace(let) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
