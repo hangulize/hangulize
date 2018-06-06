@@ -1,5 +1,9 @@
 <template>
-  <form class="transcription" @submit.prevent="onSubmit">
+  <form
+    class="transcription"
+    :class="{ focused: focused }"
+    @submit.prevent="onSubmit"
+  >
     <label>
 
       <span class="lang">
@@ -12,6 +16,8 @@
         v-model="word"
         :placeholder="example.word"
         :class="'script-' + spec.lang.script"
+        @focus="focused = true"
+        @blur="focused = false"
       />
 
       <span class="transcribed">{{ transcribed }}</span>
@@ -34,6 +40,8 @@ export default {
     return {
       word: '',
       transcribed: '',
+
+      focused: false,
 
       random: _.random(true)
     }
@@ -89,6 +97,11 @@ form {
   display: block;
   float: left;
   clear: left;
+  opacity: 0.5;
+}
+
+form.focused {
+  opacity: 1;
 }
 
 label {
