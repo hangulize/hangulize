@@ -33,6 +33,7 @@ export default {
   data () {
     return {
       word: '',
+      transcribed: '',
 
       random: _.random(true)
     }
@@ -43,22 +44,32 @@ export default {
       const test = this.spec.test
       const i = _.floor(test.length * this.random)
       return test[i]
+    }
+  },
+
+  watch: {
+    spec () {
+      this.hangulize()
     },
 
-    transcribed () {
-      if (!this.word) {
-        return this.example.transcribed
-      }
-
-      const h = H.newHangulizer(this.spec)
-      return h.Hangulize(this.word)
+    word () {
+      this.hangulize()
     }
   },
 
   methods: {
+    hangulize () {
+      const h = H.newHangulizer(this.spec)
+      this.transcribed = h.Hangulize(this.word || this.example.word)
+    },
+
     onSubmit (e) {
       this.$emit('submit')
     }
+  },
+
+  created () {
+    this.hangulize()
   },
 
   mounted () {
