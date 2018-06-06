@@ -71,7 +71,8 @@ export default {
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css?family=Noto+Sans&subset=cyrillic,greek,vietnamese');
-@import url(//fonts.googleapis.com/earlyaccess/notosansjp.css);
+@import url('https://fonts.googleapis.com/earlyaccess/notosansjp.css');
+@import url('https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
 
 form {
   background: #fff;
@@ -100,5 +101,12 @@ input.script-roman, input.script-cyrillic {
 
 input.script-roman, input.script-kana {
   font-family: 'Noto Sans JP', sans-serif;
+}
+
+.transcribed {
+  font-family: 'Spoqa Han Sans', sans-serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  color: #49f;
 }
 </style>
