@@ -277,28 +277,22 @@ func newRules(
 
 // -----------------------------------------------------------------------------
 
-// collectGroupLetters collects letters from rules for the group step in the
-// pipeline.
-//
-// Basically it finds normal letters in the pattern expressions.  Normal letter
-// does not have any special meaning in a regexp.  All letters with category L
-// from patterns survive.  But another letters with category non-L will be
-// discarded if appeared at the above rpatterns.
-//
-// Usually non-L letters are used as intermediate rewriting helpers.  The
-// helpers should be produced and consumed in only rewrite rules.  Input non-L
-// letters should be alive to the transcription result.
-//
+// collectGroupLetters collects letters from rules to be grouped.  The grouping
+// step assorts letters for their meaning to keep meaningless letters until the
+// final result.
 func collectGroupLetters(rules []*Rule) []string {
 	var letters []string
 	rletters := make(map[string]bool)
 
 	for _, rule := range rules {
+		// Mark letters in RPatterns.
 		for _, let := range rule.To.letters {
 			rletters[let] = true
 		}
 
 		for _, let := range rule.From.letters {
+			// Non-L letters appearing in the above RPatterns should be
+			// discarded.  Bacause they are just hints for rewriting.
 			if rletters[let] {
 				ch, _ := utf8.DecodeRuneInString(let)
 				if !unicode.IsLetter(ch) {
