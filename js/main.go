@@ -12,9 +12,7 @@ import (
 // "test":, "source": ...}}.  It exposes some information
 // to be used in JavaScript-side.
 func packSpec(s *hangulize.Spec) *js.Object {
-	// Append only lang, config, test, source.
-	info := js.Global.Get("Object").New()
-
+	// Pick lang, config, test, source for JavaScript-side usage.
 	lang := js.Global.Get("Object").New()
 	lang.Set("id", s.Lang.ID)
 	lang.Set("codes", s.Lang.Codes)
@@ -26,7 +24,7 @@ func packSpec(s *hangulize.Spec) *js.Object {
 	config.Set("authors", s.Config.Authors)
 	config.Set("stage", s.Config.Stage)
 
-	test := js.Global.Get("Object").New()
+	test := js.Global.Get("Array").New()
 	for i, pair := range s.Test {
 		o := js.Global.Get("Object").New()
 		o.Set("word", pair.Left())
@@ -34,15 +32,14 @@ func packSpec(s *hangulize.Spec) *js.Object {
 		test.SetIndex(i, &o)
 	}
 
-	info.Set("lang", lang)
-	info.Set("config", config)
-	info.Set("test", test)
-	info.Set("source", s.Source)
-
-	// Result
 	o := js.Global.Get("Object").New()
-	o.Set("spec", js.MakeWrapper(s))
-	o.Set("info", info)
+	o.Set("lang", lang)
+	o.Set("config", config)
+	o.Set("test", test)
+	o.Set("source", s.Source)
+
+	// Keep the spec in $spec.
+	o.Set("$spec", js.MakeWrapper(s))
 	return o
 }
 
