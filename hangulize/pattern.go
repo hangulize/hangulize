@@ -42,7 +42,7 @@ type Pattern struct {
 	neg *regexp.Regexp // negative regexp
 
 	// Letters used in the positive/negative regexps.
-	letters []string
+	letters stringSet
 
 	// References to expanded vars.
 	usedVars [][]string
@@ -75,7 +75,7 @@ func newPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	letters := set(splitLetters(regexpLetters(reExpr + negExpr)))
+	letters := newStringSet(splitLetters(regexpLetters(reExpr + negExpr))...)
 
 	// Compile regexp.
 	re, err := regexp.Compile(reExpr)
@@ -95,7 +95,7 @@ func newPattern(
 // Letters returns the set of natural letters used in the expression in
 // ascending order.
 func (p *Pattern) Letters() []string {
-	return p.letters
+	return p.letters.Array()
 }
 
 // Explain shows the HRE expression with

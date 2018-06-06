@@ -35,7 +35,7 @@ func ExampleNormalize() {
 // Letters in keep will not normalized by the given normalizer.
 func ExampleNormalize_keep() {
 	roman := &RomanNormalizer{}
-	fmt.Println(Normalize("pisáť", roman, []string{"ť"}))
+	fmt.Println(Normalize("pisáť", roman, newStringSet("ť")))
 	// Output: pisať
 }
 

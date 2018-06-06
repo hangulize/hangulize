@@ -10,18 +10,15 @@ import (
 // Normalize converts a word to normal form.  This behavior is called
 // "normalization".  It takes a normalizer which normalizes a letter.  It
 // doesn't normalize letters in array keep.
-func Normalize(word string, norm Normalizer, keep []string) string {
+func Normalize(word string, norm Normalizer, keep stringSet) string {
 	if norm == nil {
 		return word
 	}
 
-	// Sort letters to keep.
-	keepSet := set(keep)
-
 	var buf strings.Builder
 
 	for _, ch := range word {
-		if inSet(string(ch), keepSet) {
+		if keep.HasRune(ch) {
 			buf.WriteRune(ch)
 		} else {
 			buf.WriteRune(norm.normalize(ch))

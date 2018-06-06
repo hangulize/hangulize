@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"fmt"
 	"regexp"
 	"sort"
 	"strings"
@@ -71,6 +72,8 @@ func noCapture(expr string) string {
 	return strings.Replace(expr, "(", "(?:", -1)
 }
 
+// -----------------------------------------------------------------------------
+
 // indexOf finds the index of the given value in a string array.  It returns -1
 // if not found.  The time complexity is O(n).
 func indexOf(val string, vals []string) int {
@@ -82,25 +85,50 @@ func indexOf(val string, vals []string) int {
 	return -1
 }
 
-func set(vals []string) []string {
-	unique := make(map[string]bool)
-	for _, val := range vals {
-		unique[val] = true
-	}
+// -----------------------------------------------------------------------------
 
-	var set []string
-	for val := range unique {
-		set = append(set, val)
-	}
+type stringSet map[string]bool
 
-	sort.Strings(set)
+func (s *stringSet) String() string {
+	return fmt.Sprint(s.Array())
+}
+
+// newStringSet creates a stringSet from the given strings.
+// Duplicated string doesn't occur a failure.
+func newStringSet(strs ...string) stringSet {
+	set := make(stringSet, len(strs))
+	for _, str := range strs {
+		set[str] = true
+	}
 	return set
 }
 
-func inSet(val string, set []string) bool {
-	i := sort.SearchStrings(set, val)
-	return i < len(set) && set[i] == val
+// Has tests if the string is in the set.
+func (s *stringSet) Has(str string) bool {
+	return (*s)[str]
 }
+
+// HasRune tests if the rune is in the set.
+func (s *stringSet) HasRune(ch rune) bool {
+	return s.Has(string(ch))
+}
+
+// Array returns a []string array containing strings in the set.
+// Each string is unique and ordered in ascending order.
+func (s *stringSet) Array() []string {
+	strings := make([]string, len(*s))
+
+	i := 0
+	for str := range *s {
+		strings[i] = str
+		i++
+	}
+
+	sort.Strings(strings)
+	return strings
+}
+
+// -----------------------------------------------------------------------------
 
 var (
 	reSpace  = regexp.MustCompile(`\s`)
