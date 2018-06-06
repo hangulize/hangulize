@@ -45,3 +45,25 @@ func (s *stringSet) Has(str string) bool {
 func (s *stringSet) HasRune(ch rune) bool {
 	return s.Has(string(ch))
 }
+
+// Add inserts the string into the set.
+func (s *stringSet) Add(str string) {
+	(*s)[str] = true
+}
+
+// AddRune inserts the rune into the set.
+func (s *stringSet) AddRune(ch rune) {
+	s.Add(string(ch))
+}
+
+// Discard removes the string from the set.
+func (s *stringSet) Discard(str string) bool {
+	exists := (*s)[str]
+	delete(*s, str)
+	return exists
+}
+
+// DiscardRune removes the rune from the set.
+func (s *stringSet) DiscardRune(ch rune) bool {
+	return s.Discard(string(ch))
+}
