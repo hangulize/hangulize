@@ -18,33 +18,27 @@
       >{{ trace.Word }} {{ trace.Why }}</sui-list-item>
     </sui-list>
 
-    <div id="editor"></div>
-
     <template v-for="(_, i) in words">
-      <Transcription
-        :key="i"
-        :lang="selectedLang"
-        @submit="onSubmit"
-      />
+      <Transcription :key="i" :spec="spec" @submit="onSubmit" />
     </template>
+
+    <Editor :source="source" @change="onSourceChange" />
   </div>
 </template>
 
 <script>
 import _ from 'lodash'
-import ace from 'brace'
-
-import HangulizeTheme from './ace/theme-hangulize'
-import HGLMode from './ace/mode-hgl'
 
 import H from 'hangulize'
 import Transcription from './components/Transcription'
+import Editor from './components/Editor'
 
 export default {
   name: 'App',
 
   components: {
-    Transcription
+    Transcription,
+    Editor
   },
 
   data () {
@@ -58,7 +52,7 @@ export default {
       words: [''],
 
       spec: null,
-      editor: null
+      source: ''
     }
   },
 
@@ -80,12 +74,8 @@ export default {
 
   watch: {
     selectedLang (lang) {
-      if (!this.editor) {
-        return
-      }
-
-      const spec = H.specs[lang]
-      this.editor.session.setValue(spec.info.source)
+      this.spec = H.specs[lang]
+      this.source = this.spec.source
     },
 
     word (word) {
@@ -104,47 +94,21 @@ export default {
 
     onSubmit () {
       this.words.push('')
+    },
+
+    onSourceChange (source) {
+      this.updateSource(source)
     }
   },
 
   created () {
     _.forEach(H.specs, (spec, lang) => {
-      this.langs.push({ text: spec.info.lang.korean, value: lang })
+      this.langs.push({ text: spec.lang.korean, value: lang })
 
       if (!this.selectedLang) {
         this.selectedLang = lang
       }
     })
-  },
-
-  mounted () {
-    const editor = ace.edit('editor')
-
-    editor.renderer.setShowGutter(false)
-    editor.setTheme(HangulizeTheme)
-    editor.session.setMode(new HGLMode())
-
-    editor.session.on('change', () => {
-      this.updateSource(editor.getValue())
-    })
-
-    this.editor = editor
   }
 }
 </script>
-
-<style scoped>
-@import 'https://fonts.googleapis.com/css?family=IBM+Plex+Mono';
-@import 'https://fonts.googleapis.com/css?family=Nanum+Gothic+Coding';
-
-#editor {
-  font-family: 'IBM Plex Mono', 'Nanum Gothic Coding', monospace;
-  height: 50em;
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 50%;
-  height: 100%;
-  font-size: 15px;
-}
-</style>

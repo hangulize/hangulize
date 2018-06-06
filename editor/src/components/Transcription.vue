@@ -3,15 +3,15 @@
     <label>
 
       <span class="lang">
-        <code>{{ spec.info.lang.id }}</code>
-        {{ spec.info.lang.korean }}
+        <code>{{ spec.lang.id }}</code>
+        {{ spec.lang.korean }}
       </span>
 
       <input
         ref="word"
         v-model="word"
         :placeholder="example.word"
-        :class="'script-' + spec.info.lang.script"
+        :class="'script-' + spec.lang.script"
       />
 
       <span class="transcribed">{{ transcribed }}</span>
@@ -28,22 +28,20 @@ import H from 'hangulize'
 export default {
   name: 'Transcription',
 
-  props: ['lang'],
+  props: ['spec'],
 
   data () {
     return {
-      word: ''
+      word: '',
+
+      random: _.random(true)
     }
   },
 
   computed: {
-    spec () {
-      return H.specs[this.lang]
-    },
-
     example () {
-      const test = this.spec.info.test
-      const i = _.random(test.length)
+      const test = this.spec.test
+      const i = _.floor(test.length * this.random)
       return test[i]
     },
 
