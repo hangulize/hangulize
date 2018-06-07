@@ -79,13 +79,13 @@ export default {
       this.transcribed = h.Hangulize(this.word || this.example.word)
     },
 
-    onSubmit (e) {
-      this.$emit('submit')
+    onSubmit () {
+      this.$emit('submit', this)
     }
   },
 
   created () {
-    this.hangulize()
+    this.$nextTick(this.hangulize)
   },
 
   mounted () {

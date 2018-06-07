@@ -21,7 +21,12 @@
     </sui-list>
 
     <template v-for="(t, i) in transcriptions">
-      <Transcription :key="i" :spec="spec" :lang.sync="t.lang" @submit="onSubmit" />
+      <Transcription
+        :key="t.id"
+        :spec="spec"
+        :lang.sync="t.lang"
+        @submit="onSubmit(i)"
+      />
     </template>
 
     <Editor :source="source" @change="onSourceChange" />
@@ -54,7 +59,7 @@ export default {
       word: '',
       delayedWord: '',
 
-      transcriptions: [{lang: 'ita'}],
+      transcriptions: [],
 
       spec: null,
       source: ''
@@ -97,8 +102,13 @@ export default {
       this.delayedWord = word
     }, 300),
 
-    onSubmit () {
-      this.transcriptions.push({ lang: 'ita' })
+    insertTranscription (i = 0, lang = 'ita') {
+      this.transcriptions.splice(i, 0, { lang: lang, id: _.random(true) })
+    },
+
+    onSubmit (i) {
+      const lang = this.transcriptions[i].lang
+      this.insertTranscription(i + 1, lang)
     },
 
     onSourceChange (source) {
@@ -114,6 +124,8 @@ export default {
         this.selectedLang = lang
       }
     })
+
+    this.insertTranscription()
   }
 }
 </script>
