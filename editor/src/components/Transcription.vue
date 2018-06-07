@@ -78,8 +78,7 @@ export default {
 
   methods: {
     hangulize () {
-      const h = H.newHangulizer(this.spec_)
-      this.transcribed = h.Hangulize(this.word || this.example.word)
+      // Will be implemented at created().
     },
 
     onSubmit () {
@@ -88,9 +87,23 @@ export default {
   },
 
   created () {
+    // NOTE(sublee): hangulize() is expensive.  If we call this for every user
+    // input, the user experience would be bad.  So we need to wrap it with
+    // _.debounce().
+    //
+    // But if we define it in the methods, all Transcription component
+    // instances share the same debounce schedule.  We define here instead to
+    // separate schedules for each component instance.
+    //
+    // https://forum.vuejs.org/t/issues-with-vuejs-component-and-debounce/7224/13
+    //
+    this.hangulize = _.debounce(() => {
+      const h = H.newHangulizer(this.spec_)
+      this.transcribed = h.Hangulize(this.word || this.example.word)
+    }, 10)
+
     this.spec_ = _.clone(this.spec)
     this.lang_ = _.clone(this.lang)
-    this.$nextTick(this.hangulize)
   },
 
   mounted () {
