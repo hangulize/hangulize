@@ -4,7 +4,7 @@
     :class="{ focused: focused }"
     @submit.prevent="onSubmit"
   >
-    <Language :selected.sync="lang" />
+    <Language :selected.sync="lang_" />
 
     <label>
 
@@ -12,7 +12,7 @@
         ref="word"
         v-model="word"
         :placeholder="example.word"
-        :class="'script-' + spec.lang.script"
+        :class="'script-' + spec_.lang.script"
         @focus="focused = true"
         @blur="focused = false"
       />
@@ -41,6 +41,9 @@ export default {
 
   data () {
     return {
+      spec_: null,
+      lang_: null,
+
       word: '',
       transcribed: '',
 
@@ -52,30 +55,30 @@ export default {
 
   computed: {
     example () {
-      const test = this.spec.test
+      const test = this.spec_.test
       const i = _.floor(test.length * this.random)
       return test[i]
     }
   },
 
   watch: {
-    lang (lang) {
-      this.spec = H.specs[lang]
-      this.$emit('update:lang', lang)
-    },
-
-    spec () {
-      this.hangulize()
-    },
-
     word () {
       this.hangulize()
+    },
+
+    spec_ () {
+      this.hangulize()
+    },
+
+    lang_ (lang) {
+      this.spec_ = H.specs[lang]
+      this.$emit('update:lang', lang)
     }
   },
 
   methods: {
     hangulize () {
-      const h = H.newHangulizer(this.spec)
+      const h = H.newHangulizer(this.spec_)
       this.transcribed = h.Hangulize(this.word || this.example.word)
     },
 
@@ -85,6 +88,8 @@ export default {
   },
 
   created () {
+    this.spec_ = _.clone(this.spec)
+    this.lang_ = _.clone(this.lang)
     this.$nextTick(this.hangulize)
   },
 

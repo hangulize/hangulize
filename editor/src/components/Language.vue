@@ -4,7 +4,7 @@
       placeholder="언어"
       selection
       :options="langs"
-      v-model="selected"
+      v-model="selected_"
     />
   </div>
 </template>
@@ -21,6 +21,8 @@ export default {
 
   data () {
     return {
+      selected_: null,
+
       langs: _.map(H.specs, (spec, lang) => ({
         text: `${spec.lang.id} ${spec.lang.korean}`,
         value: lang
@@ -29,9 +31,13 @@ export default {
   },
 
   watch: {
-    selected (selected) {
+    selected_ (selected) {
       this.$emit('update:selected', selected)
     }
+  },
+
+  created () {
+    this.selected_ = this.selected
   }
 }
 </script>
