@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import Vue from 'vue'
 import Vuex from 'vuex'
 
@@ -19,9 +20,18 @@ export default new Vuex.Store({
 
   mutations: {
     // Inserts a transcription onto the given index.
-    insertTranscription (state, {index = 0, lang}) {
-      // Use lang of the prev transcription as default.
-      lang = lang || state.transcriptions[index - 1].lang
+    insertTranscription (state, index = 0) {
+      let lang
+
+      if (index === 0) {
+        // Pick a random lang for intiializing.
+        const langs = Object.keys(H.specs)
+        const i = _.random(langs.length)
+        lang = langs[i]
+      } else {
+        // Use lang of the prev transcription as default.
+        lang = state.transcriptions[index - 1].lang
+      }
 
       const t = {
         id: state.nextTranscriptionID++,

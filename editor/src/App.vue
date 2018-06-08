@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <Logo />
+    <TranscriptionList />
 
     <sui-dropdown
       placeholder="Language"
@@ -20,14 +21,6 @@
       >{{ trace.Word }} {{ trace.Why }}</sui-list-item>
     </sui-list>
 
-    <template v-for="(t, i) in transcriptions">
-      <Transcription
-        :key="t.id"
-        :index="i"
-        @submit="onSubmit(i)"
-      />
-    </template>
-
     <Editor :source="source" @change="onSourceChange" />
   </div>
 </template>
@@ -41,6 +34,7 @@ import H from 'hangulize'
 import store from './store/index'
 import Logo from './components/Logo'
 import Transcription from './components/Transcription'
+import TranscriptionList from './components/TranscriptionList'
 import Editor from './components/Editor'
 
 export default {
@@ -50,6 +44,7 @@ export default {
   components: {
     Logo,
     Transcription,
+    TranscriptionList,
     Editor
   },
 
