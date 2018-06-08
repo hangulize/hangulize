@@ -4,7 +4,8 @@
       placeholder="언어"
       selection
       :options="langs"
-      v-model="selected_"
+      v-model="value"
+      @input="$emit('input', value)"
     />
   </div>
 </template>
@@ -17,27 +18,19 @@ import H from 'hangulize'
 export default {
   name: 'Language',
 
-  props: ['selected'],
+  props: ['lang'],
 
-  data () {
-    return {
-      selected_: null,
+  data: () => ({
+    value: '',
 
-      langs: _.map(H.specs, (spec, lang) => ({
-        text: `${spec.lang.id} ${spec.lang.korean}`,
-        value: lang
-      }))
-    }
-  },
-
-  watch: {
-    selected_ (selected) {
-      this.$emit('update:selected', selected)
-    }
-  },
+    langs: _.map(H.specs, (spec, lang) => ({
+      text: `${spec.lang.id} ${spec.lang.korean}`,
+      value: lang
+    }))
+  }),
 
   created () {
-    this.selected_ = this.selected
+    this.value = this.lang
   }
 }
 </script>

@@ -23,8 +23,7 @@
     <template v-for="(t, i) in transcriptions">
       <Transcription
         :key="t.id"
-        :spec="spec"
-        :lang.sync="t.lang"
+        :index="i"
         @submit="onSubmit(i)"
       />
     </template>
@@ -35,15 +34,18 @@
 
 <script>
 import _ from 'lodash'
+import { mapMutations, mapState } from 'vuex'
 
 import H from 'hangulize'
 
+import store from './store/index'
 import Logo from './components/Logo'
 import Transcription from './components/Transcription'
 import Editor from './components/Editor'
 
 export default {
   name: 'App',
+  store,
 
   components: {
     Logo,
@@ -58,8 +60,6 @@ export default {
 
       word: '',
       delayedWord: '',
-
-      transcriptions: [],
 
       spec: null,
       source: ''
@@ -79,7 +79,9 @@ export default {
         word: hangulizedTraces[0],
         traces: hangulizedTraces[1]
       }
-    }
+    },
+
+    ...mapState(['transcriptions'])
   },
 
   watch: {
@@ -102,18 +104,15 @@ export default {
       this.delayedWord = word
     }, 300),
 
-    insertTranscription (i = 0, lang = 'ita') {
-      this.transcriptions.splice(i, 0, { lang: lang, id: _.random(true) })
-    },
-
     onSubmit (i) {
-      const lang = this.transcriptions[i].lang
-      this.insertTranscription(i + 1, lang)
+      this.insertTranscription({index: i + 1})
     },
 
     onSourceChange (source) {
       this.updateSource(source)
-    }
+    },
+
+    ...mapMutations(['insertTranscription'])
   },
 
   created () {
@@ -125,7 +124,7 @@ export default {
       }
     })
 
-    this.insertTranscription()
+    this.insertTranscription({lang: 'ita'})
   }
 }
 </script>

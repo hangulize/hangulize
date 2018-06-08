@@ -3,18 +3,22 @@
     class="transcription"
     :class="{ focused: focused }"
     @submit.prevent="onSubmit"
+    tabindex="-1"
   >
-    <Language :selected.sync="lang_" />
+    <Language
+      :lang="lang"
+      @input="updateLang"
+    />
 
     <label>
 
       <input
         ref="word"
-        v-model="word"
         :placeholder="example.word"
-        :class="'script-' + spec_.lang.script"
+        :class="'script-' + spec.lang.script"
         @focus="focused = true"
         @blur="focused = false"
+        @input="updateWord"
       />
 
       <span class="transcribed">{{ transcribed }}</span>
@@ -37,48 +41,59 @@ export default {
     Language
   },
 
-  props: ['spec', 'lang'],
+  props: ['index'],
 
-  data () {
-    return {
-      spec_: null,
-      lang_: null,
+  data: () => ({
+    random: _.random(true),
 
-      word: '',
-      transcribed: '',
-
-      focused: false,
-
-      random: _.random(true)
-    }
-  },
+    transcribed: ''
+  }),
 
   computed: {
+    transcription () {
+      return this.$store.getters.getTranscription(this.index)
+    },
+
+    lang () {
+      return this.transcription.lang
+    },
+
+    spec () {
+      return this.transcription.spec
+    },
+
+    word () {
+      return this.transcription.word
+    },
+
     example () {
-      const test = this.spec_.test
+      const test = this.spec.test
       const i = _.floor(test.length * this.random)
       return test[i]
-    }
-  },
-
-  watch: {
-    word () {
-      this.hangulize()
-    },
-
-    spec_ () {
-      this.hangulize()
-    },
-
-    lang_ (lang) {
-      this.spec_ = H.specs[lang]
-      this.$emit('update:lang', lang)
     }
   },
 
   methods: {
     hangulize () {
       // Will be implemented at created().
+    },
+
+    updateLang (lang) {
+      this.$store.commit('updateLang', {
+        index: this.index,
+        lang: lang
+      })
+
+      this.transcribed = ''
+      this.hangulize()
+    },
+
+    updateWord (e) {
+      this.$store.commit('updateWord', {
+        index: this.index,
+        word: e.target.value
+      })
+      this.hangulize()
     },
 
     onSubmit () {
@@ -98,12 +113,11 @@ export default {
     // https://forum.vuejs.org/t/issues-with-vuejs-component-and-debounce/7224/13
     //
     this.hangulize = _.debounce(() => {
-      const h = H.newHangulizer(this.spec_)
+      const h = H.newHangulizer(this.spec)
       this.transcribed = h.Hangulize(this.word || this.example.word)
-    }, 10)
+    }, 100)
 
-    this.spec_ = _.clone(this.spec)
-    this.lang_ = _.clone(this.lang)
+    this.hangulize()
   },
 
   mounted () {
