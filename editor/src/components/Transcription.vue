@@ -1,9 +1,14 @@
 <template>
   <form
     class="transcription"
-    :class="{ focused: focused }"
-    @submit.prevent="onSubmit"
+
     tabindex="-1"
+
+    :class="{ focused: focused }"
+    @focus="focused = true"
+    @blur="focused = false"
+
+    @submit.prevent="onSubmit"
   >
     <Language
       :lang="lang"
@@ -45,6 +50,7 @@ export default {
 
   data: () => ({
     random: _.random(true),
+    focused: false,
 
     transcribed: ''
   }),
@@ -131,17 +137,16 @@ export default {
 @import url('https://fonts.googleapis.com/earlyaccess/notosansjp.css');
 @import url('https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
 
+*:focus {
+  outline: none;
+}
+
 form {
   background: #fff;
   margin: 0.5em;
   display: block;
   float: left;
   clear: left;
-  opacity: 0.5;
-}
-
-form.focused {
-  opacity: 1;
 }
 
 label {
@@ -170,5 +175,9 @@ input.script-roman, input.script-kana {
   font-size: 1.75rem;
   font-weight: 400;
   color: #49f;
+}
+
+form.focused {
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
 }
 </style>
