@@ -2,40 +2,14 @@
   <div id="app">
     <Logo />
     <TranscriptionList />
-
-    <sui-dropdown
-      placeholder="Language"
-      selection
-      :options="langs"
-      v-model="selectedLang"
-    />
-
-    <sui-input name="word" v-model="word" />
-
-    <h1 is="sui-header" class="hangulized">{{ hangulized.word }}</h1>
-
-    <sui-list>
-      <sui-list-item
-        v-for="(trace, i) in hangulized.traces"
-        v-bind:key="i"
-      >{{ trace.Word }} {{ trace.Why }}</sui-list-item>
-    </sui-list>
-
-    <Editor :source="source" @change="onSourceChange" />
   </div>
 </template>
 
 <script>
-import _ from 'lodash'
-import { mapMutations, mapState } from 'vuex'
-
-import H from 'hangulize'
-
 import store from './store/index'
 import Logo from './components/Logo'
 import Transcription from './components/Transcription'
 import TranscriptionList from './components/TranscriptionList'
-import Editor from './components/Editor'
 
 export default {
   name: 'App',
@@ -44,82 +18,7 @@ export default {
   components: {
     Logo,
     Transcription,
-    TranscriptionList,
-    Editor
-  },
-
-  data () {
-    return {
-      langs: [],
-      selectedLang: '',
-
-      word: '',
-      delayedWord: '',
-
-      spec: null,
-      source: ''
-    }
-  },
-
-  computed: {
-    hangulized () {
-      if (!this.spec) {
-        return {}
-      }
-
-      const h = H.newHangulizer(this.spec)
-      const hangulizedTraces = h.HangulizeTrace(this.delayedWord)
-
-      return {
-        word: hangulizedTraces[0],
-        traces: hangulizedTraces[1]
-      }
-    },
-
-    ...mapState(['transcriptions'])
-  },
-
-  watch: {
-    selectedLang (lang) {
-      this.spec = H.specs[lang]
-      this.source = this.spec.source
-    },
-
-    word (word) {
-      this.updateWord(word)
-    }
-  },
-
-  methods: {
-    updateSource: _.debounce(function (source) {
-      this.spec = H.parseSpec(source)
-    }, 300),
-
-    updateWord: _.debounce(function (word) {
-      this.delayedWord = word
-    }, 300),
-
-    onSubmit (i) {
-      this.insertTranscription({index: i + 1})
-    },
-
-    onSourceChange (source) {
-      this.updateSource(source)
-    },
-
-    ...mapMutations(['insertTranscription'])
-  },
-
-  created () {
-    _.forEach(H.specs, (spec, lang) => {
-      this.langs.push({ text: spec.lang.korean, value: lang })
-
-      if (!this.selectedLang) {
-        this.selectedLang = lang
-      }
-    })
-
-    this.insertTranscription({lang: 'ita'})
+    TranscriptionList
   }
 }
 </script>
@@ -133,8 +32,11 @@ export default {
 </style>
 
 <style>
+@import url('https://spoqa.github.io/spoqa-han-sans/css/SpoqaHanSans-kr.css');
+
 body {
   background: #ece9da;
   padding: 50px;
+  font-family: 'Spoqa Han Sans', sans-serif;
 }
 </style>

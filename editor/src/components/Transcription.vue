@@ -4,26 +4,29 @@
 
     tabindex="-1"
 
-    :class="{ focused: focused }"
+    :class="{ focused, selecting }"
     @focus="focused = true"
     @blur="focused = false"
 
     @submit.prevent="onSubmit"
   >
-    <Language
-      :lang="lang"
-      @input="updateLang"
-    />
-
     <label>
+
+      <Language
+        :lang="lang"
+        @input="updateLang"
+        @open="selecting = true"
+        @close="selecting = false"
+      />
 
       <input
         ref="word"
         :placeholder="example.word"
+        :value="word"
         :class="'script-' + spec.lang.script"
         @focus="focused = true"
         @blur="focused = false"
-        @input="updateWord"
+        @input="(e) => updateWord(e.target.value)"
       />
 
       <span class="transcribed">{{ transcribed }}</span>
@@ -51,6 +54,7 @@ export default {
   data: () => ({
     random: _.random(true),
     focused: false,
+    selecting: false,
 
     transcribed: ''
   }),
@@ -94,10 +98,10 @@ export default {
       this.hangulize()
     },
 
-    updateWord (e) {
+    updateWord (word) {
       this.$store.commit('updateWord', {
         index: this.index,
-        word: e.target.value
+        word: word
       })
       this.hangulize()
     },
@@ -155,6 +159,7 @@ label {
 }
 
 input {
+  background: transparent;
   font-size: 2rem;
   font-weight: 600;
   line-height: 2;
@@ -179,5 +184,9 @@ input.script-roman, input.script-kana {
 
 form.focused {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+form.selecting {
+  box-shadow: none;
+  background: #f4f4f4;
 }
 </style>
