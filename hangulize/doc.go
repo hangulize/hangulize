@@ -1,41 +1,44 @@
 /*
-Package hangulize provides an automatic Hangul transcriber for non-Korean
-words.  Transcription means that the systematic representation of language in
-written form.
+Package hangulize transcribes non-Korean words into Hangul.
 
-	https://en.wikipedia.org/wiki/Transcription_(linguistics)
+	"Hello!" -> "헬로!"
 
-Originally, the Hangulize was invented with Python in 2010
-(https://github.com/sublee/hangulize).  It has been provided at
-http://hangulize.org/ for Korean translators.  Brian Jongseong Park proposed
-the seed idea of the Hangulize on his Blog.
+Hangulize was inspired by Brian Jongseong Park
+(http://iceager.egloos.com/2610028). Based on this idea,
+the original Hangulize was developed in Python and went out in 2010
+(https://github.com/sublee/hangulize). Since then, serving as a web application
+on http://hangulize.org/, it has been of great help for Korean translators.
 
-	http://iceager.egloos.com/2610028
-
-This Go re-implementation will be a reboot of the Hangulize with attractive
-feature improvements.
+This Go re-implementation is a reboot of Hangulize with feature improvements.
 
 Pipeline
 
-When we transcribe, the word goes through Hangulize's procedural pipeline.  The
-pipeline has 5 steps: "Normalize", "Group", "Rewrite", "Transcribe", and
-"Compose Hangul".  If we can transcribe "Hello!" in English into "헬로!"
-(actually, English is not supported yet), the pipeline world work like:
+Hangulize transcribes with 5 steps. These steps include "Normalize", "Group",
+"Rewrite", "Transcribe", and "Compose". To clarify these concepts,
+let's consider an imaginary example of "Hello!" in English into "헬로!"
+(actually, English is not supported yet).
 
-	0. Input       "Hello!"
-	1. Normalize   "hello!"
-	2. Group       "hello", "!"
-	3. Rewrite     "heˈlō", "!"
-	4. Transcribe  "ㅎㅔ-ㄹㄹㅗ", "!"
-	5. Compose H.  "헬로!"
+First, Hangulize normalizes letter cases:
 
-The "1. Normalize" step eliminates letter case from the word to make the next
-steps work easier.  The "2. Group" step groups letters by their meaningness
-into subwords.  Meaningful letter is the letter which appears in the
-rewrite/transcribe rules.  The "3. Rewrite" step minimizes the gap between
-pronunciation and spelling.  The "4. Transcribe" step determines Hangul
-spelling for the pronunciation.  Finally, the  "5. Compose Hangul" step
-converts decomposed Jamo phonemes to composed Hangul syllables.
+	"Hello" -> "hello!"
+
+And then, it groups letters by meanings:
+
+	"hello!" -> "hello", "!"
+
+After that, grouped chunks are rewritten as source language-specific rules.
+This step is usually for minimizing the differences between pronunciation
+and spelling:
+
+	"hello", "!" -> "heˈlō", "!"
+
+And it transcribes rewritten chunks into Hangul Jamo phonemes.
+
+	"heˈlō", "!" -> "ㅎㅔ-ㄹㄹㅗ", "!"
+
+Finally, it composes Jamo phonemes to Hangul syllables and joins all groups.
+
+	"ㅎㅔ-ㄹㄹㅗ", "!" -> "헬로!"
 
 Spec
 
