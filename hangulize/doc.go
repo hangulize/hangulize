@@ -43,7 +43,7 @@ Finally, it composes Jamo phonemes to Hangul syllables and joins all groups.
 Spec
 
 A spec is written by the HGL format which is a configuration DSL for Hangulize
-2.  One spec is for one language transcription system.  So we need to describe
+2. One spec is for one language transcription system. So we need to describe
 about the language at the first:
 
 	lang:
@@ -59,12 +59,12 @@ Then write about yourself and the stage of this spec:
 	    author = "John Doe <john@example.com>"
 	    stage  = "draft"
 
-We will write many patterns in rewrite/transcribe rules soon.  Some expressions
-may appear many times annoyingly.  To not repeat ourselves, we can use
+We will write many patterns in rewrite/transcribe rules soon. Some expressions
+may appear many times annoyingly. To not repeat ourselves, we can use
 variables and macros.
 
-A variable is a combination of letters.  Variable in pattern will match with
-one of the letters.  Variable "foo" can be referenced with "<foo>" in the
+A variable is a combination of letters. Variable in pattern will match with
+one of the letters. Variable "foo" can be referenced with "<foo>" in the
 patterns.
 
 	vars:
@@ -76,9 +76,9 @@ is the common macro for "<vowels>" variable:
 	macros:
 	    "@" = "<vowels>"
 
-Now we can write "rewrite" rules.  There are Pattern and RPattern.  Pattern
-matches with letters in a word.  RPattern represents how the matched letters
-should be replaced.  A replaced word by a rule would become as the input for
+Now we can write "rewrite" rules. There are Pattern and RPattern. Pattern
+matches with letters in a word. RPattern represents how the matched letters
+should be replaced. A replaced word by a rule would become as the input for
 the next rule:
 
 	rewrite:
@@ -87,12 +87,12 @@ the next rule:
 	    "{@}gli"  -> "li"
 	    "gn{@}"   -> "nJ"
 
-Pattern is based on Regular Expression but it has it's own custom syntax.  We
-call it "HRE" which means "Hangulize-specific Regular Expression".  For the
+Pattern is based on Regular Expression but it has it's own custom syntax. We
+call it "HRE" which means "Hangulize-specific Regular Expression". For the
 detail, see the documentation of Pattern.
 
-"transcribe" rules are exactly same with "rewrite" rules.  But it's RPatterns
-represent Hangul Jamo phonemes.  In contrast to "rewrite", a replaced word
+"transcribe" rules are exactly same with "rewrite" rules. But it's RPatterns
+represent Hangul Jamo phonemes. In contrast to "rewrite", a replaced word
 won't become as the input for the next rules:
 
 	transcribe:
@@ -101,8 +101,8 @@ won't become as the input for the next rules:
 	    "f" -> "ㅍ"
 	    "g" -> "ㄱ"
 
-Finally, we should write expected transcription examples.  They are used for
-unit testing.  Verify your spec yourself:
+Finally, we should write expected transcription examples. They are used for
+unit testing. Verify your spec yourself:
 
 	test:
 	    "allegretto" -> "알레그레토"
