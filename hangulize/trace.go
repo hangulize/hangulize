@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// Trace is emitted when a replacement occurs.  It is used for tracing of
+// Trace is emitted when a replacement occurs. It is used for tracing of
 // Hangulize pipeline internal.
 type Trace struct {
 	Step string

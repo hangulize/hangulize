@@ -61,7 +61,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	source := sourceBuf.String()
 
 	// -------------------------------------------------------------------------
-	// Every sections are optional.  An empty HGL source is also valid spec.
+	// Every sections are optional. An empty HGL source is also valid spec.
 
 	// lang
 	var lang Language
@@ -277,7 +277,7 @@ func newRules(
 
 // -----------------------------------------------------------------------------
 
-// collectGroupLetters collects letters from rules to be grouped.  The grouping
+// collectGroupLetters collects letters from rules to be grouped. The grouping
 // step assorts letters for their meaning to keep meaningless letters until the
 // final result.
 func collectGroupLetters(rules []*Rule) stringSet {
@@ -292,7 +292,7 @@ func collectGroupLetters(rules []*Rule) stringSet {
 
 		for let := range rule.From.letters {
 			// Non-L letters appearing in the above RPatterns should be
-			// discarded.  Bacause they are just hints for rewriting.
+			// discarded. Bacause they are just hints for rewriting.
 			if rletters[let] {
 				ch, _ := utf8.DecodeRuneInString(let)
 				if !unicode.IsLetter(ch) {

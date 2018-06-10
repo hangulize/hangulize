@@ -5,8 +5,8 @@ import (
 	"strings"
 )
 
-// indexOf finds the index of the given value in a string array.  It returns -1
-// if not found.  The time complexity is O(n).
+// indexOf finds the index of the given value in a string array. It returns -1
+// if not found. The time complexity is O(n).
 func indexOf(val string, vals []string) int {
 	for i, _val := range vals {
 		if _val == val {
@@ -16,7 +16,7 @@ func indexOf(val string, vals []string) int {
 	return -1
 }
 
-// safeSlice is a safe version of s[start:stop].  When start or stop is
+// safeSlice is a safe version of s[start:stop]. When start or stop is
 // invalid, this function returns "" instead of panic().
 func safeSlice(s string, start int, stop int) string {
 	if start < 0 || stop < 0 {
@@ -52,7 +52,7 @@ var (
 
 // re compiles a verbose regular expression.
 //
-// The expression can be indented and described by comments.  Every comment
+// The expression can be indented and described by comments. Every comment
 // lines and whitespace except escaped "\ " will be removed before compiling.
 //
 // Example:

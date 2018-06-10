@@ -7,9 +7,9 @@ import (
 	"golang.org/x/text/unicode/norm"
 )
 
-// Normalize converts a word to normal form.  This behavior is called
-// "normalization".  It takes a normalizer which normalizes a letter.  It
-// doesn't normalize letters in array keep.
+// Normalize converts a word to normal form. This behavior is called
+// "normalization". It takes a normalizer which normalizes a letter. It doesn't
+// normalize letters in array keep.
 func Normalize(word string, norm Normalizer, keep stringSet) string {
 	if norm == nil {
 		return word
