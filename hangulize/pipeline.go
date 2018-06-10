@@ -37,9 +37,20 @@ func (p *pipeline) normalize(word string) string {
 
 	p.tr.TraceWord("normalize", "custom", word)
 
-	norm := p.h.spec.norm
+	script := p.h.spec.script
 	except := p.h.spec.normLetters
-	word = Normalize(word, norm, except)
+
+	var buf strings.Builder
+
+	for _, ch := range word {
+		if except.HasRune(ch) {
+			buf.WriteRune(ch)
+		} else {
+			buf.WriteRune(script.Normalize(ch))
+		}
+	}
+
+	word = buf.String()
 
 	p.tr.TraceWord("normalize", p.h.spec.Lang.Script, word)
 
@@ -60,7 +71,13 @@ func (p *pipeline) group(word string) []subword {
 
 	for i, ch := range word {
 		let := string(ch)
-		if p.h.spec.groupLetters.HasRune(ch) || (p.h.spec.norm != nil && p.h.spec.norm.is(ch)) || isSpace(let) {
+
+		switch {
+		case p.h.spec.script.Is(ch):
+			fallthrough
+		case p.h.spec.groupLetters.HasRune(ch):
+			fallthrough
+		case isSpace(let):
 			rep.Replace(i, i+len(let), let)
 		}
 	}
