@@ -184,6 +184,10 @@ func TestVarToVar(t *testing.T) {
 	assert.Equal(t, "ei", hangulize(spec, "bc"))
 }
 
+func TestJpnIgnoresRoman(t *testing.T) {
+	assert.Equal(t, "abc아", Hangulize("jpn", "abcあ"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
