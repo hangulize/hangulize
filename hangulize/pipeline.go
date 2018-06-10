@@ -60,7 +60,7 @@ func (p *pipeline) group(word string) []subword {
 
 	for i, ch := range word {
 		let := string(ch)
-		if p.h.spec.groupLetters.Has(let) || isSpace(let) {
+		if p.h.spec.groupLetters.HasRune(ch) || (p.h.spec.norm != nil && p.h.spec.norm.is(ch)) || isSpace(let) {
 			rep.Replace(i, i+len(let), let)
 		}
 	}
@@ -127,6 +127,11 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	rtr := p.tr.RuleTracer(subwords)
 
 	for i, sw := range subwords {
+		if sw.level == 0 {
+			swBuf.Append(sw)
+			continue
+		}
+
 		word := sw.word
 		level := sw.level
 

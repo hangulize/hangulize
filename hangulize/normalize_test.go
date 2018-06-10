@@ -52,6 +52,6 @@ func ExampleKanaNormalizer() {
 }
 
 func ExampleGetNormalizer() {
-	kana, _ := GetNormalizer("kana")
+	kana := GetNormalizer("kana")
 	Normalize("こんにちは", kana, nil)
 }

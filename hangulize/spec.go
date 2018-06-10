@@ -143,11 +143,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// -------------------------------------------------------------------------
 
 	// canonical normalizer
-	norm, ok := GetNormalizer(lang.Script)
-	_ = ok
-	// if !ok {
-	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
-	// }
+	norm := GetNormalizer(lang.Script)
 
 	// custom normalization
 	var args []string
@@ -165,8 +161,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// unique/sorted letters in rewrite/transcribe
-	rules := append(rewrite, transcribe...)
-	groupLetters := collectGroupLetters(rules)
+	groupLetters := collectGroupLetters(rewrite, transcribe)
 
 	// -------------------------------------------------------------------------
 
@@ -280,24 +275,45 @@ func newRules(
 // collectGroupLetters collects letters from rules to be grouped. The grouping
 // step assorts letters for their meaning to keep meaningless letters until the
 // final result.
-func collectGroupLetters(rules []*Rule) stringSet {
+func collectGroupLetters(rewrite []*Rule, transcribe []*Rule) stringSet {
 	var letters []string
 	rletters := make(map[string]bool)
 
-	for _, rule := range rules {
+	for _, rule := range rewrite {
 		// Mark letters in RPatterns.
 		for let := range rule.To.letters {
 			rletters[let] = true
 		}
 
 		for let := range rule.From.letters {
+			ch, _ := utf8.DecodeRuneInString(let)
+
+			if unicode.IsLetter(ch) {
+				continue
+			}
+
 			// Non-L letters appearing in the above RPatterns should be
 			// discarded. Bacause they are just hints for rewriting.
 			if rletters[let] {
-				ch, _ := utf8.DecodeRuneInString(let)
-				if !unicode.IsLetter(ch) {
-					continue
-				}
+				continue
+			}
+
+			letters = append(letters, let)
+		}
+	}
+
+	for _, rule := range transcribe {
+		for let := range rule.From.letters {
+			ch, _ := utf8.DecodeRuneInString(let)
+
+			if unicode.IsLetter(ch) {
+				continue
+			}
+
+			// Non-L letters appearing in the above RPatterns should be
+			// discarded. Bacause they are just hints for rewriting.
+			if rletters[let] {
+				continue
 			}
 
 			letters = append(letters, let)
