@@ -30,26 +30,37 @@ func Normalize(word string, norm Normalizer, keep stringSet) string {
 
 // Normalizer normalizes a letter.
 type Normalizer interface {
+	is(rune) bool
 	normalize(rune) rune
 }
 
 var normalizers = map[string]Normalizer{
-	"roman": &RomanNormalizer{},
-	"kana":  &KanaNormalizer{},
+	"roman":    &RomanNormalizer{},
+	"georgian": &GeorgianNormalizer{},
+	"greek":    &GreekNormalizer{},
+	"kana":     &KanaNormalizer{},
 
 	"cyrillic": &DefaultNormalizer{},
 }
 
 // GetNormalizer chooses a normalizer by the script name.
-func GetNormalizer(script string) (Normalizer, bool) {
+func GetNormalizer(script string) Normalizer {
 	norm, ok := normalizers[script]
-	return norm, ok
+	if !ok {
+		return &RomanNormalizer{}
+	}
+	return norm
 }
 
 // -----------------------------------------------------------------------------
 
 // DefaultNormalizer is the default normalizer.
 type DefaultNormalizer struct{}
+
+// is
+func (DefaultNormalizer) is(ch rune) bool {
+	return unicode.IsLetter(ch)
+}
 
 // normalize converts an upper case letter to lower case.
 func (DefaultNormalizer) normalize(ch rune) rune {
@@ -60,6 +71,11 @@ func (DefaultNormalizer) normalize(ch rune) rune {
 
 // RomanNormalizer is a normalizer for Latin or Roman script.
 type RomanNormalizer struct{}
+
+// is
+func (RomanNormalizer) is(ch rune) bool {
+	return unicode.Is(unicode.Latin, ch)
+}
 
 // normalize converts a Roman letter into ISO basic Latin lower alphabet [a-z].
 func (RomanNormalizer) normalize(ch rune) rune {
@@ -73,11 +89,46 @@ func (RomanNormalizer) normalize(ch rune) rune {
 
 // -----------------------------------------------------------------------------
 
+// GeorgianNormalizer is a normalizer for Latin or Georgian script.
+type GeorgianNormalizer struct{}
+
+// is
+func (GeorgianNormalizer) is(ch rune) bool {
+	return unicode.Is(unicode.Georgian, ch)
+}
+
+// normalize converts a Georgian letter into ISO basic Latin lower alphabet [a-z].
+func (GeorgianNormalizer) normalize(ch rune) rune {
+	return ch
+}
+
+// -----------------------------------------------------------------------------
+
+// GreekNormalizer is a normalizer for Latin or Greek script.
+type GreekNormalizer struct{}
+
+// is
+func (GreekNormalizer) is(ch rune) bool {
+	return unicode.Is(unicode.Greek, ch)
+}
+
+// normalize converts a Greek letter into ISO basic Latin lower alphabet [a-z].
+func (GreekNormalizer) normalize(ch rune) rune {
+	return unicode.ToLower(ch)
+}
+
+// -----------------------------------------------------------------------------
+
 // TODO(sublee): Find out a Kanji to Kana dictionary to hangulize Japanese
 // perfectly.
 
 // KanaNormalizer is a normalizer for Kana script which is used in Japan.
 type KanaNormalizer struct{}
+
+// is
+func (KanaNormalizer) is(ch rune) bool {
+	return unicode.Is(unicode.Katakana, ch) || unicode.Is(unicode.Hiragana, ch)
+}
 
 // normalize converts Hiragana to Katakana.
 func (KanaNormalizer) normalize(ch rune) rune {
