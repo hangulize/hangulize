@@ -167,8 +167,6 @@ form {
   background: #fff;
   margin: 0.5em;
   display: block;
-  float: left;
-  clear: left;
 }
 
 label {
@@ -180,9 +178,10 @@ input {
   background: transparent;
   font-size: 2rem;
   font-weight: 600;
-  line-height: 2;
-  padding: 0 0.5em;
+  line-height: 1;
+  padding: 0;
   border: none;
+  width: 20em;
 }
 
 input::placeholder {
@@ -198,6 +197,8 @@ input.script-roman, input.script-kana {
 }
 
 .transcribed {
+  display: block;
+  padding: 0.5em 0;
   font-family: 'Spoqa Han Sans', sans-serif;
   font-size: 1.75rem;
   font-weight: 400;
