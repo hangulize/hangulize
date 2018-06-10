@@ -12,6 +12,14 @@ import (
 // -----------------------------------------------------------------------------
 // create or panic
 
+func loadSpec(lang string) *Spec {
+	spec, ok := LoadSpec(lang)
+	if !ok {
+		panic("failed to laod spec")
+	}
+	return spec
+}
+
 func mustParseSpec(hgl string) *Spec {
 	spec, err := ParseSpec(strings.NewReader(hgl))
 	if err != nil {
