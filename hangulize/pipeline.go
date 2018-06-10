@@ -75,7 +75,7 @@ func (p *pipeline) group(word string) []subword {
 		switch {
 		case p.h.spec.script.Is(ch):
 			fallthrough
-		case p.h.spec.groupLetters.HasRune(ch):
+		case p.h.spec.puncts.HasRune(ch):
 			fallthrough
 		case isSpace(let):
 			rep.Replace(i, i+len(let), let)

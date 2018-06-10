@@ -34,10 +34,12 @@ type Spec struct {
 	Source string
 
 	// Prepared stuffs
-	script       script
+	script script
+	puncts stringSet
+
+	// Custom normalization
 	normReplacer *strings.Replacer
 	normLetters  stringSet
-	groupLetters stringSet
 }
 
 func (s *Spec) String() string {
@@ -143,6 +145,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// -------------------------------------------------------------------------
 
 	script := getScript(lang.Script)
+	puncts := collectPuncts(rewrite, transcribe)
 
 	// custom normalization
 	var args []string
@@ -158,9 +161,6 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	for to := range normalize {
 		normLetters[to] = true
 	}
-
-	// unique/sorted letters in rewrite/transcribe
-	groupLetters := collectGroupLetters(rewrite, transcribe)
 
 	// -------------------------------------------------------------------------
 
@@ -180,9 +180,10 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		source,
 
 		script,
+		puncts,
+
 		normReplacer,
 		normLetters,
-		groupLetters,
 	}
 	return &spec, nil
 }
@@ -271,12 +272,30 @@ func newRules(
 
 // -----------------------------------------------------------------------------
 
-// collectGroupLetters collects letters from rules to be grouped. The grouping
-// step assorts letters for their meaning to keep meaningless letters until the
-// final result.
-func collectGroupLetters(rewrite []*Rule, transcribe []*Rule) stringSet {
-	var letters []string
+// collectPuncts collects punctuation characters from rewrite/transcribe rules.
+// It discards the punctuations that is used only for rewriting hints.
+func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringSet {
+	var puncts []string
 	rletters := make(map[string]bool)
+
+	collectFrom := func(rule *Rule) {
+		for let := range rule.From.letters {
+			ch, _ := utf8.DecodeRuneInString(let)
+
+			// Collect only punctuation characters. (category P)
+			if !unicode.IsPunct(ch) {
+				continue
+			}
+
+			// Punctuations appearing in the above RPatterns should be
+			// discarded. Bacause they are just hints for rewriting.
+			if rletters[let] {
+				continue
+			}
+
+			puncts = append(puncts, let)
+		}
+	}
 
 	for _, rule := range rewrite {
 		// Mark letters in RPatterns.
@@ -284,40 +303,12 @@ func collectGroupLetters(rewrite []*Rule, transcribe []*Rule) stringSet {
 			rletters[let] = true
 		}
 
-		for let := range rule.From.letters {
-			ch, _ := utf8.DecodeRuneInString(let)
-
-			if unicode.IsLetter(ch) {
-				continue
-			}
-
-			// Non-L letters appearing in the above RPatterns should be
-			// discarded. Bacause they are just hints for rewriting.
-			if rletters[let] {
-				continue
-			}
-
-			letters = append(letters, let)
-		}
+		collectFrom(rule)
 	}
 
 	for _, rule := range transcribe {
-		for let := range rule.From.letters {
-			ch, _ := utf8.DecodeRuneInString(let)
-
-			if unicode.IsLetter(ch) {
-				continue
-			}
-
-			// Non-L letters appearing in the above RPatterns should be
-			// discarded. Bacause they are just hints for rewriting.
-			if rletters[let] {
-				continue
-			}
-
-			letters = append(letters, let)
-		}
+		collectFrom(rule)
 	}
 
-	return newStringSet(letters...)
+	return newStringSet(puncts...)
 }
