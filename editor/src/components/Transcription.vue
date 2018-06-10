@@ -29,7 +29,12 @@
         @input="(e) => updateWord(e.target.value)"
       />
 
-      <span class="transcribed">{{ transcribed }}</span>
+      <span
+        class="transcribed"
+        :class="{ example: exampleTranscribed }"
+      >
+        {{ transcribed }}
+      </span>
 
     </label>
   </form>
@@ -56,7 +61,8 @@ export default {
     focused: false,
     selecting: false,
 
-    transcribed: ''
+    transcribed: '',
+    exampleTranscribed: true
   }),
 
   computed: {
@@ -124,7 +130,19 @@ export default {
     //
     this.hangulize = _.debounce(() => {
       const h = H.newHangulizer(this.spec)
-      this.transcribed = h.Hangulize(this.word || this.example.word)
+
+      if (this.word) {
+        this.exampleTranscribed = false
+        this.transcribed = h.Hangulize(this.word)
+        return
+      }
+
+      this.exampleTranscribed = true
+      if (this.spec === H.specs[this.lang]) {
+        this.transcribed = this.example.transcribed
+      } else {
+        this.transcribed = h.Hangulize(this.example.word)
+      }
     }, 100)
 
     this.hangulize()
@@ -167,6 +185,10 @@ input {
   border: none;
 }
 
+input::placeholder {
+  color: #aaa;
+}
+
 input.script-roman, input.script-cyrillic {
   font-family: 'Noto Sans', sans-serif;
 }
@@ -180,6 +202,10 @@ input.script-roman, input.script-kana {
   font-size: 1.75rem;
   font-weight: 400;
   color: #49f;
+}
+
+.transcribed.example {
+  color: #abd;
 }
 
 form.focused {

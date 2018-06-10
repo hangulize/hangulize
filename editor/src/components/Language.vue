@@ -1,7 +1,8 @@
 <template>
   <div class="language">
-    <Lang :lang="lang" @click.stop="selecting = true" />
-    <sui-icon name="dropdown" />
+    <Lang :lang="lang" @click.stop="selecting = true">
+      <sui-icon name="dropdown" />
+    </Lang>
 
     <LanguageSelector
       v-if="selecting"
@@ -76,5 +77,9 @@ export default {
 .language {
   display: inline-block;
   position: relative;
+}
+
+.lang {
+  cursor: pointer;
 }
 </style>
