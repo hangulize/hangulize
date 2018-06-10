@@ -1,38 +1,38 @@
 language: go
 
 go:
-  - '1.10.2'
+- '1.10.2'
 
 install:
-  - go get -v -t ./...
-  - GOOS=windows go get -v -t ./...
-  - go get -v github.com/gobuffalo/packr/...
-  - go get -v github.com/mitchellh/gox
-  - go get -v github.com/gopherjs/gopherjs
+- go get -v -t ./...
+- GOOS=windows go get -v -t ./...
+- go get -v github.com/gobuffalo/packr/...
+- go get -v github.com/mitchellh/gox
+- go get -v github.com/gopherjs/gopherjs
 
 script:
-  - set -e
+- set -e
 
-  # Test -----------------------------------------------------------------------
-  - go test -v ./hgl
-  - go test -v ./hangulize
+# Test -----------------------------------------------------------------------
+- go test -v ./hgl
+- go test -v ./hangulize
 
-  # Build ----------------------------------------------------------------------
-  - mkdir -p build
+# Build ----------------------------------------------------------------------
+- mkdir -p build
 
-    # pack bundle
-  - packr --compress --input ./hangulize -v
+  # pack bundle
+- packr --compress --input ./hangulize -v
 
-    # executable
-  - |
-    gox -arch='amd64' \
-        -os='linux darwin windows' \
-        -output="build/hangulize_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}" \
-        -verbose
+  # executable
+- |
+  gox -arch='amd64' \
+      -os='linux darwin windows' \
+      -output="build/hangulize_${TRAVIS_TAG}_{{.OS}}_{{.Arch}}" \
+      -verbose
 
-    # js
-  - gopherjs build ./js -o "build/hangulize-${TRAVIS_TAG}.js" -m -v
-  - rm -f build/*.js.map
+  # js
+- gopherjs build ./js -o "build/hangulize-${TRAVIS_TAG}.js" -m -v
+- rm -f build/*.js.map
 
 deploy:
   provider: releases
@@ -44,4 +44,4 @@ deploy:
   file_glob: true
 
   api_key:
-    secure: HD/kMnp2djKpx5an8VDpYpkgvTnSM5KnoPkj1obyEe5dhT6mmjBkfsjQMufJ88CzgufZytITohEfaPqlDvrVs7QMc5Ucup0WrOPjnSzNAL/3N8Fqu6I+5KUQ/fGZsaYAOCXct0iuIMreLrDlVy+Q3vQBhKJn6y9wz918wIk7N0ucJMuIOZPffEqDPuErjuSqr1vbAcoPsyiioMmEasI+4h2H/ax8YmmmJub0O8YCyrh/iwQZk/xVBL7O9RU8xZKEDBy0qJPFBFK5atZwORPDQhh1dKx5q97Ip/GOz43rh8bZrTd2QVDDSqJmVv52UX2dpFo5Pzg9wO6t/sNdIgeuLH5vHc39kt4H9QJpBdgdcRiGhIbMMAHGW/d75sIBubGAvpTQ9cBZEQ9xgDrr00G8PQVt2SyJeZM2uLx6wv3zirJrk3rpEZFC2Jo+/wJQARwo/bbuPjypzcT6wVdhj3jkidp0N/yXPGQwRoDUNPD119oo9sWGSbdYPLGLPUclcbf2roou+DFZ+kxGorJcmiAS8ZYaL9H5pY6ItW92g7DBVNud/fSMZLwfgxmLN33sGzs5mb7lbKjsVIa2Jqy32hQ6ANmLQMWYcZjXf5tD+jPenwq847K3u8zEmpGJn7/ShGXVKakN+nbFoyyD8tfn3/u2RTDLGjCe7g6DDd1AYnWO5t8=
+    secure: Dx83tKAMHcWJICWG1+UWawAqWum8juHUbUJ6TmUF1JC8omDnbCLlaFDN0mqRIYoNAWoPViKEQoyiqNK1nziwEgD1JA/pYViFrTCjbNqSAWEyFkZ381uPpTEVm3RA0BlyZKAqmHpUyA4EccKKqRRq+FoM9pgvs03KxAZ2B1nz/P9vUlusYfHjI6x4NygFnHtbD845VC7v0Zveod4KgHQ5dKqrW3mG6woOq17OU/7Nt0Y2Ybq6U1Ll8epulp59NVuLKm0zsxK2MXAgPCxaGqbnSKE3qV4bxVq3T5iicu1mYVrjO9jwToGcLK3d6ce30XX/SfrZ3M2t3qOgKKx57MhJZQeL14L/xqCEKcHLrtJT1fsq4LKtGJF+nx1wtG25UcvIbaoL7ifGYbzXQytekYpydBSMTsC5c8cu7wG2knSdGeTp7V2fTD8AWROd65XLNEQdwvpgUDqNfs1cp82IDS0XkxZZirOqXmZZdO2BOrt44WZTX/eG5HeRri0kIJ136VigUr4BDqlV1jxMAq4OwO4w+dZsdKP21pDHq8B2rhSkhQIpfGVEgA8rdHs0YcC9IyJkN3SL6NeuEFukrL+agtOzHNM5mTM+sKuxZmRTq4a03EK8LMo7+oSsuphF4g7RQmehwOT9nKjmRxTXKWKjOXkE7joYSYNh9AsxDnDgGZrOjCg=
