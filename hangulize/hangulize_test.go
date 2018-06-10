@@ -1,9 +1,7 @@
 package hangulize
 
 import (
-	"bytes"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,35 +14,12 @@ func TestLang(t *testing.T) {
 
 		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
 
-		h := NewHangulizer(spec)
-
 		for _, testCase := range spec.Test {
-			loanword := testCase.Left()
+			word := testCase.Left()
 			expected := testCase.Right()[0]
 
-			t.Run(lang+"/"+loanword, func(t *testing.T) {
-				got, tr := h.HangulizeTrace(loanword)
-				if got == expected {
-					return
-				}
-
-				// Trace result to understand the failure reason.
-				f := bytes.NewBufferString("")
-				hr := strings.Repeat("-", 30)
-
-				// Render failure message.
-				fmt.Fprintln(f, hr)
-				fmt.Fprintf(f, `lang: "%s"`, lang)
-				fmt.Fprintln(f)
-				fmt.Fprintf(f, `word: %#v`, loanword)
-				fmt.Fprintln(f)
-				fmt.Fprintln(f, hr)
-				for _, t := range tr {
-					fmt.Fprintln(f, t.String())
-				}
-				fmt.Fprintln(f, hr)
-
-				assert.Equal(t, expected, got, f.String())
+			t.Run(lang+"/"+word, func(t *testing.T) {
+				assertHangulize(t, spec, expected, word)
 			})
 		}
 	}
