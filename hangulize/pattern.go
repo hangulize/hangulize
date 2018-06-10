@@ -10,8 +10,8 @@ import (
 
 // Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
 //
-// The transcription logic includes several rewriting rules.  A rule has a
-// Pattern and an RPattern.  A sub-word which is matched with the Pattern, will
+// The transcription logic includes several rewriting rules. A rule has a
+// Pattern and an RPattern. A sub-word which is matched with the Pattern, will
 // be rewritten by the RPattern.
 //
 //  rewrite:
@@ -109,14 +109,14 @@ func (p *Pattern) Explain() string {
 
 // -----------------------------------------------------------------------------
 
-// Find searches up to n matches in the word.  If n is -1, it will search all
-// matches.  The result is an array of submatch locations.
+// Find searches up to n matches in the word. If n is -1, it will search all
+// matches. The result is an array of submatch locations.
 func (p *Pattern) Find(word string, n int) [][]int {
 	var matches [][]int
 	offset := 0
 
 	for n < 0 || len(matches) < n {
-		// Erase visited characters on the word with "\x00".  Because of
+		// Erase visited characters on the word with "\x00". Because of
 		// lookaround, the search cursor should be calculated manually.
 		erased := strings.Repeat(".", offset) + word[offset:]
 
@@ -142,7 +142,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 			stop = m[1]
 		}
 
-		// Pick matched word.  Call it "highlight".
+		// Pick matched word. Call it "highlight".
 		highlight := erased[m[0]:m[1]]
 
 		// Test highlight with p.neg to determine whether skip or not.

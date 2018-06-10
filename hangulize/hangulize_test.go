@@ -58,8 +58,8 @@ func hangulize(spec *Spec, word string) string {
 	return h.Hangulize(word)
 }
 
-// TestSlash tests "/" in input word.  The original Hangulize removes the "/"
-// so the result was "글로르이아" instead of "글로르/이아".
+// TestSlash tests "/" in input word. The original Hangulize removes the "/" so
+// the result was "글로르이아" instead of "글로르/이아".
 func TestSlash(t *testing.T) {
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
 	assert.Equal(t, "글로르{}이아", Hangulize("ita", "glor{}ia"))

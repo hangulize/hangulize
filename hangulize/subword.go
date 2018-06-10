@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// subword is a chunk of a word with a level number.  The level indicates which
+// subword is a chunk of a word with a level number. The level indicates which
 // pipeline step generated this sw.
 type subword struct {
 	word  string
@@ -38,7 +38,7 @@ func (b *subwordsBuilder) Reset() {
 	b.subwords = b.subwords[:0]
 }
 
-// Subwords builds the buffered subwords into a []Subword array.  It merges
+// Subwords builds the buffered subwords into a []Subword array. It merges
 // adjoin subwords if they share the same level.
 func (b *subwordsBuilder) Subwords() []subword {
 	var subwords []subword
@@ -87,7 +87,7 @@ func (r replacement) String() string {
 
 // -----------------------------------------------------------------------------
 
-// subwordReplacer remembers replacements in a buffer.  Finally, it applies the
+// subwordReplacer remembers replacements in a buffer. Finally, it applies the
 // replacements and splits the result in several subwords.
 type subwordReplacer struct {
 	word string

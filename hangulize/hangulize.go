@@ -1,8 +1,8 @@
 package hangulize
 
-// Hangulize is the most simple and useful API of thie package.  It transcribes
-// a non-Korean word into Hangul, which is the Korean alphabet.  For example,
-// it will transcribe "Владивосто́к" in Russian into "블라디보스토크".
+// Hangulize is the most simple and useful API of thie package. It transcribes
+// a non-Korean word into Hangul, which is the Korean alphabet. For example, it
+// will transcribe "Владивосто́к" in Russian into "블라디보스토크".
 func Hangulize(lang string, word string) string {
 	spec, ok := LoadSpec(lang)
 	if !ok {
