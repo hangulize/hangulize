@@ -34,7 +34,7 @@ type Spec struct {
 	Source string
 
 	// Prepared stuffs
-	norm         Normalizer
+	script       script
 	normReplacer *strings.Replacer
 	normLetters  stringSet
 	groupLetters stringSet
@@ -142,8 +142,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 	// -------------------------------------------------------------------------
 
-	// canonical normalizer
-	norm := GetNormalizer(lang.Script)
+	script := getScript(lang.Script)
 
 	// custom normalization
 	var args []string
@@ -180,7 +179,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 		source,
 
-		norm,
+		script,
 		normReplacer,
 		normLetters,
 		groupLetters,
