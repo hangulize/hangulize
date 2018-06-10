@@ -1,9 +1,7 @@
 package hangulize
 
 import (
-	"bytes"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,35 +14,12 @@ func TestLang(t *testing.T) {
 
 		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
 
-		h := NewHangulizer(spec)
-
 		for _, testCase := range spec.Test {
-			loanword := testCase.Left()
+			word := testCase.Left()
 			expected := testCase.Right()[0]
 
-			t.Run(lang+"/"+loanword, func(t *testing.T) {
-				got, tr := h.HangulizeTrace(loanword)
-				if got == expected {
-					return
-				}
-
-				// Trace result to understand the failure reason.
-				f := bytes.NewBufferString("")
-				hr := strings.Repeat("-", 30)
-
-				// Render failure message.
-				fmt.Fprintln(f, hr)
-				fmt.Fprintf(f, `lang: "%s"`, lang)
-				fmt.Fprintln(f)
-				fmt.Fprintf(f, `word: %#v`, loanword)
-				fmt.Fprintln(f)
-				fmt.Fprintln(f, hr)
-				for _, t := range tr {
-					fmt.Fprintln(f, t.String())
-				}
-				fmt.Fprintln(f, hr)
-
-				assert.Equal(t, expected, got, f.String())
+			t.Run(lang+"/"+word, func(t *testing.T) {
+				assertHangulize(t, spec, expected, word)
 			})
 		}
 	}
@@ -58,11 +33,21 @@ func hangulize(spec *Spec, word string) string {
 	return h.Hangulize(word)
 }
 
-// TestSlash tests "/" in input word.  The original Hangulize removes the "/"
-// so the result was "글로르이아" instead of "글로르/이아".
+// TestSlash tests "/" in input word. The original Hangulize removes the "/" so
+// the result was "글로르이아" instead of "글로르/이아".
 func TestSlash(t *testing.T) {
 	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
 	assert.Equal(t, "글로르{}이아", Hangulize("ita", "glor{}ia"))
+}
+
+func TestComma(t *testing.T) {
+	assert.Equal(t, "글로르,이아", Hangulize("ita", "glor,ia"))
+	assert.Equal(t, "콤,오", Hangulize("ita", "com,o"))
+}
+
+func TestQuote(t *testing.T) {
+	assert.Equal(t, "글로리아", Hangulize("ita", "glor'ia"))
+	assert.Equal(t, "코모", Hangulize("ita", "com'o"))
 }
 
 func TestSpecials(t *testing.T) {
@@ -149,6 +134,35 @@ func TestZeroWidthSpace(t *testing.T) {
 	assert.Equal(t, "으프 츠", hangulize(spec, "a b c"))
 }
 
+func TestVarToVar(t *testing.T) {
+	spec := mustParseSpec(`
+	vars:
+		"abc" = "a", "b", "c"
+		"def" = "d", "e", "f"
+		"ghi" = "g", "h", "i"
+
+	rewrite:
+		"<abc><abc>" -> "<def><ghi>"
+
+	transcribe:
+		"a" -> "a"
+		"b" -> "b"
+		"c" -> "c"
+		"d" -> "d"
+		"e" -> "e"
+		"f" -> "f"
+		"g" -> "g"
+		"h" -> "h"
+		"i" -> "i"
+	`)
+	assert.Equal(t, "dg", hangulize(spec, "aa"))
+	assert.Equal(t, "ei", hangulize(spec, "bc"))
+}
+
+func TestJpnIgnoresRoman(t *testing.T) {
+	assertHangulize(t, loadSpec("jpn"), "abc아", "abcあ")
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
@@ -160,6 +174,17 @@ func BenchmarkGloria(b *testing.B) {
 
 	for i := 0; i < b.N; i++ {
 		h.Hangulize("GLORIA")
+	}
+}
+
+func BenchmarkGloriaTrace(b *testing.B) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.HangulizeTrace("GLORIA")
 	}
 }
 

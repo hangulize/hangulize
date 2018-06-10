@@ -2,9 +2,45 @@ package hangulize
 
 import (
 	"regexp"
-	"sort"
 	"strings"
 )
+
+// indexOf finds the index of the given value in a string array. It returns -1
+// if not found. The time complexity is O(n).
+func indexOf(val string, vals []string) int {
+	for i, _val := range vals {
+		if _val == val {
+			return i
+		}
+	}
+	return -1
+}
+
+// safeSlice is a safe version of s[start:stop]. When start or stop is
+// invalid, this function returns "" instead of panic().
+func safeSlice(s string, start int, stop int) string {
+	if start < 0 || stop < 0 {
+		return ""
+	}
+	if stop-start > 0 {
+		return s[start:stop]
+	}
+	return ""
+}
+
+// captured returns the captured substring by their group number.
+func captured(s string, m []int, n int) string {
+	i := n * 2
+	return safeSlice(s, m[i], m[i+1])
+}
+
+// noCapture removes capturing groups in a regexp string.
+func noCapture(expr string) string {
+	return strings.Replace(expr, "(", "(?:", -1)
+}
+
+// -----------------------------------------------------------------------------
+// Verbose Regexp
 
 var (
 	// Match with a line starting with "---".
@@ -16,7 +52,7 @@ var (
 
 // re compiles a verbose regular expression.
 //
-// The expression can be indented and described by comments.  Every comment
+// The expression can be indented and described by comments. Every comment
 // lines and whitespace except escaped "\ " will be removed before compiling.
 //
 // Example:
@@ -48,68 +84,8 @@ func re(verboseExpr string) *regexp.Regexp {
 	return regexp.MustCompile(expr)
 }
 
-// safeSlice is a safe version of s[start:stop].  When start or stop is
-// invalid, this function returns "" instead of panic().
-func safeSlice(s string, start int, stop int) string {
-	if start < 0 || stop < 0 {
-		return ""
-	}
-	if stop-start > 0 {
-		return s[start:stop]
-	}
-	return ""
-}
-
-// captured returns the captured substring by their group number.
-func captured(s string, m []int, n int) string {
-	i := n * 2
-	return safeSlice(s, m[i], m[i+1])
-}
-
-// noCapture removes capturing groups in a regexp string.
-func noCapture(expr string) string {
-	return strings.Replace(expr, "(", "(?:", -1)
-}
-
-// indexOf finds the index of the given value in a string array.  It returns -1
-// if not found.  The time complexity is O(n).
-func indexOf(val string, vals []string) int {
-	for i, _val := range vals {
-		if _val == val {
-			return i
-		}
-	}
-	return -1
-}
-
-func set(vals []string) []string {
-	unique := make(map[string]bool)
-	for _, val := range vals {
-		unique[val] = true
-	}
-
-	var set []string
-	for val := range unique {
-		set = append(set, val)
-	}
-
-	sort.Strings(set)
-	return set
-}
-
-func inSet(val string, set []string) bool {
-	i := sort.SearchStrings(set, val)
-	return i < len(set) && set[i] == val
-}
-
-// trueFlags generates [true...] for the given length.
-func trueFlags(length int) []bool {
-	flags := make([]bool, length)
-	for i := 0; i < length; i++ {
-		flags[i] = true
-	}
-	return flags
-}
+// -----------------------------------------------------------------------------
+// Finding meaningful letters from Regexp
 
 var (
 	reSpace  = regexp.MustCompile(`\s`)
@@ -139,6 +115,14 @@ func regexpLetters(reExpr string) string {
 	// Remove escaped letters again.
 	letters = reQuoted.ReplaceAllString(letters, ``)
 
+	return letters
+}
+
+func splitLetters(word string) []string {
+	var letters []string
+	for _, ch := range word {
+		letters = append(letters, string(ch))
+	}
 	return letters
 }
 

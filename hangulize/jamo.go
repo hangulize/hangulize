@@ -12,7 +12,7 @@ const none = rune(0)
 // ComposeHangul converts decomposed Jamo phonemes to composed Hangul
 // syllables.
 //
-// Decomposed Jamo phonemes look like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ".  A Jaeum
+// Decomposed Jamo phonemes look like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ". A Jaeum
 // after a hyphen ("-ㄴ") means that it is a Jongseong (tail).
 //
 func ComposeHangul(word string) string {

@@ -20,7 +20,7 @@ const (
 	// Comment represents a comment content excluding initial "#".
 	Comment
 
-	// Newline means only "\n".  HGL is a line-sensitive format.
+	// Newline means only "\n". HGL is a line-sensitive format.
 	Newline
 
 	// String represents a text literal.

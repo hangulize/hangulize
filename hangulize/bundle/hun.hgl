@@ -3,7 +3,7 @@ lang:
     codes   = "hu", "hun"
     english = "Hungarian"
     korean  = "헝가리어"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

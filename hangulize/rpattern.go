@@ -18,6 +18,9 @@ type RPattern struct {
 	expr string
 
 	parts []rPart
+
+	// Letters used in the regexp.
+	letters stringSet
 }
 
 func (rp *RPattern) String() string {
@@ -80,7 +83,10 @@ func newRPattern(expr string,
 		parts = append(parts, rPart{plain, plainText, nil})
 	}
 
-	return &RPattern{expr, parts}
+	// Collect letters in the regexp.
+	letters := newStringSet(splitLetters(regexpLetters(expr))...)
+
+	return &RPattern{expr, parts, letters}
 }
 
 // -----------------------------------------------------------------------------
@@ -114,4 +120,10 @@ func (rp *RPattern) Interpolate(p *Pattern, word string, m []int) string {
 	}
 
 	return buf.String()
+}
+
+// Letters returns the set of natural letters used in the expression in
+// ascending order.
+func (rp *RPattern) Letters() []string {
+	return rp.letters.Array()
 }

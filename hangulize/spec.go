@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/pkg/errors"
 
@@ -12,11 +14,11 @@ import (
 
 // Spec represents a transactiption specification for a language.
 type Spec struct {
-	// Meta information sections.
+	// Meta information sections
 	Lang   Language
 	Config Config
 
-	// Helper setting sections.
+	// Helper setting sections
 	Macros    map[string]string
 	Vars      map[string][]string
 	Normalize map[string][]string
@@ -25,14 +27,19 @@ type Spec struct {
 	Rewrite    []*Rule
 	Transcribe []*Rule
 
-	// Test examples.
+	// Test examples
 	Test []hgl.Pair
 
-	// Prepared stuffs.
+	// Source code
+	Source string
+
+	// Prepared stuffs
+	script script
+	puncts stringSet
+
+	// Custom normalization
 	normReplacer *strings.Replacer
-	normLetters  []string
-	norm         Normalizer
-	letters      []string
+	normLetters  stringSet
 }
 
 func (s *Spec) String() string {
@@ -42,15 +49,21 @@ func (s *Spec) String() string {
 // ParseSpec parses a Spec from an HGL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
 	var err error
+	var sourceBuf strings.Builder
 
-	h, err := hgl.Parse(r)
+	// Use TeeReader to copy the source while parsing.
+	tee := io.TeeReader(r, &sourceBuf)
+
+	h, err := hgl.Parse(tee)
 
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse HGL source")
 	}
 
+	source := sourceBuf.String()
+
 	// -------------------------------------------------------------------------
-	// Every sections are optional.  An empty HGL source is also valid spec.
+	// Every sections are optional. An empty HGL source is also valid spec.
 
 	// lang
 	var lang Language
@@ -131,6 +144,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 	// -------------------------------------------------------------------------
 
+	script := getScript(lang.Script)
+	puncts := collectPuncts(rewrite, transcribe)
+
 	// custom normalization
 	var args []string
 	for to, froms := range normalize {
@@ -141,30 +157,10 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	var normLetters []string
+	normLetters := make(stringSet)
 	for to := range normalize {
-		normLetters = append(normLetters, to)
+		normLetters[to] = true
 	}
-
-	// canonical normalizer
-	norm, ok := GetNormalizer(lang.Script)
-	_ = ok
-	// if !ok {
-	// 	return nil, fmt.Errorf("no normalizer for %#v", lang.Script)
-	// }
-
-	// unique/sorted letters in rewrite/transcribe
-	var letters []string
-
-	rules := append(rewrite, transcribe...)
-
-	for _, rule := range rules {
-		for _, let := range rule.From.letters {
-			letters = append(letters, let)
-		}
-	}
-
-	letters = set(letters)
 
 	// -------------------------------------------------------------------------
 
@@ -181,10 +177,13 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 		test,
 
+		source,
+
+		script,
+		puncts,
+
 		normReplacer,
 		normLetters,
-		norm,
-		letters,
 	}
 	return &spec, nil
 }
@@ -196,8 +195,8 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 type Language struct {
 	ID      string    // Arbitrary, but identifiable language ID.
 	Codes   [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
-	English string    // The langauge name in English.
-	Korean  string    // The langauge name in Korean.
+	English string    // The language name in English.
+	Korean  string    // The language name in Korean.
 	Script  string
 }
 
@@ -269,4 +268,47 @@ func newRules(
 	}
 
 	return rules, nil
+}
+
+// -----------------------------------------------------------------------------
+
+// collectPuncts collects punctuation characters from rewrite/transcribe rules.
+// It discards the punctuations that is used only for rewriting hints.
+func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringSet {
+	var puncts []string
+	rletters := make(map[string]bool)
+
+	collectFrom := func(rule *Rule) {
+		for let := range rule.From.letters {
+			ch, _ := utf8.DecodeRuneInString(let)
+
+			// Collect only punctuation characters. (category P)
+			if !unicode.IsPunct(ch) {
+				continue
+			}
+
+			// Punctuations appearing in the above RPatterns should be
+			// discarded. Bacause they are just hints for rewriting.
+			if rletters[let] {
+				continue
+			}
+
+			puncts = append(puncts, let)
+		}
+	}
+
+	for _, rule := range rewrite {
+		// Mark letters in RPatterns.
+		for let := range rule.To.letters {
+			rletters[let] = true
+		}
+
+		collectFrom(rule)
+	}
+
+	for _, rule := range transcribe {
+		collectFrom(rule)
+	}
+
+	return newStringSet(puncts...)
 }

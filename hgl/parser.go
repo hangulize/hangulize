@@ -64,7 +64,7 @@ func (p *parser) parse() (HGL, error) {
 			continue
 		}
 
-		// Remember the last string.  It will be a section name or a key.
+		// Remember the last string. It will be a section name or a key.
 		if tok == String {
 			lastString = lit
 			continue
