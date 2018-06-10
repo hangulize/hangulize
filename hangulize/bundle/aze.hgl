@@ -3,7 +3,7 @@ lang:
     codes   = "az", "aze"
     english = "Azerbaijani"
     korean  = "아제르바이잔어"
-    script  = "cyrillic"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

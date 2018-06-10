@@ -3,7 +3,7 @@ lang:
     codes   = "sh", "hbs"
     english = "Serbo-Croatian"
     korean  = "세르보크로아트어"
-    script  = "cyrillic"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
