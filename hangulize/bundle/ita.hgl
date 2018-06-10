@@ -3,7 +3,7 @@ lang:
     codes   = "it", "ita"
     english = "Italian"
     korean  = "이탈리아어"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
@@ -18,8 +18,8 @@ vars:
 rewrite:
     "'"             -> ""
     "^gli$"         -> "li"
-    "^glia$"        -> "g.lia"
-    "^glioma$"      -> "g.lioma"
+    "^glia$"        -> "g{}lia"
+    "^glioma$"      -> "g{}lioma"
     "^gli{@}"       -> "li"
     "{@}gli"        -> "li"
     "gn{@}"         -> "nJ"
@@ -50,7 +50,7 @@ rewrite:
     "ee"            -> "e"
     "ff"            -> "f"
     "hh"            -> "h"
-    "{@}h{@}"       -> "."
+    "{@}h{@}"       -> "{}"
     "h"             -> ""
     "ii"            -> "i"
     "jj"            -> "j"

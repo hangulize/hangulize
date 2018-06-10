@@ -3,7 +3,7 @@ lang:
     codes   = "et", "est"
     english = "Estonian"
     korean  = "에스토니아어"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

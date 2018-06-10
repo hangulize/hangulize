@@ -72,7 +72,7 @@ func expandLookaround(expr string) (string, string, error) {
 	}
 
 	if negExpr == `` {
-		// This regexp has a paradox.  So it never matches with any text.
+		// This regexp has a paradox. So it never matches with any text.
 		negExpr = `$^`
 	}
 

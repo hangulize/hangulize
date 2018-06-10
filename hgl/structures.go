@@ -21,7 +21,7 @@ func (p *Pair) String() string {
 	return fmt.Sprintf("Pair{%#v, %#v}", p.l, p.r)
 }
 
-// Left is a string.  It is used for as keys in dict:
+// Left is a string. It is used for as keys in dict:
 //
 //  english = "Italian"
 //  ^^^^^^^
@@ -35,7 +35,7 @@ func (p Pair) Left() string {
 	return p.l
 }
 
-// Right is a string array.  It is used for as values in dict:
+// Right is a string array. It is used for as values in dict:
 //
 //  english = "Italian"
 //	          ^^^^^^^^^
@@ -96,13 +96,13 @@ func (s *DictSection) Pairs() []Pair {
 	return pairs
 }
 
-// addPair adds a pair into a list section.  It never fails.
+// addPair adds a pair into a list section. It never fails.
 func (s *ListSection) addPair(l string, r []string) error {
 	s.pairs = append(s.pairs, Pair{l, r})
 	return nil
 }
 
-// addPair adds a pair into a dict section.  If there's already a pair having
+// addPair adds a pair into a dict section. If there's already a pair having
 // same left, it will fails.
 func (s *DictSection) addPair(l string, r []string) error {
 	_, ok := s.dict[l]
@@ -144,7 +144,7 @@ func (s *DictSection) Injective() (map[string]string, error) {
 	return oneToOne, nil
 }
 
-// One assumes the given left (key) has only one right (values).  Then returns
+// One assumes the given left (key) has only one right (values). Then returns
 // the only right value.
 func (s *DictSection) One(left string) string {
 	right, ok := s.dict[left]

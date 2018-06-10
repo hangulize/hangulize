@@ -3,7 +3,7 @@ lang:
     codes   = "eo", "epo"
     english = "Esperanto"
     korean  = "에스페란토어"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Yunwon Jeong"

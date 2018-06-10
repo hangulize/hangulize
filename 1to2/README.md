@@ -1,6 +1,6 @@
 # 1to2
 
-Migrates a langauge spec to Hangulize 2
+Migrates a language spec to Hangulize 2
 from the original Hangulize.
 
 ## Installation

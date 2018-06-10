@@ -3,7 +3,7 @@ lang:
     codes   = "sv", "swe"
     english = "Swedish"
     korean  = "스웨덴어"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
@@ -75,7 +75,7 @@ rewrite:
     "lysekil"        -> "lyseSil"
     "guyan"          -> "Gaian"
     "mEnnisk"        -> "mEnniS"
-    "sjuk"           -> "sjuk."
+    "sjuk"           -> "sjuk{}"
     "xx"             -> "x"
     "x"              -> "ks"
     "ds"             -> "s"
@@ -99,7 +99,7 @@ rewrite:
     "ch"             -> "k"
     "c{e|i|y}"       -> "s"
     "c"              -> "k"
-    "tionde"         -> "ti.onde"
+    "tionde"         -> "ti{}onde"
     "tion"           -> "Son"
     "^dj"            -> "j"
     "gj"             -> "j"

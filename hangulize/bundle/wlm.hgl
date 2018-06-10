@@ -3,7 +3,7 @@ lang:
     codes   = "", "wlm"
     english = "Middle Welsh"
     korean  = "웨일스어(중세)"
-    script  = "roman"
+    script  = "latin"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
