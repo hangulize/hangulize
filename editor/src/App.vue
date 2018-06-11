@@ -1,13 +1,13 @@
 <template>
   <div id="app">
-    <Logo />
+    <Header />
     <TranscriptionList />
   </div>
 </template>
 
 <script>
 import store from './store/index'
-import Logo from './components/Logo'
+import Header from './components/Header'
 import Transcription from './components/Transcription'
 import TranscriptionList from './components/TranscriptionList'
 
@@ -16,7 +16,7 @@ export default {
   store,
 
   components: {
-    Logo,
+    Header,
     Transcription,
     TranscriptionList
   }
