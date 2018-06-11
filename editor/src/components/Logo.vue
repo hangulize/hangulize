@@ -7,5 +7,7 @@
 <style scoped>
 .logo {
   text-align: center;
+  margin: 3rem;
+  margin-bottom: 2rem;
 }
 </style>
