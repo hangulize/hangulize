@@ -23,9 +23,12 @@ export default {
   },
 
   created () {
-    this.$store.commit('insertTranscription')
-    this.$store.commit('insertTranscription')
-    this.$store.commit('insertTranscription')
+    if (this.transcriptions.length === 0) {
+      this.$store.commit('insertTranscription')
+      this.$store.commit('insertTranscription')
+      this.$store.commit('insertTranscription')
+      this.$nextTick(() => this.$store.commit('focusTranscription', 0))
+    }
   }
 }
 </script>
