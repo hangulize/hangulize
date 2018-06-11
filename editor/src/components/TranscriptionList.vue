@@ -1,13 +1,13 @@
 <template>
   <div class="transcriptions">
     <template v-for="(t, i) in transcriptions">
-      <Transcription :key="t.id" :index="i" @submit="onSubmit(i)" />
+      <Transcription :key="t.id" :index="i" />
     </template>
   </div>
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex'
+import { mapState } from 'vuex'
 
 import Transcription from './Transcription'
 
@@ -22,16 +22,10 @@ export default {
     ...mapState(['transcriptions'])
   },
 
-  methods: {
-    onSubmit (i) {
-      this.insertTranscription(i + 1)
-    },
-
-    ...mapMutations(['insertTranscription'])
-  },
-
   created () {
-    this.insertTranscription()
+    this.$store.commit('insertTranscription')
+    this.$store.commit('insertTranscription')
+    this.$store.commit('insertTranscription')
   }
 }
 </script>

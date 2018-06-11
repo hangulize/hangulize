@@ -3,12 +3,11 @@
     class="transcription"
 
     tabindex="-1"
-
     :class="{ focused, selecting }"
-    @focus="focused = true"
-    @blur="focused = false"
 
-    @submit.prevent="onSubmit"
+    @focus="focus"
+    @blur="blur"
+    @submit.prevent="insert"
   >
     <label>
 
@@ -20,13 +19,18 @@
       />
 
       <input
-        ref="word"
+        ref="input"
+
         :placeholder="example.word"
         :value="word"
         :class="'script-' + spec.lang.script"
-        @focus="focused = true"
-        @blur="focused = false"
+
         @input="(e) => updateWord(e.target.value)"
+        @focus="focus"
+        @blur="blur"
+        @keydown.up="focusAbove"
+        @keydown.down="focusBelow"
+        @keydown.backspace="maybeRemove"
       />
 
       <span
@@ -58,16 +62,25 @@ export default {
 
   data: () => ({
     random: _.random(true),
-    focused: false,
     selecting: false,
 
     transcribed: '',
+
+    // Whether the transcribed is from an example.
     exampleTranscribed: true
   }),
 
   computed: {
+    input () {
+      return this.$refs.input
+    },
+
     transcription () {
       return this.$store.getters.getTranscription(this.index)
+    },
+
+    id () {
+      return this.transcription.id
     },
 
     lang () {
@@ -86,6 +99,18 @@ export default {
       const test = this.spec.test
       const i = _.floor(test.length * this.random)
       return test[i]
+    },
+
+    focused () {
+      return this.id === this.$store.state.focusedTranscriptionID
+    }
+  },
+
+  watch: {
+    focused (focused) {
+      if (focused) {
+        this.input.select()
+      }
     }
   },
 
@@ -112,8 +137,39 @@ export default {
       this.hangulize()
     },
 
-    onSubmit () {
-      this.$emit('submit', this)
+    insert () {
+      this.$store.commit('insertTranscription', this.index + 1)
+    },
+
+    maybeRemove () {
+      if (this.index === 0) {
+        return
+      }
+
+      if (this.input.value !== '') {
+        return
+      }
+
+      this.$store.commit('removeTranscription', this.index)
+      this.focusAbove()
+    },
+
+    focus () {
+      this.$store.commit('focusTranscription', this.index)
+    },
+
+    focusAbove () {
+      this.$store.commit('focusTranscription', this.index - 1)
+    },
+
+    focusBelow () {
+      this.$store.commit('focusTranscription', this.index + 1)
+    },
+
+    blur () {
+      if (this.focused) {
+        this.$store.commit('blurTranscriptions')
+      }
     }
   },
 
@@ -149,7 +205,7 @@ export default {
   },
 
   mounted () {
-    this.$refs.word.focus()
+    this.focus()
   }
 }
 </script>

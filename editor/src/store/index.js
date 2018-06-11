@@ -6,9 +6,19 @@ import H from 'hangulize'
 
 Vue.use(Vuex)
 
+class Transcription {
+  constructor (id, lang) {
+    this.id = id
+    this.lang = lang
+    this.spec = H.specs[lang]
+    this.word = ''
+  }
+}
+
 export default new Vuex.Store({
   state: () => ({
     transcriptions: [],
+    focusedTranscriptionID: null,
     nextTranscriptionID: 0
   }),
 
@@ -33,14 +43,24 @@ export default new Vuex.Store({
         lang = state.transcriptions[index - 1].lang
       }
 
-      const t = {
-        id: state.nextTranscriptionID++,
-        lang: lang,
-        spec: H.specs[lang],
-        word: ''
-      }
+      const id = state.nextTranscriptionID++
+      const t = new Transcription(id, lang)
 
       state.transcriptions.splice(index, 0, t)
+    },
+
+    removeTranscription (state, index = 0) {
+      state.transcriptions.splice(index, 1)
+    },
+
+    focusTranscription (state, index = 0) {
+      index = _.clamp(index, 0, state.transcriptions.length - 1)
+      const id = state.transcriptions[index].id
+      state.focusedTranscriptionID = id
+    },
+
+    blurTranscriptions (state) {
+      state.focusedTranscriptionID = null
     },
 
     updateLang (state, {index, lang}) {
