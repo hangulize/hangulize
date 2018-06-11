@@ -21,11 +21,11 @@ p {
 }
 
 .logo {
-  margin: 3rem;
-  margin-bottom: 1rem;
+  padding: 3rem;
+  padding-bottom: 1rem;
 }
 
 .intro {
-  margin-bottom: 3rem;
+  padding-bottom: 2rem;
 }
 </style>

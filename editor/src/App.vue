@@ -28,8 +28,6 @@ export default {
 
 body {
   background: #ece9da;
-  padding: 3rem 0;
-  padding-top: 0;
   font-family: 'Spoqa Han Sans', sans-serif;
 }
 </style>

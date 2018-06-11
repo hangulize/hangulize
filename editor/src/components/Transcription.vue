@@ -244,6 +244,10 @@ input::placeholder {
   color: #aaa;
 }
 
+input::selection {
+  background: #bdf;
+}
+
 input.script-roman, input.script-cyrillic {
   font-family: 'Noto Sans', sans-serif;
 }
@@ -266,7 +270,8 @@ input.script-roman, input.script-kana {
 }
 
 form.focused {
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 3px 10px rgba(68, 51, 34, 0.2);
+  outline: 1px solid rgba(68, 51, 34, 0.05);
 }
 form.selecting {
   box-shadow: none;
