@@ -41,8 +41,9 @@ func TestSlash(t *testing.T) {
 }
 
 func TestComma(t *testing.T) {
-	assert.Equal(t, "글로르,이아", Hangulize("ita", "glor,ia"))
-	assert.Equal(t, "콤,오", Hangulize("ita", "com,o"))
+	assertHangulize(t, loadSpec("ita"), "글로르,이아", "glor,ia")
+	assertHangulize(t, loadSpec("ita"), "콤,오", "com,o")
+	assertHangulize(t, loadSpec("wlm"), "카드,고데이", "Cad,Godeu")
 }
 
 func TestQuote(t *testing.T) {
