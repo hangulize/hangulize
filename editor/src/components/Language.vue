@@ -1,6 +1,10 @@
 <template>
   <div class="language">
-    <Lang tag="div" :lang="lang" @click.stop="selecting = true">
+    <Lang tag="div"
+      :lang="lang"
+      @click.stop="selecting = true"
+      @keypress.enter="selecting = true"
+    >
       <sui-icon name="dropdown" />
     </Lang>
 
@@ -81,7 +85,8 @@ export default {
 .language > .lang {
   position: relative;
   display: inline-block;
-  line-height: 2.5em;
+  line-height: 1.5;
+  padding-top: 0.5rem;
   cursor: pointer;
 }
 

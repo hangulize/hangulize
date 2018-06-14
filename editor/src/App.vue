@@ -2,14 +2,15 @@
   <div id="app">
     <Header />
     <TranscriptionList />
+    <Footer />
   </div>
 </template>
 
 <script>
 import store from './store/index'
 import Header from './components/Header'
-import Transcription from './components/Transcription'
 import TranscriptionList from './components/TranscriptionList'
+import Footer from './components/Footer'
 
 export default {
   name: 'App',
@@ -17,8 +18,8 @@ export default {
 
   components: {
     Header,
-    Transcription,
-    TranscriptionList
+    TranscriptionList,
+    Footer
   }
 }
 </script>
@@ -29,6 +30,14 @@ export default {
 body {
   background: #ece9da;
   font-family: 'Spoqa Han Sans', sans-serif;
+}
+
+header {
+  padding-bottom: 1rem;
+}
+
+footer {
+  padding-top: 1rem;
 }
 </style>
 

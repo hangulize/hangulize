@@ -3,7 +3,7 @@
     class="transcription"
 
     tabindex="-1"
-    :class="{ focused, selecting }"
+    :class="{ focused, selecting, example: exampleTranscribed }"
 
     @focus="focus"
     @blur="blur"
@@ -33,12 +33,7 @@
         @keydown.backspace="maybeRemove"
       />
 
-      <span
-        class="transcribed"
-        :class="{ example: exampleTranscribed }"
-      >
-        {{ transcribed }}
-      </span>
+      <span class="transcribed">{{ transcribed }}</span>
 
     </label>
   </form>
@@ -222,23 +217,26 @@ export default {
 
 form {
   background: #fff;
-  margin: 0.5em;
   display: block;
+  margin: 0.5rem 0;
 }
 
 label {
   display: block;
   padding: 0 1em;
+  cursor: text;
 }
 
 input {
   background: transparent;
   font-size: 2rem;
-  font-weight: 600;
+  font-weight: 400;
   line-height: 1;
   padding: 0;
+  padding-bottom: 0.1em;
   border: none;
-  width: 20em;
+  border-bottom: 2px solid #49f;
+  width: 100%;
 }
 
 input::placeholder {
@@ -259,23 +257,27 @@ input.script-roman, input.script-kana {
 
 .transcribed {
   display: block;
-  padding: 0.5em 0;
+  padding: 0.3em 0 0.7em;
   font-family: 'Spoqa Han Sans', sans-serif;
   font-size: 1.75rem;
   font-weight: 400;
   color: #49f;
 }
 
-.transcribed.example {
-  color: #abd;
-}
-
 form.focused {
-  box-shadow: 0 3px 10px rgba(68, 51, 34, 0.2);
-  outline: 1px solid rgba(68, 51, 34, 0.05);
+  box-shadow: 0 3px 10px rgba(68, 51, 34, 0.3);
+  outline: 1px solid rgba(68, 51, 34, 0.1);
 }
 form.selecting {
   box-shadow: none;
   background: #f4f4f4;
+}
+
+.example input {
+  border-color: #eee;
+}
+
+.example .transcribed {
+  color: #abd;
 }
 </style>
