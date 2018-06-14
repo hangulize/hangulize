@@ -43,6 +43,11 @@ func TestSlash(t *testing.T) {
 func TestComma(t *testing.T) {
 	assertHangulize(t, loadSpec("ita"), "글로르,이아", "glor,ia")
 	assertHangulize(t, loadSpec("ita"), "콤,오", "com,o")
+}
+
+func TestPunctInVar(t *testing.T) {
+	assertHangulize(t, loadSpec("nld"), "빔%", "Wim%")
+	assertHangulize(t, loadSpec("cym"), "귀,림", "Gwi,lym")
 	assertHangulize(t, loadSpec("wlm"), "카드,고데이", "Cad,Godeu")
 }
 
