@@ -257,17 +257,20 @@ input.script-roman, input.script-kana {
 
 .transcribed {
   display: block;
-  padding: 0.3em 0 0.7em;
+  padding: 0.2rem 0 0.6rem;
   font-family: 'Spoqa Han Sans', sans-serif;
   font-size: 1.75rem;
   font-weight: 400;
+  line-height: 1.2;
   color: #49f;
+  word-wrap: break-word;
 }
 
 form.focused {
   box-shadow: 0 3px 10px rgba(68, 51, 34, 0.3);
   outline: 1px solid rgba(68, 51, 34, 0.1);
 }
+
 form.selecting {
   box-shadow: none;
   background: #f4f4f4;
