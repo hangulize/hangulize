@@ -218,7 +218,7 @@ export default {
 form {
   background: #fff;
   display: block;
-  margin: 0.5rem 0;
+  margin: 0.5rem 0 1rem;
 }
 
 label {
@@ -232,8 +232,7 @@ input {
   font-size: 2rem;
   font-weight: 400;
   line-height: 1;
-  padding: 0;
-  padding-bottom: 0.1em;
+  padding: 0.1rem 0 0.2rem;
   border: none;
   border-bottom: 2px solid #49f;
   width: 100%;
@@ -257,7 +256,7 @@ input.script-roman, input.script-kana {
 
 .transcribed {
   display: block;
-  padding: 0.2rem 0 0.6rem;
+  padding: 0.3rem 0 1rem;
   font-family: 'Spoqa Han Sans', sans-serif;
   font-size: 1.75rem;
   font-weight: 400;
