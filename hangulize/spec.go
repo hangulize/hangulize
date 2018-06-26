@@ -144,9 +144,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 			word := pair.Left()
 			transcribed := pair.Right()[0]
 
-			example := [2]string{word, transcribed}
+			exm := [2]string{word, transcribed}
 
-			test = append(test, example)
+			test = append(test, exm)
 		}
 	}
 

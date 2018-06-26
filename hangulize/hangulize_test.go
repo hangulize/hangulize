@@ -14,9 +14,9 @@ func TestLang(t *testing.T) {
 
 		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
 
-		for _, example := range spec.Test {
-			word := example[0]
-			expected := example[1]
+		for _, exm := range spec.Test {
+			word := exm[0]
+			expected := exm[1]
 
 			t.Run(lang+"/"+word, func(t *testing.T) {
 				assertHangulize(t, spec, expected, word)
