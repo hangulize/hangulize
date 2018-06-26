@@ -1,8 +1,8 @@
 package hangulize
 
 import (
+	"bytes"
 	"fmt"
-	"strings"
 )
 
 // RPattern is a dynamic replacement pattern.
@@ -93,7 +93,7 @@ func newRPattern(expr string,
 
 // Interpolate determines the final replacement based on the matched Pattern.
 func (rp *RPattern) Interpolate(p *Pattern, word string, m []int) string {
-	var buf strings.Builder
+	var buf bytes.Buffer
 	varIndex := 0
 
 	for _, part := range rp.parts {

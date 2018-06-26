@@ -1,8 +1,8 @@
 package hangulize
 
 import (
+	"bytes"
 	"fmt"
-	"strings"
 )
 
 // subword is a chunk of a word with a level number. The level indicates which
@@ -21,7 +21,7 @@ type subwordsBuilder struct {
 
 // String() concatenates buffered subwords to assemble the full word.
 func (b *subwordsBuilder) String() string {
-	var buf strings.Builder
+	var buf bytes.Buffer
 	for _, sw := range b.subwords {
 		buf.WriteString(sw.word)
 	}
@@ -49,7 +49,7 @@ func (b *subwordsBuilder) Subwords() []subword {
 	}
 
 	// Merge same level adjoin subwords.
-	var buf strings.Builder
+	var buf bytes.Buffer
 	mergingLevel := -1
 
 	for _, sw := range b.subwords {
@@ -125,7 +125,7 @@ func (r *subwordReplacer) ReplaceBy(repls ...replacement) {
 
 // flush applies the buffered replacements to the SubwordReplacer internal.
 func (r *subwordReplacer) flush() {
-	var buf strings.Builder
+	var buf bytes.Buffer
 	var levels []int
 
 	offset := 0
@@ -174,7 +174,7 @@ func (r *subwordReplacer) Subwords() []subword {
 
 	level := r.levels[0]
 
-	var buf strings.Builder
+	var buf bytes.Buffer
 
 	for i, ch := range r.word {
 		if r.levels[i] != level {

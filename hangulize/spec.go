@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -49,7 +50,7 @@ func (s *Spec) String() string {
 // ParseSpec parses a Spec from an HGL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
 	var err error
-	var sourceBuf strings.Builder
+	var sourceBuf bytes.Buffer
 
 	// Use TeeReader to copy the source while parsing.
 	tee := io.TeeReader(r, &sourceBuf)

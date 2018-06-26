@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"bytes"
 	"strings"
 )
 
@@ -40,7 +41,7 @@ func (p *pipeline) normalize(word string) string {
 	script := p.h.spec.script
 	except := p.h.spec.normLetters
 
-	var buf strings.Builder
+	var buf bytes.Buffer
 
 	for _, ch := range word {
 		if except.HasRune(ch) {
@@ -206,8 +207,8 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
 func (p *pipeline) composeHangul(subwords []subword) string {
-	var buf strings.Builder
-	var jamoBuf strings.Builder
+	var buf bytes.Buffer
+	var jamoBuf bytes.Buffer
 
 	for _, sw := range subwords {
 		// Don't touch level=0 subwords. They just have passed through the

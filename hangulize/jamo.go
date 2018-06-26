@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"bufio"
+	"bytes"
 	"strings"
 
 	"github.com/suapapa/go_hangul"
@@ -17,7 +18,7 @@ const none = rune(0)
 //
 func ComposeHangul(word string) string {
 	r := bufio.NewReader(strings.NewReader(word))
-	var buf strings.Builder
+	var buf bytes.Buffer
 
 	var lmt [3]rune // [lead, medial, tail]
 	const (
