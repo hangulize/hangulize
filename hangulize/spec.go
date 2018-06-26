@@ -29,7 +29,7 @@ type Spec struct {
 	Transcribe []*Rule
 
 	// Test examples
-	Test []hgl.Pair
+	Test [][2]string
 
 	// Source code
 	Source string
@@ -138,9 +138,16 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// test
-	var test []hgl.Pair
+	test := make([][2]string, 0)
 	if sec, ok := h["test"]; ok {
-		test = sec.(*hgl.ListSection).Array()
+		for _, pair := range sec.(*hgl.ListSection).Array() {
+			word := pair.Left()
+			transcribed := pair.Right()[0]
+
+			example := [2]string{word, transcribed}
+
+			test = append(test, example)
+		}
 	}
 
 	// -------------------------------------------------------------------------
