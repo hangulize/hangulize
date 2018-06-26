@@ -75,7 +75,7 @@ func v2Specs(c *gin.Context) {
 
 		for _, lang := range hangulize.ListLangs() {
 			spec, _ := hangulize.LoadSpec(lang)
-			specs[lang] = packSpec(spec)
+			specs[lang] = v2PackSpec(spec)
 		}
 
 		c.JSON(http.StatusOK, gin.H{
@@ -87,7 +87,7 @@ func v2Specs(c *gin.Context) {
 	}
 }
 
-func packSpec(s *hangulize.Spec) *gin.H {
+func v2PackSpec(s *hangulize.Spec) *gin.H {
 	test := make([]gin.H, len(s.Test))
 
 	for i, t := range s.Test {

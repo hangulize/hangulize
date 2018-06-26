@@ -13,6 +13,9 @@ func init() {
 	v2 := router.Group("/v2")
 	v2Init(v2)
 
+	v1 := router.Group("/v1")
+	v1Init(v1)
+
 	http.Handle("/", router)
 }
 
