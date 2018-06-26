@@ -25,10 +25,10 @@ func packSpec(s *hangulize.Spec) *js.Object {
 	config.Set("stage", s.Config.Stage)
 
 	test := js.Global.Get("Array").New()
-	for i, pair := range s.Test {
+	for i, exm := range s.Test {
 		o := js.Global.Get("Object").New()
-		o.Set("word", pair.Left())
-		o.Set("transcribed", pair.Right()[0])
+		o.Set("word", exm[0])
+		o.Set("transcribed", exm[1])
 		test.SetIndex(i, &o)
 	}
 
