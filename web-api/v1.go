@@ -53,11 +53,11 @@ func v1Example(c *gin.Context) {
 	}
 
 	i := rand.Intn(len(spec.Test))
-	t := spec.Test[i]
+	example := spec.Test[i]
 
 	c.JSON(http.StatusOK, gin.H{
-		"result":  t.Right()[0],
-		"word":    t.Left(),
+		"result":  example[1],
+		"word":    example[0],
 		"lang":    v1PackSpec(spec),
 		"success": true,
 		"reason":  nil,

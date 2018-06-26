@@ -90,10 +90,10 @@ func v2Specs(c *gin.Context) {
 func v2PackSpec(s *hangulize.Spec) *gin.H {
 	test := make([]gin.H, len(s.Test))
 
-	for i, t := range s.Test {
+	for i, example := range s.Test {
 		test[i] = gin.H{
-			"word":        t.Left,
-			"transcribed": t.Right,
+			"word":        example[0],
+			"transcribed": example[1],
 		}
 	}
 
