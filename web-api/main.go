@@ -1,9 +1,10 @@
-package webapi
+package main
 
 import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"google.golang.org/appengine"
 )
 
 func init() {
@@ -13,4 +14,8 @@ func init() {
 	v2Init(v2)
 
 	http.Handle("/", router)
+}
+
+func main() {
+	appengine.Main()
 }
