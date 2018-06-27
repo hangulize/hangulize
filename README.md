@@ -1,8 +1,8 @@
 # Hangulize 2
 
-[![GoDoc](https://godoc.org/github.com/sublee/hangulize2/hangulize?status.svg)](https://godoc.org/github.com/sublee/hangulize2/hangulize)
-[![Go Report Card](https://goreportcard.com/badge/github.com/sublee/hangulize2)](https://goreportcard.com/report/github.com/sublee/hangulize2)
-[![Build Status](https://travis-ci.org/sublee/hangulize2.svg?branch=develop)](https://travis-ci.org/sublee/hangulize2)
+[![GoDoc](https://godoc.org/github.com/hangulize/hangulize?status.svg)](https://godoc.org/github.com/hangulize/hangulize)
+[![Go Report Card](https://goreportcard.com/badge/github.com/hangulize/hangulize)](https://goreportcard.com/report/github.com/hangulize/hangulize)
+[![Build Status](https://travis-ci.org/hangulize/hangulize.svg?branch=develop)](https://travis-ci.org/hangulize/hangulize)
 
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
@@ -21,11 +21,11 @@
 Hangulize 2는 외래어를 한글로 변환해주는 도구입니다.
 
 ```console
-$ go get -u github.com/sublee/hangulize2/hangulize
+$ go get -u github.com/hangulize/hangulize
 ```
 
 ```go
-import "github.com/sublee/hangulize2/hangulize"
+import "github.com/hangulize/hangulize"
 
 hangulize.Hangulize("ita", "gloria")
 // output: "글로리아"
