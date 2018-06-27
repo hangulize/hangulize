@@ -1,4 +1,4 @@
-# Hangulize 2
+# Hangulize
 
 [![GoDoc](https://godoc.org/github.com/hangulize/hangulize?status.svg)](https://godoc.org/github.com/hangulize/hangulize)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hangulize/hangulize)](https://goreportcard.com/report/github.com/hangulize/hangulize)
@@ -18,7 +18,7 @@
 >
 > Brian Jongseong Park (http://iceager.egloos.com/2610028)
 
-Hangulize 2는 외래어를 한글로 변환해주는 도구입니다.
+Hangulize는 외래어를 한글로 변환해주는 도구입니다.
 
 ```console
 $ go get -u github.com/hangulize/hangulize
@@ -33,20 +33,25 @@ hangulize.Hangulize("ita", "gloria")
 
 ## 리부트
 
-Hangulize 2의 전신인 [Hangulize](https://github.com/sublee/hangulize)는
-2010년에 Python으로 개발되었습니다. 웹 상에서 사용할 수 있도록
-[hangulize.org](http://hangulize.org)를 제공하고 있습니다.
+Hangulize 프로젝트는 2010년에 Python으로 처음 구현되었고, 웹 상에서 누구나 쉽게
+사용할 수 있도록 [hangulize.org](http://hangulize.org/) 서비스를
+제공해왔습니다. 이 Python 구현의 소스코드와 관련 자료는
+[sublee/hangulize](https://github.com/sublee/hangulize)에서 확인할 수 있습니다.
 
-기존 Hangulize의 기능은 모두 계승하면서, 성능을 높이고 코드의 유지보수 가능성과
-규칙 설계 시 생산성을 높이기 위해 리부트합니다. Hangulize 2는 Go로 개발됩니다.
+시간이 흘러 2018년, 기존 Hangulize의 기능은 모두 계승하면서 성능을 높이고
+코드의 유지보수 가능성과 규칙 설계 시 생산성을 높이기 위해 리부트를
+결정했습니다. 리부트한 Hangulize를 구현하는 데에는 Go를 사용했습니다.
+
+이 프로젝트는 처음에 "Hangulize 2"로 명명했으나 기존 Hangulize를 충분히 대체할
+수 있을 것으로 보여 숫자 2를 뗀 "Hangulize"로 이름을 바꿨습니다.
 
 ## 목표
 
-- 기존 Hangulize 기능 모두 계승
-- 규칙 설계에 정적 파일(`.hgl`) 사용
-- 간편한 규칙 설계환경
-- 규칙 설계법 꼼꼼히 문서화
-- [hangulize.org](http://hangulize.org) 개편
+- [x] 기존 Hangulize(Python 구현)의 기능을 모두 계승
+- [x] 규칙 설계에 정적 파일(`.hgl`) 사용
+- [ ] 간편한 규칙 설계환경
+- [ ] 규칙 설계법 꼼꼼히 문서화
+- [ ] [hangulize.org](http://hangulize.org) 개편
 
 ## 지원하는 언어
 
@@ -98,6 +103,6 @@ wlm      draft    Middle Welsh             웨일스어(중세)
 
 ## 라이선스
 
-Hangulize 2는 BSD-3-Clause 라이선스 하에 공개되어 있습니다. 소스코드를 사용할
+Hangulize는 BSD-3-Clause 라이선스 하에 공개되어 있습니다. 소스코드를 사용할
 경우 라이선스 내용을 준수해주세요. 라이선스 전문은 `LICENSE` 파일에서 확인하실
 수 있습니다.
