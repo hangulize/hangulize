@@ -12,16 +12,31 @@ install:
 script:
 - go test -v
 
-after_success:
-- |
-  if [[ -n "$TRAVIS_TAG"]]; then
-    git clone "https://${GITHUB_TOKEN}@github.com/hangulize/hangulize.js"
-    git -C hangulize.js commit \
-      --allow-empty -m "Build Hangulize-${TRAVIS_TAG}" --author='Travis CI'
-    git -C hangulize.js tag "$TRAVIS_TAG"
-    git -C hangulize.js push origin "$TRAVIS_TAG"
-  fi
-
 env:
   global:
     secure: pUlQstTJJW4ib9GwDY5RZ6j10o1bxsqIUK4ku/45TZYDvWA2pN7+sS3vo1m+rxKhuLHowKerB/OjGKileQOWtkSq5kcdj48B8GwrPX29OvieWMzvuZjUMR1nDYya5tXgtzUHyVOmTUKaqKA5Yc4VhB6baChoEpUGLe3FGRdQvBP+lNYsr/FgUvp9d4FBPn17t94shHV4eindGUwfNBL/9qu4LeFZ4HKvmu7FL9LaECk1Mf3VpxU2ichLEXBKpJ38tn7CmXzQvjw8EvuNc9jGPqscxDWfAEaUEWttwec+AWRQTTYZmnlx9JdmrLpCSNTiGPrdUtR+mgUWW6uKEhzeaTYUBnwZHczpCuPe5x3RIZJT9wFIiJ4nRId3ZJH9uOQjQTA8dlTjbtj8jxH5htiVK7u7qizK0cU6t+BkibCaoAisyTNOs3FfdRYpDsfPbVk7Hi/AnMTTmXaRL3tYsySZT4Vti+yGnxs15hjBjUwLoKn1qn+T9ZmKfxuwXcc0gT3Bpj0EwXp2P10GzWZCeC8e7VwISliUsuMsilF0xTD3W9JgLzbhqZPw3lFZRet/ouV4q5EMjVVXTL0Pb6KTyOu18cf+JJZztPl3sf4ol4DOpsE/5wdfd8KXt0glH33JFVPgnMO9EbRZjfHCUFzjpLWjL/6ERQgaC8NnYOnTZRktOu0=
+
+# After success, "trigger-build.sh" is created for the deploy step.
+# This script makes a new tag on the given repo to trigger a build
+# for the latest version of "hangulize/hangulize".
+after_success:
+
+# NOTE(sublee): Do not insert blank lines. Heredoc will end at a blank line.
+- |
+  cat << '' > trigger-build.sh
+  set -e
+  readonly REPO="$1"
+  git clone "https://${GITHUB_TOKEN}@github.com/hangulize/${REPO}.git"
+  cd "$REPO"
+  git config user.name 'Travis CI'
+  git commit --allow-empty --allow-empty-message -m "$TRAVIS_COMMIT_MESSAGE"
+  git tag -f "$TRAVIS_TAG"
+  git push origin -f "$TRAVIS_TAG"
+
+deploy:
+- provider: script
+  script: bash trigger-build.sh hangulize.js
+  skip_cleanup: true
+  on:
+    tags: true
+    go: '1.10.x'
