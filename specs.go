@@ -8,13 +8,13 @@ import (
 	"github.com/pkg/errors"
 )
 
+// The box for HGL files.
+var hgls = packr.NewBox("./hgls")
+
 const ext = `.hgl`
 
-// cached specs
-var (
-	specs  = make(map[string]*Spec)
-	bundle = packr.NewBox("./bundle")
-)
+// Cached specs.
+var specs = make(map[string]*Spec)
 
 // LoadSpec finds a bundled spec by the given language name.
 // Once it loads a spec, it will cache the spec.
@@ -29,12 +29,12 @@ func LoadSpec(lang string) (*Spec, bool) {
 
 	filename := lang + ext
 
-	if !bundle.Has(filename) {
+	if !hgls.Has(filename) {
 		// not found
 		return nil, false
 	}
 
-	hgl := bundle.String(filename)
+	hgl := hgls.String(filename)
 	spec, err := ParseSpec(strings.NewReader(hgl))
 
 	// Bundled spec must not have any error.
@@ -52,7 +52,7 @@ func LoadSpec(lang string) (*Spec, bool) {
 func ListLangs() []string {
 	var langs []string
 
-	for _, filename := range bundle.List() {
+	for _, filename := range hgls.List() {
 		if strings.HasSuffix(filename, ext) {
 			langs = append(langs, strings.TrimSuffix(filename, ext))
 		}
