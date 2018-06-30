@@ -1,3 +1,5 @@
+//go:generate packr -v
+
 package hangulize
 
 import (
