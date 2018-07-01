@@ -1,3 +1,4 @@
+//go:generate go get -v github.com/gobuffalo/packr/...
 //go:generate packr -v
 
 package hangulize
