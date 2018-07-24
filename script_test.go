@@ -16,4 +16,5 @@ func TestKanaNormalize(t *testing.T) {
 	kana := &_Kana{}
 	assert.Equal(t, "ア", kana.Normalize("あ"))
 	assert.Equal(t, "ァ", kana.Normalize("ぁ"))
+	assert.Equal(t, "オオサカ", kana.Normalize("大阪"))
 }
