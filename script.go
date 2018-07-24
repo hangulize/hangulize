@@ -5,6 +5,7 @@ import (
 	"strings"
 	"unicode"
 
+	kagome "github.com/ikawaha/kagome/tokenizer"
 	"golang.org/x/text/unicode/norm"
 )
 
@@ -140,25 +141,77 @@ func (_Greek) Normalize(word string) string {
 //
 //   ひらがな カタカナ
 //
-type _Kana struct{}
+type _Kana struct {
+	kagome *kagome.Tokenizer
+}
 
 // Is checks whether the character is either Hiragana or Katakana.
 func (_Kana) Is(ch rune) bool {
 	return unicode.Is(unicode.Hiragana, ch) || unicode.Is(unicode.Katakana, ch)
 }
 
-// Normalize converts Hiragana to Katakana.
-func (_Kana) Normalize(word string) string {
-	return normalizeEachLetter(word, func(ch rune) rune {
-		const (
-			hiraganaMin = rune(0x3040)
-			hiraganaMax = rune(0x309f)
-		)
+// Kagome caches a Kagome tokenizer because it is expensive.
+func (k *_Kana) Kagome() *kagome.Tokenizer {
+	if k.kagome == nil {
+		t := kagome.New()
+		k.kagome = &t
+	}
+	return k.kagome
+}
 
-		if hiraganaMin <= ch && ch <= hiraganaMax {
-			// hiragana to katakana
-			return ch + 96
+// ReadKanji guesses Katakana from Kanji.
+func (k *_Kana) ReadKanji(word string) string {
+	const (
+		kanjiMin = rune(0x4e00)
+		kanjiMax = rune(0x9faf)
+	)
+
+	kanjiFound := false
+	for _, ch := range word {
+		if ch >= kanjiMin && ch <= kanjiMax {
+			kanjiFound = true
+			break
 		}
-		return ch
-	})
+	}
+
+	// Don't initialize the Kagome tokenizer if there's no Kanji.
+	if !kanjiFound {
+		return word
+	}
+
+	tokens := k.Kagome().Tokenize(word)
+
+	chunks := make([]string, 0)
+
+	for _, tok := range tokens {
+		switch tok.Class {
+		case kagome.KNOWN:
+			fs := tok.Features()
+			pron := fs[7]
+			chunks = append(chunks, pron)
+		case kagome.UNKNOWN:
+			chunks = append(chunks, tok.Surface)
+		}
+	}
+
+	return strings.Join(chunks, " ")
+}
+
+// ToKatakana converts Hiragana to Katakana.
+func (_Kana) ToKatakana(ch rune) rune {
+	const (
+		hiraganaMin = rune(0x3040)
+		hiraganaMax = rune(0x309f)
+	)
+
+	if hiraganaMin <= ch && ch <= hiraganaMax {
+		return ch + 96
+	}
+	return ch
+}
+
+// Normalize converts Hiragana to Katakana.
+func (k *_Kana) Normalize(word string) string {
+	word = k.ReadKanji(word)
+	return normalizeEachLetter(word, k.ToKatakana)
 }
