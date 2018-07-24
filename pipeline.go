@@ -43,13 +43,17 @@ func (p *pipeline) normalize(word string) string {
 
 	var buf bytes.Buffer
 
-	for _, ch := range word {
+	l := 0
+	r := 0
+	for i, ch := range word {
+		r = i
 		if except.HasRune(ch) {
+			buf.WriteString(script.Normalize(word[l:r]))
 			buf.WriteRune(ch)
-		} else {
-			buf.WriteRune(script.Normalize(ch))
+			l = r + len(string(ch))
 		}
 	}
+	buf.WriteString(script.Normalize(word[l:]))
 
 	word = buf.String()
 
