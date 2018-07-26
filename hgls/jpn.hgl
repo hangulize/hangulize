@@ -4,6 +4,7 @@ lang:
     english = "Japanese"
     korean  = "일본어"
     script  = "kana"
+    dictate = "furigana"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"
