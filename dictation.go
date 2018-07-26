@@ -26,8 +26,10 @@ type Dictator interface {
 	Dictate(string) [][2]string
 }
 
+// dictators is the registry holding the imported dictators.
 var dictators = make(map[string]Dictator)
 
+// UseDictator keeps a dictator for ready to use.
 func UseDictator(d Dictator) bool {
 	id := d.ID()
 
@@ -39,6 +41,7 @@ func UseDictator(d Dictator) bool {
 	return true
 }
 
+// UnuseDictator discards an imported dictator.
 func UnuseDictator(id string) bool {
 	_, ok := dictators[id]
 	if ok {
@@ -47,6 +50,7 @@ func UnuseDictator(id string) bool {
 	return ok
 }
 
+// GetDictator returns the imported dictator by the ID.
 func GetDictator(id string) (Dictator, bool) {
 	d, ok := dictators[id]
 	return d, ok
