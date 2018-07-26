@@ -25,3 +25,29 @@ type Dictator interface {
 	ID() string
 	Dictate(string) [][2]string
 }
+
+var dictators = make(map[string]Dictator)
+
+func UseDictator(d Dictator) bool {
+	id := d.ID()
+
+	if _, ok := dictators[id]; ok {
+		return false
+	}
+
+	dictators[id] = d
+	return true
+}
+
+func UnuseDictator(id string) bool {
+	_, ok := dictators[id]
+	if ok {
+		delete(dictators, id)
+	}
+	return ok
+}
+
+func GetDictator(id string) (Dictator, bool) {
+	d, ok := dictators[id]
+	return d, ok
+}
