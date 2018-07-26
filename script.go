@@ -1,7 +1,6 @@
 package hangulize
 
 import (
-	"bytes"
 	"strings"
 	"unicode"
 
@@ -12,7 +11,7 @@ import (
 // script represents a writing system.
 type script interface {
 	Is(rune) bool
-	Normalize(string) string
+	Normalize(rune) rune
 }
 
 // scripts is the registry of Scripts by their name.
@@ -38,18 +37,6 @@ func getScript(name string) script {
 	return script
 }
 
-// normalizeEachLette normalizes a word by a function which normalizes each
-// letter.
-func normalizeEachLetter(word string, normalizeRune func(rune) rune) string {
-	var buf bytes.Buffer
-
-	for _, ch := range word {
-		buf.WriteRune(normalizeRune(ch))
-	}
-
-	return buf.String()
-}
-
 // -----------------------------------------------------------------------------
 
 // _Latin represents the Latin or Roman script. Most langauges Hangulize
@@ -66,15 +53,13 @@ func (_Latin) Is(ch rune) bool {
 //
 //   Pokémon -> pokemon
 //
-func (_Latin) Normalize(word string) string {
-	return normalizeEachLetter(word, func(ch rune) rune {
-		props := norm.NFD.PropertiesString(string(ch))
-		bin := props.Decomposition()
-		if len(bin) != 0 {
-			ch = rune(bin[0])
-		}
-		return unicode.ToLower(ch)
-	})
+func (_Latin) Normalize(ch rune) rune {
+	props := norm.NFD.PropertiesString(string(ch))
+	bin := props.Decomposition()
+	if len(bin) != 0 {
+		ch = rune(bin[0])
+	}
+	return unicode.ToLower(ch)
 }
 
 // -----------------------------------------------------------------------------
@@ -90,9 +75,9 @@ func (_Cyrillic) Is(ch rune) bool {
 	return unicode.Is(unicode.Cyrillic, ch)
 }
 
-// Normalize converts a word into lower case.
-func (_Cyrillic) Normalize(word string) string {
-	return strings.ToLower(word)
+// Normalize converts character into lower case.
+func (_Cyrillic) Normalize(ch rune) rune {
+	return unicode.ToLower(ch)
 }
 
 // -----------------------------------------------------------------------------
@@ -110,8 +95,8 @@ func (_Georgian) Is(ch rune) bool {
 
 // Normalize does nothing. Georgian is unicase, which means, there's only one
 // case for each letter.
-func (_Georgian) Normalize(word string) string {
-	return word
+func (_Georgian) Normalize(ch rune) rune {
+	return ch
 }
 
 // -----------------------------------------------------------------------------
@@ -127,9 +112,9 @@ func (_Greek) Is(ch rune) bool {
 	return unicode.Is(unicode.Greek, ch)
 }
 
-// Normalize converts a word into lower case.
-func (_Greek) Normalize(word string) string {
-	return strings.ToLower(word)
+// Normalize converts character into lower case.
+func (_Greek) Normalize(ch rune) rune {
+	return unicode.ToLower(ch)
 }
 
 // -----------------------------------------------------------------------------
@@ -197,21 +182,16 @@ func (k *_Kana) ReadKanji(word string) string {
 	return strings.Join(chunks, " ")
 }
 
-// ToKatakana converts Hiragana to Katakana.
-func (_Kana) ToKatakana(ch rune) rune {
+// Normalize converts Hiragana to Katakana.
+func (_Kana) Normalize(ch rune) rune {
 	const (
 		hiraganaMin = rune(0x3040)
 		hiraganaMax = rune(0x309f)
 	)
 
 	if hiraganaMin <= ch && ch <= hiraganaMax {
+		// hiragana to katakana
 		return ch + 96
 	}
 	return ch
-}
-
-// Normalize converts Hiragana to Katakana.
-func (k *_Kana) Normalize(word string) string {
-	word = k.ReadKanji(word)
-	return normalizeEachLetter(word, k.ToKatakana)
 }
