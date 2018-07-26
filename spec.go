@@ -206,6 +206,7 @@ type Language struct {
 	English string    // The language name in English.
 	Korean  string    // The language name in Korean.
 	Script  string
+	Dictate string
 }
 
 func (l *Language) String() string {
@@ -229,6 +230,7 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 		English: dict.One("english"),
 		Korean:  dict.One("korean"),
 		Script:  dict.One("script"),
+		Dictate: dict.One("dictate"),
 	}
 	return &lang, nil
 }
