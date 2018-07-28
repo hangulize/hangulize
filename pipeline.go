@@ -13,6 +13,7 @@ type pipeline struct {
 // forward runs the Hangulize pipeline for a word.
 func (p *pipeline) forward(word string) string {
 	p.input(word)
+	word, _ = p.pronounce(word)
 	word = p.normalize(word)
 	subwords := p.group(word)
 	subwords = p.rewrite(subwords)
@@ -27,7 +28,29 @@ func (p *pipeline) input(word string) {
 	p.tr.TraceWord("input", "", word)
 }
 
-// 1. Normalize (Word -> Word)
+// 1. Pronounce (Word -> Word)
+//
+// This step guesses the pronunciation from the spelling based on lexical
+// analysis. Most languages don't require this step. But some languages, such
+// as English, just the spelling is not enough to guess the pronunciation.
+//
+func (p *pipeline) pronounce(word string) (string, bool) {
+	id := p.h.spec.Lang.Pronounce
+	if id == "" {
+		// The language doesn't require a pronouncer. It's okay.
+		return word, true
+	}
+
+	d, ok := GetPronouncer(id)
+	if !ok {
+		// The language requires a pronouncer but not imported yet.
+		return word, false
+	}
+
+	return d.Pronounce(word), true
+}
+
+// 2. Normalize (Word -> Word)
 //
 // This step eliminates letter case to make the next steps work easier.
 //
@@ -58,7 +81,7 @@ func (p *pipeline) normalize(word string) string {
 	return word
 }
 
-// 2. Group meaningful letters (Word -> Subwords[level=0 or 1])
+// 3. Group meaningful letters (Word -> Subwords[level=0 or 1])
 //
 // Meaningful letter is the letter which appears in the rewrite/transcribe
 // rules. This step groups letters by their meaningness into subwords. A
@@ -86,7 +109,7 @@ func (p *pipeline) group(word string) []subword {
 	return rep.Subwords()
 }
 
-// 3. Rewrite (Subwords -> Subwords[level=1])
+// 4. Rewrite (Subwords -> Subwords[level=1])
 //
 // This step minimizes the gap between pronunciation and spelling.
 //
@@ -129,7 +152,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 	return subwords
 }
 
-// 4. Transcribe (Subwords -> Subwords[level=2])
+// 5. Transcribe (Subwords -> Subwords[level=2])
 //
 // This step determines Hangul spelling for the pronunciation.
 //
@@ -200,7 +223,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	return subwords
 }
 
-// 5. Compose Hangul (Subwords -> Word)
+// 6. Compose Hangul (Subwords -> Word)
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //

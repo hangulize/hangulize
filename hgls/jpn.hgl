@@ -1,15 +1,17 @@
 lang:
-    id      = "jpn"
-    codes   = "ja", "jpn"
-    english = "Japanese"
-    korean  = "일본어"
-    script  = "kana"
+    id        = "jpn"
+    codes     = "ja", "jpn"
+    english   = "Japanese"
+    korean    = "일본어"
+    script    = "kana"
+    pronounce = "furigana"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"
     stage  = "draft"
 
 rewrite:
+    "ー"          -> ""
     "ア|ァ"       -> "a"
     "イ|ィ"       -> "i"
     "ウ|ゥ"       -> "u"
@@ -272,4 +274,16 @@ test:
     "えひめ"         -> "에히메"
     "よなぐに"        -> "요나구니"
     "にほん"         -> "니혼"
+    "日本"           -> "닛폰"
+    "鈴木大地"       -> "스즈키 다이치"
+    "加藤勝信"       -> "가토 가쓰노부"
+    "山本幸三"       -> "야마모토 고조"
+    "今村雅弘"       -> "이마무라 마사히로"
+    "新海誠"         -> "신카이 마코토"
+    "ゲーム"         -> "게무"
+
+    "東京" -> "도쿄"
+    "九州" -> "규슈"
+    "新潟" -> "니가타"
+    "大阪" -> "오사카"
 
