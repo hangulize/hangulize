@@ -37,11 +37,13 @@ func (p *pipeline) input(word string) {
 func (p *pipeline) pronounce(word string) (string, bool) {
 	id := p.h.spec.Lang.Pronounce
 	if id == "" {
+		// The language doesn't require a pronouncer. It's okay.
 		return word, true
 	}
 
 	d, ok := GetPronouncer(id)
 	if !ok {
+		// The language requires a pronouncer but not imported yet.
 		return word, false
 	}
 
