@@ -1,3 +1,8 @@
+/*
+Package furigana implements the hangulize.Pronouncer interface for Japanese
+Kanji. Kanji has very broad characters so they need a dictionary to be
+pronounced. This pronouncer uses IPADIC in Kagome to analyze Kanji.
+*/
 package furigana
 
 import (
