@@ -67,7 +67,9 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 			morphs = append(morphs, pron)
 
 		case kagome.UNKNOWN:
-			morphs = append(morphs, spell)
+			if strings.TrimSpace(spell) != "" {
+				morphs = append(morphs, spell)
+			}
 
 		default:
 			continue
