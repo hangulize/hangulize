@@ -201,11 +201,12 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 // Language identifies a natural language.
 type Language struct {
-	ID      string    // Arbitrary, but identifiable language ID.
-	Codes   [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
-	English string    // The language name in English.
-	Korean  string    // The language name in Korean.
-	Script  string
+	ID        string    // Arbitrary, but identifiable language ID.
+	Codes     [2]string // [0]: ISO 639-1 code, [1]: ISO 639-3 code
+	English   string    // The language name in English.
+	Korean    string    // The language name in Korean.
+	Script    string
+	Pronounce string
 }
 
 func (l *Language) String() string {
@@ -224,11 +225,12 @@ func newLanguage(dict *hgl.DictSection) (*Language, error) {
 	codes[1] = _codes[1]
 
 	lang := Language{
-		ID:      dict.One("id"),
-		Codes:   codes,
-		English: dict.One("english"),
-		Korean:  dict.One("korean"),
-		Script:  dict.One("script"),
+		ID:        dict.One("id"),
+		Codes:     codes,
+		English:   dict.One("english"),
+		Korean:    dict.One("korean"),
+		Script:    dict.One("script"),
+		Pronounce: dict.One("pronounce"),
 	}
 	return &lang, nil
 }

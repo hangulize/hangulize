@@ -218,6 +218,14 @@ func ExampleHangulize_nietzsche() {
 	// Output: 프리드리히 빌헬름 니체
 }
 
+func ExampleHangulize_shinkaiMakoto() {
+	// import "github.com/hangulize/hangulize/pronounce/furigana"
+	// UsePronouncer(&furigana.P)
+
+	fmt.Println(Hangulize("jpn", "新海誠"))
+	// Output: 신카이 마코토
+}
+
 func ExampleNewHangulizer() {
 	spec, _ := LoadSpec("nld")
 	h := NewHangulizer(spec)

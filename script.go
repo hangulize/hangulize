@@ -117,9 +117,6 @@ func (_Greek) Normalize(ch rune) rune {
 
 // -----------------------------------------------------------------------------
 
-// TODO(sublee): Find out a Kanji to Kana dictionary to hangulize Japanese
-// perfectly.
-
 // _Kana represents the Kana script including Hiragana and Katakana.
 //
 //   ひらがな カタカナ
