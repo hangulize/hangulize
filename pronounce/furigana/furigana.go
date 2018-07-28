@@ -1,0 +1,74 @@
+package furigana
+
+import (
+	"strings"
+
+	kagome "github.com/ikawaha/kagome/tokenizer"
+)
+
+// P is the Furigana dictator.
+var P furiganaPronouncer
+
+// ----------------------------------------------------------------------------
+
+type furiganaPronouncer struct {
+	kagome *kagome.Tokenizer
+}
+
+func (furiganaPronouncer) ID() string {
+	return "furigana"
+}
+
+// Kagome caches d Kagome tokenizer because it is expensive.
+func (p *furiganaPronouncer) Kagome() *kagome.Tokenizer {
+	if p.kagome == nil {
+		t := kagome.New()
+		p.kagome = &t
+	}
+	return p.kagome
+}
+
+func (p *furiganaPronouncer) Pronounce(word string) string {
+	const (
+		furiganaMin = rune(0x4e00)
+		furiganaMax = rune(0x9faf)
+	)
+
+	furiganaFound := false
+	for _, ch := range word {
+		if ch >= furiganaMin && ch <= furiganaMax {
+			furiganaFound = true
+			break
+		}
+	}
+
+	// Don't initialize the Kagome tokenizer if there's no furigana because
+	// Kagome is expensive.
+	if !furiganaFound {
+		return word
+	}
+
+	var morphs []string
+
+	for _, tok := range p.Kagome().Tokenize(word) {
+		spell := tok.Surface
+		var pron string
+
+		switch tok.Class {
+
+		case kagome.KNOWN:
+			fs := tok.Features()
+			pron = fs[7]
+			morphs = append(morphs, pron)
+
+		case kagome.UNKNOWN:
+			morphs = append(morphs, spell)
+
+		default:
+			continue
+
+		}
+	}
+
+	return strings.Join(morphs, " ")
+}

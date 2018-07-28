@@ -13,7 +13,7 @@ type pipeline struct {
 // forward runs the Hangulize pipeline for a word.
 func (p *pipeline) forward(word string) string {
 	p.input(word)
-	word, _ = p.dictate(word)
+	word, _ = p.pronounce(word)
 	word = p.normalize(word)
 	subwords := p.group(word)
 	subwords = p.rewrite(subwords)
@@ -28,27 +28,19 @@ func (p *pipeline) input(word string) {
 	p.tr.TraceWord("input", "", word)
 }
 
-// 1. Dictate (Word -> Word)
-func (p *pipeline) dictate(word string) (string, bool) {
-	id := p.h.spec.Lang.Dictate
+// 1. Pronounce (Word -> Word)
+func (p *pipeline) pronounce(word string) (string, bool) {
+	id := p.h.spec.Lang.Pronounce
 	if id == "" {
 		return word, true
 	}
 
-	d, ok := GetDictator(id)
+	d, ok := GetPronouncer(id)
 	if !ok {
 		return word, false
 	}
 
-	// TODO(sublee): Aware of exception letters.
-	var buf bytes.Buffer
-
-	for _, lexeme := range d.Dictate(word) {
-		pron := lexeme[1]
-		buf.WriteString(pron)
-	}
-
-	return buf.String(), true
+	return d.Pronounce(word), true
 }
 
 // 2. Normalize (Word -> Word)
