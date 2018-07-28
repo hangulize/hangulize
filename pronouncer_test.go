@@ -3,16 +3,10 @@ package hangulize
 import (
 	"testing"
 
-	"github.com/hangulize/hangulize/pronounce/furigana"
 	"github.com/stretchr/testify/assert"
+
+	_ "github.com/hangulize/hangulize/pronounce" // register all pronouncers
 )
-
-// -----------------------------------------------------------------------------
-// Use all pronouncers automatically for test.
-
-func init() {
-	UsePronouncer(&furigana.P)
-}
 
 // -----------------------------------------------------------------------------
 
