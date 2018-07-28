@@ -4,7 +4,13 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/hangulize/hangulize"
 )
+
+func TestPronouncer(t *testing.T) {
+	assert.Implements(t, (*hangulize.Pronouncer)(nil), &P)
+}
 
 func TestKana(t *testing.T) {
 	assert.Equal(t, "ない", P.Pronounce("ない"))
