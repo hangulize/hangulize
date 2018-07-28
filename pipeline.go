@@ -29,6 +29,11 @@ func (p *pipeline) input(word string) {
 }
 
 // 1. Pronounce (Word -> Word)
+//
+// This step guesses the pronunciation from the spelling based on lexical
+// analysis. Most languages don't require this step. But some languages, such
+// as English, just the spelling is not enough to guess the pronunciation.
+//
 func (p *pipeline) pronounce(word string) (string, bool) {
 	id := p.h.spec.Lang.Pronounce
 	if id == "" {
