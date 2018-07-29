@@ -35,21 +35,21 @@ func (p *furiganaPronouncer) Kagome() *kagome.Tokenizer {
 
 func (p *furiganaPronouncer) Pronounce(word string) string {
 	const (
-		furiganaMin = rune(0x4e00)
-		furiganaMax = rune(0x9faf)
+		kanjiMin = rune(0x4e00)
+		kanjiMax = rune(0x9faf)
 	)
 
-	furiganaFound := false
+	kanjiFound := false
 	for _, ch := range word {
-		if ch >= furiganaMin && ch <= furiganaMax {
-			furiganaFound = true
+		if ch >= kanjiMin && ch <= kanjiMax {
+			kanjiFound = true
 			break
 		}
 	}
 
-	// Don't initialize the Kagome tokenizer if there's no furigana because
+	// Don't initialize the Kagome tokenizer if there's no Kanji because
 	// Kagome is expensive.
-	if !furiganaFound {
+	if !kanjiFound {
 		return word
 	}
 
