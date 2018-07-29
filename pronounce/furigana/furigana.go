@@ -49,33 +49,35 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 
 	// Don't initialize the Kagome tokenizer if there's no Kanji because
 	// Kagome is expensive.
-	if !kanjiFound {
-		return word
-	}
+	if kanjiFound {
+		var morphs []string
 
-	var morphs []string
+		for _, tok := range p.Kagome().Tokenize(word) {
+			spell := tok.Surface
+			var pron string
 
-	for _, tok := range p.Kagome().Tokenize(word) {
-		spell := tok.Surface
-		var pron string
+			switch tok.Class {
 
-		switch tok.Class {
+			case kagome.KNOWN:
+				fs := tok.Features()
+				pron = fs[7]
+				morphs = append(morphs, pron)
 
-		case kagome.KNOWN:
-			fs := tok.Features()
-			pron = fs[7]
-			morphs = append(morphs, pron)
+			case kagome.UNKNOWN:
+				if strings.TrimSpace(spell) != "" {
+					morphs = append(morphs, spell)
+				}
 
-		case kagome.UNKNOWN:
-			if strings.TrimSpace(spell) != "" {
-				morphs = append(morphs, spell)
+			default:
+				continue
+
 			}
-
-		default:
-			continue
-
 		}
+
+		word = strings.Join(morphs, " ")
 	}
 
-	return strings.Join(morphs, " ")
+	word = repeatKana(word)
+	return word
+
 }
