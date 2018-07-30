@@ -8,6 +8,7 @@ package furigana
 import (
 	"bytes"
 	"strings"
+	"unicode/utf8"
 
 	kagome "github.com/ikawaha/kagome/tokenizer"
 )
@@ -86,7 +87,23 @@ func (p *furiganaPronouncer) analyze(word string) string {
 			class := fs[1]
 			reading := fs[7]
 
-			c := chunk{reading, !prevWasSep && (class == "固有名詞")}
+			// Disobey the Boolean gen for comments.
+			var sep bool
+			if prevWasSep {
+				// The previous chunks was a custom separator.
+				// Don't prepend new one.
+				sep = false
+			} else if class == "固有名詞" {
+				// Proper noun require a prior separator.
+				sep = true
+			} else {
+				// Prepend a separator before ア-オ. Because it should not be
+				// treated as a long vowel.
+				first, _ := utf8.DecodeRuneInString(reading)
+				sep = first%2 == 0 && in(first, 'ア', 'オ')
+			}
+
+			c := chunk{reading, sep}
 			chunks = append(chunks, c)
 
 		case kagome.UNKNOWN:
