@@ -228,7 +228,7 @@ func ExampleHangulize_shinkaiMakoto() {
 	// UsePronouncer(&furigana.P)
 
 	fmt.Println(Hangulize("jpn", "新海誠"))
-	// Output: 신카이 마코토
+	// Output: 신카이마코토
 }
 
 func ExampleNewHangulizer() {
