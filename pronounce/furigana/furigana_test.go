@@ -18,8 +18,8 @@ func TestKana(t *testing.T) {
 }
 
 func TestPersons(t *testing.T) {
-	assert.Equal(t, "シンカイ マコト", P.Pronounce("新海誠"))
-	assert.Equal(t, "マツモト ユキヒロ", P.Pronounce("松本行弘"))
+	assert.Equal(t, "シンカイ・マコト", P.Pronounce("新海誠"))
+	assert.Equal(t, "マツモト・ユキヒロ", P.Pronounce("松本行弘"))
 }
 
 func TestPlaces(t *testing.T) {
