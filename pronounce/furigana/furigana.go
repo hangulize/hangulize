@@ -50,7 +50,7 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 	// Don't initialize the Kagome tokenizer if there's no Kanji because
 	// Kagome is expensive.
 	if kanjiFound {
-		var morphs []string
+		var chunks []string
 
 		for _, tok := range p.Kagome().Tokenize(word) {
 			spell := tok.Surface
@@ -61,11 +61,14 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 			case kagome.KNOWN:
 				fs := tok.Features()
 				pron = fs[7]
-				morphs = append(morphs, pron)
+				chunks = append(chunks, pron, "・")
 
 			case kagome.UNKNOWN:
-				if strings.TrimSpace(spell) != "" {
-					morphs = append(morphs, spell)
+				if strings.TrimSpace(spell) == "" {
+					// Use the input spaces as a glue.
+					chunks = append(chunks[:len(chunks)-1], spell)
+				} else {
+					chunks = append(chunks, spell, "・")
 				}
 
 			default:
@@ -74,7 +77,12 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 			}
 		}
 
-		word = strings.Join(morphs, " ")
+		// Discard the final glue.
+		if len(chunks) > 0 {
+			chunks = chunks[:len(chunks)-1]
+		}
+
+		word = strings.Join(chunks, "")
 	}
 
 	word = repeatKana(word)
