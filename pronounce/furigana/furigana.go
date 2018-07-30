@@ -67,7 +67,7 @@ type chunk struct {
 func (p *furiganaPronouncer) analyze(word string) string {
 	var chunks []chunk
 
-	prevWasSep := false
+	skipNextSep := false
 
 	for _, tok := range p.Kagome().Tokenize(word) {
 		switch tok.Class {
@@ -84,15 +84,19 @@ func (p *furiganaPronouncer) analyze(word string) string {
 			// 7: reading
 			// 8: pronunciation
 
-			class := fs[1]
-			reading := fs[7]
+			var (
+				part    = fs[0]
+				class   = fs[1]
+				reading = fs[7]
+			)
 
 			// Disobey the Boolean gen for comments.
 			var sep bool
-			if prevWasSep {
+			if skipNextSep {
 				// The previous chunks was a custom separator.
 				// Don't prepend new one.
 				sep = false
+				skipNextSep = false
 			} else if class == "固有名詞" {
 				// Proper noun require a prior separator.
 				sep = true
@@ -106,6 +110,11 @@ func (p *furiganaPronouncer) analyze(word string) string {
 			c := chunk{reading, sep}
 			chunks = append(chunks, c)
 
+			if part == "フィラー" {
+				// Just fillers should be merged with the next chunk.
+				skipNextSep = true
+			}
+
 		case kagome.UNKNOWN:
 			surf := tok.Surface
 			isSpace := strings.TrimSpace(surf) == ""
@@ -113,10 +122,11 @@ func (p *furiganaPronouncer) analyze(word string) string {
 			var c *chunk
 			if isSpace {
 				// Whitespace is used as the sep.
-				prevWasSep = true
 				c = &chunk{surf, false}
+				skipNextSep = true
 			} else {
-				c = &chunk{surf, !prevWasSep}
+				c = &chunk{surf, !skipNextSep}
+				skipNextSep = false
 			}
 			chunks = append(chunks, *c)
 
