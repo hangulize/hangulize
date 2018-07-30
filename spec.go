@@ -28,9 +28,8 @@ type Spec struct {
 	Rewrite    []*Rule
 	Transcribe []*Rule
 
-	// Test and public examples
-	Test     [][2]string
-	Examples [][2]string
+	// Test examples
+	Test [][2]string
 
 	// Source code
 	Source string
@@ -139,18 +138,17 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// test
-	var testPairs []hgl.Pair
+	test := make([][2]string, 0)
 	if sec, ok := h["test"]; ok {
-		testPairs = sec.(*hgl.ListSection).Array()
-	}
-	test := newExamples(testPairs)
+		for _, pair := range sec.(*hgl.ListSection).Array() {
+			word := pair.Left()
+			transcribed := pair.Right()[0]
 
-	// examples
-	var examplePairs []hgl.Pair
-	if sec, ok := h["examples"]; ok {
-		examplePairs = sec.(*hgl.ListSection).Array()
+			exm := [2]string{word, transcribed}
+
+			test = append(test, exm)
+		}
 	}
-	examples := newExamples(examplePairs)
 
 	// -------------------------------------------------------------------------
 
@@ -186,7 +184,6 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 		transcribe,
 
 		test,
-		examples,
 
 		source,
 
@@ -281,23 +278,6 @@ func newRules(
 	}
 
 	return rules, nil
-}
-
-// -----------------------------------------------------------------------------
-// "test"/"examples" secsion
-
-func newExamples(pairs []hgl.Pair) [][2]string {
-	exms := make([][2]string, 0)
-
-	for _, pair := range pairs {
-		word := pair.Left()
-		transcribed := pair.Right()[0]
-
-		exm := [2]string{word, transcribed}
-		exms = append(exms, exm)
-	}
-
-	return exms
 }
 
 // -----------------------------------------------------------------------------
