@@ -37,6 +37,6 @@ func TestRepeatKana(t *testing.T) {
 }
 
 func TestNakaguroBetweenProperNouns(t *testing.T) {
-	assert.Equal(t, "カゼノタニノ・ナウシカ", P.Pronounce("風の谷のナウシカ"))
+	assert.Equal(t, "カゼノタニ", P.Pronounce("風の谷"))
 	assert.Equal(t, "キムラ・タクヤ", P.Pronounce("木村拓哉"))
 }

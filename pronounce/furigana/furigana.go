@@ -6,6 +6,7 @@ pronounced. This pronouncer uses IPADIC in Kagome to analyze Kanji.
 package furigana
 
 import (
+	"bytes"
 	"strings"
 
 	kagome "github.com/ikawaha/kagome/tokenizer"
@@ -50,42 +51,78 @@ func (p *furiganaPronouncer) Pronounce(word string) string {
 	// Don't initialize the Kagome tokenizer if there's no Kanji because
 	// Kagome is expensive.
 	if kanjiFound {
-		var chunks []string
-
-		for _, tok := range p.Kagome().Tokenize(word) {
-			spell := tok.Surface
-			var pron string
-
-			switch tok.Class {
-
-			case kagome.KNOWN:
-				fs := tok.Features()
-				pron = fs[7]
-				chunks = append(chunks, pron, "・")
-
-			case kagome.UNKNOWN:
-				if strings.TrimSpace(spell) == "" {
-					// Use the input spaces as a glue.
-					chunks = append(chunks[:len(chunks)-1], spell)
-				} else {
-					chunks = append(chunks, spell, "・")
-				}
-
-			default:
-				continue
-
-			}
-		}
-
-		// Discard the final glue.
-		if len(chunks) > 0 {
-			chunks = chunks[:len(chunks)-1]
-		}
-
-		word = strings.Join(chunks, "")
+		word = p.analyze(word)
 	}
 
 	word = repeatKana(word)
 	return word
+}
 
+type chunk struct {
+	s   string
+	sep bool
+}
+
+func (p *furiganaPronouncer) analyze(word string) string {
+	var chunks []chunk
+
+	prevWasSep := false
+
+	for _, tok := range p.Kagome().Tokenize(word) {
+		switch tok.Class {
+
+		case kagome.KNOWN:
+			fs := tok.Features()
+			// 0: part-of-speech
+			// 1: sub-class 1
+			// 2: sub-class 2
+			// 3: sub-class 3
+			// 4: inflection
+			// 5: conjugation
+			// 6: root-form
+			// 7: reading
+			// 8: pronunciation
+
+			class := fs[1]
+			reading := fs[7]
+
+			c := chunk{reading, !prevWasSep && (class == "固有名詞")}
+			chunks = append(chunks, c)
+
+		case kagome.UNKNOWN:
+			surf := tok.Surface
+			isSpace := strings.TrimSpace(surf) == ""
+
+			var c *chunk
+			if isSpace {
+				// Whitespace is used as the sep.
+				prevWasSep = true
+				c = &chunk{surf, false}
+			} else {
+				c = &chunk{surf, !prevWasSep}
+			}
+			chunks = append(chunks, *c)
+
+		default:
+			continue
+
+		}
+	}
+
+	var buf bytes.Buffer
+
+	skipSep := true
+	for _, c := range chunks {
+		if c.sep {
+			if skipSep {
+				skipSep = false
+			} else {
+				// Separate this chunk by Nakaguro.
+				buf.WriteRune('・')
+			}
+		}
+		buf.WriteString(c.s)
+	}
+
+	return buf.String()
 }
