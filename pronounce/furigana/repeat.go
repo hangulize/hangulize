@@ -56,14 +56,10 @@ func isKatakana(ch rune) bool {
 func toSeion(ch rune) rune {
 	switch ch {
 
-	case 'ゔ':
-		fallthrough
-	case 'ヴ':
+	case 'ゔ', 'ヴ':
 		return ch - 78
 
-	case 'ゞ':
-		fallthrough
-	case 'ヾ':
+	case 'ゞ', 'ヾ':
 		return ch - 1
 
 	}
@@ -92,14 +88,10 @@ func toSeion(ch rune) rune {
 func toDakuon(ch rune) rune {
 	switch ch {
 
-	case 'う':
-		fallthrough
-	case 'ウ':
+	case 'う', 'ウ':
 		return ch + 78
 
-	case 'ゝ':
-		fallthrough
-	case 'ヽ':
+	case 'ゝ', 'ヽ':
 		return ch + 1
 
 	}
