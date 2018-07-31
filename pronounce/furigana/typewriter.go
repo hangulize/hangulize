@@ -108,8 +108,9 @@ func (t *typewriter) Typewrite() string {
 			break
 		}
 
-		if prevCat == filler || prevCat == space || prevCat == illegal {
-			// Any separator not needed.
+		// Prevent a redundant separator.
+		switch prevCat {
+		case space, filler, punct, illegal:
 			buf.WriteString(str)
 			continue
 		}
