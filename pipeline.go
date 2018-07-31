@@ -279,23 +279,35 @@ func (p *pipeline) localizePuncts(word string) string {
 	chars := []rune(word)
 	last := len(chars) - 1
 
+	// Pre-evaluate punct or space classification.
+	isPunct := make(map[int]bool)
+	isSpace := make(map[int]bool)
+	for i, ch := range chars {
+		isPunct[i] = unicode.IsPunct(ch)
+		isSpace[i] = unicode.IsSpace(ch)
+	}
+	isSpace[-1] = true
+	isSpace[last+1] = true
+
 	var buf bytes.Buffer
 
 	for i, ch := range chars {
-		if !unicode.IsPunct(ch) {
+		if !isPunct[i] {
 			buf.WriteRune(ch)
 			continue
 		}
 
 		punct := script.LocalizePunct(ch)
 
-		// Trim left space at the first.
-		if i == 0 {
+		// Trim left after punct or space.
+		l := i - 1
+		if isPunct[l] || isSpace[l] {
 			punct = strings.TrimLeftFunc(punct, unicode.IsSpace)
 		}
 
-		// Trim right space at the last.
-		if i == last {
+		// Trim right before punct or space.
+		r := i + 1
+		if isPunct[r] || isSpace[r] {
 			punct = strings.TrimRightFunc(punct, unicode.IsSpace)
 		}
 

@@ -170,6 +170,14 @@ func (_Kana) LocalizePunct(punct rune) string {
 		return ". "
 	case '、':
 		return ", "
+	case '：':
+		return ": "
+	case '！':
+		return "! "
+	case '？':
+		return "? "
+	case '〜':
+		return "~"
 	case '「':
 		return " '"
 	case '」':
