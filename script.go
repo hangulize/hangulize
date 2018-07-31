@@ -61,6 +61,7 @@ func (_Latin) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
+// LocalizePunct does nothing.
 func (_Latin) LocalizePunct(punct rune) string {
 	return string(punct)
 }
@@ -83,6 +84,7 @@ func (_Cyrillic) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
+// LocalizePunct does nothing.
 func (_Cyrillic) LocalizePunct(punct rune) string {
 	return string(punct)
 }
@@ -106,6 +108,7 @@ func (_Georgian) Normalize(ch rune) rune {
 	return ch
 }
 
+// LocalizePunct does nothing.
 func (_Georgian) LocalizePunct(punct rune) string {
 	return string(punct)
 }
@@ -128,6 +131,7 @@ func (_Greek) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
+// LocalizePunct does nothing.
 func (_Greek) LocalizePunct(punct rune) string {
 	return string(punct)
 }
