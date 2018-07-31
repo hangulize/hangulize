@@ -10,6 +10,7 @@ import (
 type script interface {
 	Is(rune) bool
 	Normalize(rune) rune
+	LocalizePunct(rune) string
 }
 
 // scripts is the registry of Scripts by their name.
@@ -60,6 +61,10 @@ func (_Latin) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
+func (_Latin) LocalizePunct(punct rune) string {
+	return string(punct)
+}
+
 // -----------------------------------------------------------------------------
 
 // _Cyrillic represents the Cyrillic script.
@@ -76,6 +81,10 @@ func (_Cyrillic) Is(ch rune) bool {
 // Normalize converts character into lower case.
 func (_Cyrillic) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
+}
+
+func (_Cyrillic) LocalizePunct(punct rune) string {
+	return string(punct)
 }
 
 // -----------------------------------------------------------------------------
@@ -97,6 +106,10 @@ func (_Georgian) Normalize(ch rune) rune {
 	return ch
 }
 
+func (_Georgian) LocalizePunct(punct rune) string {
+	return string(punct)
+}
+
 // -----------------------------------------------------------------------------
 
 // _Greek represents the Greek script.
@@ -113,6 +126,10 @@ func (_Greek) Is(ch rune) bool {
 // Normalize converts character into lower case.
 func (_Greek) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
+}
+
+func (_Greek) LocalizePunct(punct rune) string {
+	return string(punct)
 }
 
 // -----------------------------------------------------------------------------
@@ -140,4 +157,24 @@ func (_Kana) Normalize(ch rune) rune {
 		return ch + 96
 	}
 	return ch
+}
+
+// LocalizePunct converts a Japanese punctuation to fit in Korean.
+func (_Kana) LocalizePunct(punct rune) string {
+	switch punct {
+	case '。':
+		return ". "
+	case '、':
+		return ", "
+	case '「':
+		return " '"
+	case '」':
+		return "' "
+	case '『':
+		return " \""
+	case '』':
+		return "\" "
+	}
+
+	return string(punct)
 }

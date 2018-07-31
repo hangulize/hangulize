@@ -3,6 +3,7 @@ package hangulize
 import (
 	"bytes"
 	"strings"
+	"unicode"
 )
 
 type pipeline struct {
@@ -13,12 +14,20 @@ type pipeline struct {
 // forward runs the Hangulize pipeline for a word.
 func (p *pipeline) forward(word string) string {
 	p.input(word)
+
+	// preparing phase
 	word, _ = p.pronounce(word)
 	word = p.normalize(word)
+
+	// transcribing phase
 	subwords := p.group(word)
 	subwords = p.rewrite(subwords)
 	subwords = p.transcribe(subwords)
+
+	// finalizing phase
 	word = p.composeHangul(subwords)
+	word = p.localizePuncts(word)
+
 	return word
 }
 
@@ -252,4 +261,31 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	p.tr.TraceWord("compose hangul", "", word)
 
 	return word
+}
+
+func (p *pipeline) localizePuncts(word string) string {
+	script := p.h.spec.script
+	chars := []rune(word)
+	last := len(chars) - 1
+
+	var buf bytes.Buffer
+
+	for i, ch := range chars {
+		if !unicode.IsPunct(ch) {
+			buf.WriteRune(ch)
+			continue
+		}
+
+		punct := script.LocalizePunct(ch)
+		if i == 0 {
+			punct = strings.TrimLeftFunc(punct, unicode.IsSpace)
+		}
+		if i == last {
+			punct = strings.TrimRightFunc(punct, unicode.IsSpace)
+		}
+
+		buf.WriteString(punct)
+	}
+
+	return buf.String()
 }
