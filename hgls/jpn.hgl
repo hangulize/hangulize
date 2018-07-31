@@ -219,7 +219,15 @@ test:
     "茅ヶ崎"   -> "지가사키"
     "関ヶ原"   -> "세키가하라"
 
-    # Small Katakana letters
+    # Loanwords
+    "パソコン"     -> "파소콘"
+    "トイレット"   -> "도이렛토"
+    "バス"         -> "바스"
+    "タクシー"     -> "다쿠시"
+    "キーボード"   -> "기보도"
+    "マクドナルド" -> "마쿠도나루도"
+
+    # Loanwords with small Katakana letters
     "ディーブイディー" -> "디부이디"
 
     # Loanwords with "ヴ"
