@@ -10,7 +10,7 @@ import (
 type script interface {
 	Is(rune) bool
 	Normalize(rune) rune
-	LocalizePunct(rune) string
+	TransliteratePunct(rune) string
 }
 
 // scripts is the registry of Scripts by their name.
@@ -61,8 +61,8 @@ func (_Latin) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
-// LocalizePunct does nothing.
-func (_Latin) LocalizePunct(punct rune) string {
+// TransliteratePunct does nothing.
+func (_Latin) TransliteratePunct(punct rune) string {
 	return string(punct)
 }
 
@@ -84,8 +84,8 @@ func (_Cyrillic) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
-// LocalizePunct does nothing.
-func (_Cyrillic) LocalizePunct(punct rune) string {
+// TransliteratePunct does nothing.
+func (_Cyrillic) TransliteratePunct(punct rune) string {
 	return string(punct)
 }
 
@@ -108,8 +108,8 @@ func (_Georgian) Normalize(ch rune) rune {
 	return ch
 }
 
-// LocalizePunct does nothing.
-func (_Georgian) LocalizePunct(punct rune) string {
+// TransliteratePunct does nothing.
+func (_Georgian) TransliteratePunct(punct rune) string {
 	return string(punct)
 }
 
@@ -131,8 +131,8 @@ func (_Greek) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
-// LocalizePunct does nothing.
-func (_Greek) LocalizePunct(punct rune) string {
+// TransliteratePunct does nothing.
+func (_Greek) TransliteratePunct(punct rune) string {
 	return string(punct)
 }
 
@@ -163,8 +163,8 @@ func (_Kana) Normalize(ch rune) rune {
 	return ch
 }
 
-// LocalizePunct converts a Japanese punctuation to fit in Korean.
-func (_Kana) LocalizePunct(punct rune) string {
+// TransliteratePunct converts a Japanese punctuation to fit in Korean.
+func (_Kana) TransliteratePunct(punct rune) string {
 	switch punct {
 	case '。':
 		return ". "

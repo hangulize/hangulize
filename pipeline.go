@@ -26,7 +26,7 @@ func (p *pipeline) forward(word string) string {
 
 	// finalizing phase
 	word = p.composeHangul(subwords)
-	word = p.localizePuncts(word)
+	word = p.transliteratePuncts(word)
 
 	return word
 }
@@ -263,7 +263,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	return word
 }
 
-// 7. Localize Puncts (Word -> Word)
+// 7. Transliterate Punctuations (Word -> Word)
 //
 // Finally, this step converts foreign punctuations to fit it Korean.
 //
@@ -273,7 +273,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 //
 // For example, "「...」" will be "'...'".
 //
-func (p *pipeline) localizePuncts(word string) string {
+func (p *pipeline) transliteratePuncts(word string) string {
 	script := p.h.spec.script
 
 	chars := []rune(word)
@@ -297,7 +297,7 @@ func (p *pipeline) localizePuncts(word string) string {
 			continue
 		}
 
-		punct := script.LocalizePunct(ch)
+		punct := script.TransliteratePunct(ch)
 
 		// Trim left after punct or space.
 		l := i - 1
