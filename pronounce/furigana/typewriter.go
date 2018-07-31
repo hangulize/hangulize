@@ -21,51 +21,6 @@ const (
 	unknownText
 )
 
-func interpretToken(tok *kagome.Token) (string, category) {
-	str := tok.Surface
-	cat := unknownText
-
-	if tok.Class == kagome.KNOWN {
-		// 0: part-of-speech
-		// 1: sub-class 1
-		// 2: sub-class 2
-		// 3: sub-class 3
-		// 4: inflection
-		// 5: conjugation
-		// 6: root-form
-		// 7: reading
-		// 8: pronunciation
-		fs := tok.Features()
-		var (
-			partOfSpeech = fs[0]
-			subClass1    = fs[1]
-			subClass2    = fs[2]
-			reading      = fs[7]
-		)
-
-		str = reading
-
-		if partOfSpeech == "フィラー" {
-			cat = filler
-		} else if partOfSpeech == "記号" {
-			cat = punct
-		} else if subClass2 == "人名" {
-			cat = personName
-		} else if subClass1 == "固有名詞" {
-			cat = properNoun
-		} else {
-			cat = morpheme
-		}
-	} else {
-		isSpace := strings.TrimSpace(str) == ""
-		if isSpace {
-			cat = space
-		}
-	}
-
-	return str, cat
-}
-
 type typewriter struct {
 	tokens  []kagome.Token
 	cur     int
@@ -144,4 +99,49 @@ func (t *typewriter) Typewrite() string {
 	}
 
 	return buf.String()
+}
+
+func interpretToken(tok *kagome.Token) (string, category) {
+	str := tok.Surface
+	cat := unknownText
+
+	if tok.Class == kagome.KNOWN {
+		// 0: part-of-speech
+		// 1: sub-class 1
+		// 2: sub-class 2
+		// 3: sub-class 3
+		// 4: inflection
+		// 5: conjugation
+		// 6: root-form
+		// 7: reading
+		// 8: pronunciation
+		fs := tok.Features()
+		var (
+			partOfSpeech = fs[0]
+			subClass1    = fs[1]
+			subClass2    = fs[2]
+			reading      = fs[7]
+		)
+
+		str = reading
+
+		if partOfSpeech == "フィラー" {
+			cat = filler
+		} else if partOfSpeech == "記号" {
+			cat = punct
+		} else if subClass2 == "人名" {
+			cat = personName
+		} else if subClass1 == "固有名詞" {
+			cat = properNoun
+		} else {
+			cat = morpheme
+		}
+	} else {
+		isSpace := strings.TrimSpace(str) == ""
+		if isSpace {
+			cat = space
+		}
+	}
+
+	return str, cat
 }
