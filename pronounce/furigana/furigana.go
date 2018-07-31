@@ -6,8 +6,6 @@ pronounced. This pronouncer uses IPADIC in Kagome to analyze Kanji.
 package furigana
 
 import (
-	"strings"
-
 	kagome "github.com/ikawaha/kagome/tokenizer"
 )
 
@@ -35,47 +33,26 @@ func (p *furiganaPronouncer) Kagome() *kagome.Tokenizer {
 
 func (p *furiganaPronouncer) Pronounce(word string) string {
 	const (
-		furiganaMin = rune(0x4e00)
-		furiganaMax = rune(0x9faf)
+		kanjiMin = rune(0x4e00)
+		kanjiMax = rune(0x9faf)
 	)
 
-	furiganaFound := false
+	kanjiFound := false
 	for _, ch := range word {
-		if ch >= furiganaMin && ch <= furiganaMax {
-			furiganaFound = true
+		if ch >= kanjiMin && ch <= kanjiMax {
+			kanjiFound = true
 			break
 		}
 	}
 
-	// Don't initialize the Kagome tokenizer if there's no furigana because
+	// Don't initialize the Kagome tokenizer if there's no Kanji because
 	// Kagome is expensive.
-	if !furiganaFound {
-		return word
+	if kanjiFound {
+		tokens := p.Kagome().Tokenize(word)
+		tw := newTypewriter(tokens)
+		word = tw.Typewrite()
 	}
 
-	var morphs []string
-
-	for _, tok := range p.Kagome().Tokenize(word) {
-		spell := tok.Surface
-		var pron string
-
-		switch tok.Class {
-
-		case kagome.KNOWN:
-			fs := tok.Features()
-			pron = fs[7]
-			morphs = append(morphs, pron)
-
-		case kagome.UNKNOWN:
-			if strings.TrimSpace(spell) != "" {
-				morphs = append(morphs, spell)
-			}
-
-		default:
-			continue
-
-		}
-	}
-
-	return strings.Join(morphs, " ")
+	word = repeatKana(word)
+	return word
 }

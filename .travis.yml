@@ -8,7 +8,7 @@ install:
 - go get -v -t ./...
 
 script:
-- go test -v
+- go test -v ./...
 
 env:
   global:
