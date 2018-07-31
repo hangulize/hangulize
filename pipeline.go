@@ -70,7 +70,7 @@ func (p *pipeline) normalize(word string) string {
 		if except.HasRune(ch) {
 			buf.WriteRune(ch)
 		} else {
-			buf.WriteRune(script.Normalize(ch))
+			buf.WriteString(script.Normalize(ch))
 		}
 	}
 
