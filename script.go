@@ -10,6 +10,7 @@ import (
 type script interface {
 	Is(rune) bool
 	Normalize(rune) rune
+	TransliteratePunct(rune) string
 }
 
 // scripts is the registry of Scripts by their name.
@@ -60,6 +61,11 @@ func (_Latin) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
+// TransliteratePunct does nothing.
+func (_Latin) TransliteratePunct(punct rune) string {
+	return string(punct)
+}
+
 // -----------------------------------------------------------------------------
 
 // _Cyrillic represents the Cyrillic script.
@@ -76,6 +82,11 @@ func (_Cyrillic) Is(ch rune) bool {
 // Normalize converts character into lower case.
 func (_Cyrillic) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
+}
+
+// TransliteratePunct does nothing.
+func (_Cyrillic) TransliteratePunct(punct rune) string {
+	return string(punct)
 }
 
 // -----------------------------------------------------------------------------
@@ -97,6 +108,11 @@ func (_Georgian) Normalize(ch rune) rune {
 	return ch
 }
 
+// TransliteratePunct does nothing.
+func (_Georgian) TransliteratePunct(punct rune) string {
+	return string(punct)
+}
+
 // -----------------------------------------------------------------------------
 
 // _Greek represents the Greek script.
@@ -113,6 +129,11 @@ func (_Greek) Is(ch rune) bool {
 // Normalize converts character into lower case.
 func (_Greek) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
+}
+
+// TransliteratePunct does nothing.
+func (_Greek) TransliteratePunct(punct rune) string {
+	return string(punct)
 }
 
 // -----------------------------------------------------------------------------
@@ -140,4 +161,32 @@ func (_Kana) Normalize(ch rune) rune {
 		return ch + 96
 	}
 	return ch
+}
+
+// TransliteratePunct converts a Japanese punctuation to fit in Korean.
+func (_Kana) TransliteratePunct(punct rune) string {
+	switch punct {
+	case '。':
+		return ". "
+	case '、':
+		return ", "
+	case '：':
+		return ": "
+	case '！':
+		return "! "
+	case '？':
+		return "? "
+	case '〜':
+		return "~"
+	case '「':
+		return " '"
+	case '」':
+		return "' "
+	case '『':
+		return " \""
+	case '』':
+		return "\" "
+	}
+
+	return string(punct)
 }

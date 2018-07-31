@@ -3,6 +3,7 @@ package hangulize
 import (
 	"bytes"
 	"strings"
+	"unicode"
 )
 
 type pipeline struct {
@@ -13,12 +14,20 @@ type pipeline struct {
 // forward runs the Hangulize pipeline for a word.
 func (p *pipeline) forward(word string) string {
 	p.input(word)
+
+	// preparing phase
 	word, _ = p.pronounce(word)
 	word = p.normalize(word)
+
+	// transcribing phase
 	subwords := p.group(word)
 	subwords = p.rewrite(subwords)
 	subwords = p.transcribe(subwords)
+
+	// finalizing phase
 	word = p.composeHangul(subwords)
+	word = p.transliteratePuncts(word)
+
 	return word
 }
 
@@ -252,4 +261,58 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	p.tr.TraceWord("compose hangul", "", word)
 
 	return word
+}
+
+// 7. Transliterate Punctuations (Word -> Word)
+//
+// Finally, this step converts foreign punctuations to fit it Korean.
+//
+// Korean has adapted the European punctuations. Those are the most common in
+// the world. But a few langauges, such as Japanese or Chinese, use different
+// punctuations with Korean. This step will reduce that kind of culture gap.
+//
+// For example, "「...」" will be "'...'".
+//
+func (p *pipeline) transliteratePuncts(word string) string {
+	script := p.h.spec.script
+
+	chars := []rune(word)
+	last := len(chars) - 1
+
+	// Pre-evaluate punct or space classification.
+	isPunct := make(map[int]bool)
+	isSpace := make(map[int]bool)
+	for i, ch := range chars {
+		isPunct[i] = unicode.IsPunct(ch)
+		isSpace[i] = unicode.IsSpace(ch)
+	}
+	isSpace[-1] = true
+	isSpace[last+1] = true
+
+	var buf bytes.Buffer
+
+	for i, ch := range chars {
+		if !isPunct[i] {
+			buf.WriteRune(ch)
+			continue
+		}
+
+		punct := script.TransliteratePunct(ch)
+
+		// Trim left after punct or space.
+		l := i - 1
+		if isPunct[l] || isSpace[l] {
+			punct = strings.TrimLeftFunc(punct, unicode.IsSpace)
+		}
+
+		// Trim right before punct or space.
+		r := i + 1
+		if isPunct[r] || isSpace[r] {
+			punct = strings.TrimRightFunc(punct, unicode.IsSpace)
+		}
+
+		buf.WriteString(punct)
+	}
+
+	return buf.String()
 }
