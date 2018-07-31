@@ -113,6 +113,9 @@ func (p *furiganaPronouncer) analyze(word string) string {
 			if part == "フィラー" {
 				// Just fillers should be merged with the next chunk.
 				skipNextSep = true
+			} else if part == "記号" {
+				// Symbols are also separators.
+				skipNextSep = true
 			}
 
 		case kagome.UNKNOWN:
