@@ -263,8 +263,19 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	return word
 }
 
+// 7. Localize Puncts (Word -> Word)
+//
+// Finally, this step converts foreign punctuations to fit it Korean.
+//
+// Korean has adapted the European punctuations. Those are the most common in
+// the world. But a few langauges, such as Japanese or Chinese, use different
+// punctuations with Korean. This step will reduce that kind of culture gap.
+//
+// For example, "「...」" will be "'...'".
+//
 func (p *pipeline) localizePuncts(word string) string {
 	script := p.h.spec.script
+
 	chars := []rune(word)
 	last := len(chars) - 1
 
@@ -277,9 +288,13 @@ func (p *pipeline) localizePuncts(word string) string {
 		}
 
 		punct := script.LocalizePunct(ch)
+
+		// Trim left space at the first.
 		if i == 0 {
 			punct = strings.TrimLeftFunc(punct, unicode.IsSpace)
 		}
+
+		// Trim right space at the last.
 		if i == last {
 			punct = strings.TrimRightFunc(punct, unicode.IsSpace)
 		}
