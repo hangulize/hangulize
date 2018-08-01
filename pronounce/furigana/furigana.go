@@ -6,7 +6,7 @@ pronounced. This pronouncer uses IPADIC in Kagome to analyze Kanji.
 package furigana
 
 import (
-	kagome "github.com/ikawaha/kagome/tokenizer"
+	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
 
 // P is the Furigana dictator.

@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	kagome "github.com/ikawaha/kagome/tokenizer"
+	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
 
 type category int
