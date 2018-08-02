@@ -38,3 +38,9 @@ deploy:
   on:
     tags: true
     go: '1.10.x'
+- provider: script
+  script: bash trigger-build.sh api.hangulize.org
+  skip_cleanup: true
+  on:
+    tags: true
+    go: '1.9.x'
