@@ -208,6 +208,23 @@ func TestJpnKatakanaLongVowel(t *testing.T) {
 	assertHangulize(t, jpn, "제체", "チェチェ")
 }
 
+type stubFurigana struct{}
+
+func (p *stubFurigana) ID() string {
+	return "furigana"
+}
+
+func (p *stubFurigana) Pronounce(word string) string {
+	return "スタブ"
+}
+
+func TestInstancePronouncers(t *testing.T) {
+	spec, _ := LoadSpec("jpn")
+	h := NewHangulizer(spec)
+	h.UsePronouncer(&stubFurigana{})
+	assert.Equal(t, "스타부", h.Hangulize("1234"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
