@@ -43,10 +43,6 @@ func (h *Hangulizer) UnusePronouncer(id string) bool {
 // GetPronouncer returns a pronouncer by the ID.
 func (h *Hangulizer) GetPronouncer(id string) (Pronouncer, bool) {
 	p, ok := getPronouncer(id, &h.pronouncers)
-	if !ok {
-		// Fallback by the global pronouncer registry.
-		p, ok = getPronouncer(id, &globalPronouncers)
-	}
 	return p, ok
 }
 

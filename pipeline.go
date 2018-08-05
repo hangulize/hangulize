@@ -50,13 +50,22 @@ func (p *pipeline) pronounce(word string) (string, bool) {
 		return word, true
 	}
 
-	d, ok := p.h.GetPronouncer(id)
-	if !ok {
-		// The language requires a pronouncer but not imported yet.
-		return word, false
+	pron, ok := p.h.GetPronouncer(id)
+	if ok {
+		goto PronouncerFound
 	}
 
-	return d.Pronounce(word), true
+	// Fallback by the global pronouncer registry.
+	pron, ok = GetPronouncer(id)
+	if ok {
+		goto PronouncerFound
+	}
+
+	// The language requires a pronouncer but not imported yet.
+	return word, false
+
+PronouncerFound:
+	return pron.Pronounce(word), true
 }
 
 // 2. Normalize (Word -> Word)
