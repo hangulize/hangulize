@@ -50,7 +50,7 @@ func (p *pipeline) pronounce(word string) (string, bool) {
 		return word, true
 	}
 
-	d, ok := GetPronouncer(id)
+	d, ok := p.h.GetPronouncer(id)
 	if !ok {
 		// The language requires a pronouncer but not imported yet.
 		return word, false
