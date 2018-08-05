@@ -16,17 +16,38 @@ func Hangulize(lang string, word string) string {
 
 // Hangulizer provides the transcription logic for the underlying spec.
 type Hangulizer struct {
-	spec *Spec
+	spec        *Spec
+	pronouncers map[string]Pronouncer
 }
 
 // NewHangulizer creates a Hangulizer for a spec.
 func NewHangulizer(spec *Spec) *Hangulizer {
-	return &Hangulizer{spec}
+	return &Hangulizer{spec, make(map[string]Pronouncer)}
 }
 
 // Spec returns the underlying spec.
 func (h *Hangulizer) Spec() *Spec {
 	return h.spec
+}
+
+// UsePronouncer keeps a pronouncer for ready to use.
+func (h *Hangulizer) UsePronouncer(p Pronouncer) bool {
+	return usePronouncer(p, &h.pronouncers)
+}
+
+// UnusePronouncer discards a pronouncer.
+func (h *Hangulizer) UnusePronouncer(id string) bool {
+	return unusePronouncer(id, &h.pronouncers)
+}
+
+// GetPronouncer returns a pronouncer by the ID.
+func (h *Hangulizer) GetPronouncer(id string) (Pronouncer, bool) {
+	p, ok := getPronouncer(id, &h.pronouncers)
+	if !ok {
+		// Fallback by the global pronouncer registry.
+		p, ok = getPronouncer(id, &globalPronouncers)
+	}
+	return p, ok
 }
 
 // Hangulize transcribes a loanword into Hangul.

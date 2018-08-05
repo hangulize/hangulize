@@ -20,32 +20,50 @@ type Pronouncer interface {
 	Pronounce(string) string
 }
 
-// pronouncers is the registry holding the imported pronouncers.
-var pronouncers = make(map[string]Pronouncer)
-
-// UsePronouncer keeps a pronouncer for ready to use.
-func UsePronouncer(p Pronouncer) bool {
+// usePronouncer keeps a pronouncer into the given registry.
+func usePronouncer(p Pronouncer, pronouncers *map[string]Pronouncer) bool {
 	id := p.ID()
 
-	if _, ok := pronouncers[id]; ok {
+	if _, ok := (*pronouncers)[id]; ok {
 		return false
 	}
 
-	pronouncers[id] = p
+	(*pronouncers)[id] = p
 	return true
 }
 
-// UnusePronouncer discards an imported pronouncer.
-func UnusePronouncer(id string) bool {
-	_, ok := pronouncers[id]
+// unusePronouncer discards a pronouncer from the given registry.
+func unusePronouncer(id string, pronouncers *map[string]Pronouncer) bool {
+	_, ok := (*pronouncers)[id]
 	if ok {
-		delete(pronouncers, id)
+		delete(*pronouncers, id)
 	}
 	return ok
 }
 
-// GetPronouncer returns the imported pronouncer by the ID.
-func GetPronouncer(id string) (Pronouncer, bool) {
-	p, ok := pronouncers[id]
+// getPronouncer discards a pronouncer from the given registry.
+func getPronouncer(
+	id string,
+	pronouncers *map[string]Pronouncer,
+) (Pronouncer, bool) {
+	p, ok := (*pronouncers)[id]
 	return p, ok
+}
+
+// globalPronouncers is the registry holding the imported globalPronouncers.
+var globalPronouncers = make(map[string]Pronouncer)
+
+// UsePronouncer keeps a pronouncer for ready to use globally.
+func UsePronouncer(p Pronouncer) bool {
+	return usePronouncer(p, &globalPronouncers)
+}
+
+// UnusePronouncer discards a global pronouncer.
+func UnusePronouncer(id string) bool {
+	return unusePronouncer(id, &globalPronouncers)
+}
+
+// GetPronouncer returns a global pronouncer by the ID.
+func GetPronouncer(id string) (Pronouncer, bool) {
+	return getPronouncer(id, &globalPronouncers)
 }
