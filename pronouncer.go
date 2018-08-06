@@ -1,7 +1,7 @@
 package hangulize
 
-// Pronouncer is an interface to guess pronunciation from spelling based on
-// lexical analysis.
+// Pronouncer is an interface to guess the pronunciation from a spelling based
+// on lexical analysis.
 //
 // The lexical analysis may require large size of dictionary data. To keep
 // Hangulize lightweight, pronouncers are implemented out of this package.
