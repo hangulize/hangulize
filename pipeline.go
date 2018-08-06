@@ -25,8 +25,8 @@ func (p *pipeline) forward(word string) string {
 	subwords = p.transcribe(subwords)
 
 	// finalizing phase
-	word = p.composeHangul(subwords)
-	word = p.transliteratePuncts(word)
+	word = p.compose(subwords)
+	word = p.transliterate(word)
 
 	return word
 }
@@ -241,13 +241,13 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	return subwords
 }
 
-// 6. Compose Hangul (Subwords -> Word)
+// 6. Compose (Subwords -> Word)
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) composeHangul(subwords []subword) string {
+func (p *pipeline) compose(subwords []subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
@@ -272,7 +272,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	return word
 }
 
-// 7. Transliterate Punctuations (Word -> Word)
+// 7. Transliterate (Word -> Word)
 //
 // Finally, this step converts foreign punctuations to fit it Korean.
 //
@@ -282,7 +282,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 //
 // For example, "「...」" will be "'...'".
 //
-func (p *pipeline) transliteratePuncts(word string) string {
+func (p *pipeline) transliterate(word string) string {
 	script := p.h.spec.script
 
 	chars := []rune(word)
