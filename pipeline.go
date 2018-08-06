@@ -25,8 +25,8 @@ func (p *pipeline) forward(word string) string {
 	subwords = p.transcribe(subwords)
 
 	// finalizing phase
-	word = p.composeHangul(subwords)
-	word = p.transliteratePuncts(word)
+	word = p.compose(subwords)
+	word = p.transliterate(word)
 
 	return word
 }
@@ -44,19 +44,28 @@ func (p *pipeline) input(word string) {
 // as English, just the spelling is not enough to guess the pronunciation.
 //
 func (p *pipeline) pronounce(word string) (string, bool) {
-	id := p.h.spec.Lang.Pronounce
+	id := p.h.spec.Lang.Pronouncer
 	if id == "" {
 		// The language doesn't require a pronouncer. It's okay.
 		return word, true
 	}
 
-	d, ok := GetPronouncer(id)
-	if !ok {
-		// The language requires a pronouncer but not imported yet.
-		return word, false
+	pron, ok := p.h.GetPronouncer(id)
+	if ok {
+		goto PronouncerFound
 	}
 
-	return d.Pronounce(word), true
+	// Fallback by the global pronouncer registry.
+	pron, ok = GetPronouncer(id)
+	if ok {
+		goto PronouncerFound
+	}
+
+	// The language requires a pronouncer but not imported yet.
+	return word, false
+
+PronouncerFound:
+	return pron.Pronounce(word), true
 }
 
 // 2. Normalize (Word -> Word)
@@ -232,13 +241,13 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	return subwords
 }
 
-// 6. Compose Hangul (Subwords -> Word)
+// 6. Compose (Subwords -> Word)
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) composeHangul(subwords []subword) string {
+func (p *pipeline) compose(subwords []subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
@@ -263,7 +272,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 	return word
 }
 
-// 7. Transliterate Punctuations (Word -> Word)
+// 7. Transliterate (Word -> Word)
 //
 // Finally, this step converts foreign punctuations to fit it Korean.
 //
@@ -273,7 +282,7 @@ func (p *pipeline) composeHangul(subwords []subword) string {
 //
 // For example, "「...」" will be "'...'".
 //
-func (p *pipeline) transliteratePuncts(word string) string {
+func (p *pipeline) transliterate(word string) string {
 	script := p.h.spec.script
 
 	chars := []rune(word)

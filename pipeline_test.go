@@ -12,10 +12,10 @@ func TestTransliteratePuncts(t *testing.T) {
 	h := NewHangulizer(&s)
 	p := pipeline{h, nil}
 
-	assert.Equal(t, "foo.", p.transliteratePuncts("foo。"))
-	assert.Equal(t, ", foo, bar", p.transliteratePuncts("、foo、bar"))
-	assert.Equal(t, "foo, bar,", p.transliteratePuncts("foo、 bar、"))
-	assert.Equal(t, "'foo' bar", p.transliteratePuncts("「foo」bar"))
-	assert.Equal(t, "foo: bar!", p.transliteratePuncts("foo：bar！"))
-	assert.Equal(t, "foo!?", p.transliteratePuncts("foo！？"))
+	assert.Equal(t, "foo.", p.transliterate("foo。"))
+	assert.Equal(t, ", foo, bar", p.transliterate("、foo、bar"))
+	assert.Equal(t, "foo, bar,", p.transliterate("foo、 bar、"))
+	assert.Equal(t, "'foo' bar", p.transliterate("「foo」bar"))
+	assert.Equal(t, "foo: bar!", p.transliterate("foo：bar！"))
+	assert.Equal(t, "foo!?", p.transliterate("foo！？"))
 }
