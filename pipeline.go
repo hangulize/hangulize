@@ -44,7 +44,7 @@ func (p *pipeline) input(word string) {
 // as English, just the spelling is not enough to guess the pronunciation.
 //
 func (p *pipeline) pronounce(word string) (string, bool) {
-	id := p.h.spec.Lang.Pronounce
+	id := p.h.spec.Lang.Pronouncer
 	if id == "" {
 		// The language doesn't require a pronouncer. It's okay.
 		return word, true
