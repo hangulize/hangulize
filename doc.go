@@ -13,8 +13,8 @@ This Go re-implementation is a reboot of Hangulize with feature improvements.
 
 Pipeline
 
-Hangulize transcribes with 5 steps. These steps include "Normalize", "Group",
-"Rewrite", "Transcribe", and "Compose". To clarify these concepts,
+Basically, Hangulize transcribes with 5 steps. These steps include "Normalize",
+"Group", "Rewrite", "Transcribe", and "Compose". To clarify these concepts,
 let's consider an imaginary example of "Hello!" in English into "헬로!"
 (actually, English is not supported yet).
 
@@ -39,6 +39,26 @@ And it transcribes rewritten chunks into Hangul Jamo phonemes.
 Finally, it composes Jamo phonemes to Hangul syllables and joins all groups.
 
 	"ㅎㅔ-ㄹㄹㅗ", "!" -> "헬로!"
+
+Extended Pipeline
+
+Some languages, such as Japanese, may require 2 more steps: "Pronounce" and
+"Transliterate". The prior is before the Normalize step, and the latter is
+after the Compose step.
+
+Japanese uses Kanji which is an ideogram. There is the Kanji-to-Kana mapping
+called Furigana. To get Furigana from Kanji, we need a lexical analysis based
+on several dictionaries. The Pronounce step guesses the pronunciation from a
+spelling based on lexical analysis.
+
+	"日本語" -> "ニホンゴ"
+
+Furthermore, Japanese uses the full-width characters for puctuations while
+Korean and European languages use the half-width. The full-width puctuations
+need to be replaced with the half-width and a space to generate a comfortable
+Korean word. The Transliterate step replaces them.
+
+	"이마、아이니유키마스" -> "이마, 아이니유키마스"
 
 Spec
 
