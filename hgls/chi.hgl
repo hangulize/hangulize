@@ -1,10 +1,10 @@
 lang:
-    id        = "chi"
-    codes     = "zh", "chi"
-    english   = "Chinese"
-    korean    = "중국어"
-    script    = "latin"
-    pronounce = "pinyin"
+    id         = "chi"
+    codes      = "zh", "chi"
+    english    = "Chinese"
+    korean     = "중국어"
+    script     = "latin"
+    pronouncer = "pinyin"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"
