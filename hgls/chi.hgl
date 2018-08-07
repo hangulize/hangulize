@@ -11,14 +11,9 @@ config:
     stage  = "draft"
 
 rewrite:
-    "" -> ""
-
     "{j|q|x}u" -> "yu"
-    "n$" -> "n,"
 
 transcribe:
-    # "ng$" -> "-ㅇ"
-
     # 합구류
     "(w|u)ang" -> "ㅘ-ㅇ"
     "weng"     -> "ㅝ-ㅇ"
@@ -105,7 +100,6 @@ transcribe:
     "t" -> "ㅌ"
     "n" -> "ㄴ"
     "l" -> "ㄹ"
-    "n," -> "-ㄴ"
 
     # 설근성
     "g" -> "ㄱ"
