@@ -74,6 +74,7 @@ hun      draft    Hungarian                헝가리어
 isl      draft    Icelandic                아이슬란드어
 ita      draft    Italian                  이탈리아어
 jpn      draft    Japanese                 일본어
+jpn-ck   draft    Japanese (C.K.)          일본어(최영애-김용옥)
 kat-1    draft    Georgian (1st scheme)    조지아어(제1안)
 kat-2    draft    Georgian (2nd scheme)    조지아어(제2안)
 lat      draft    Latin                    라틴어
