@@ -1,7 +1,7 @@
 lang:
     id         = "jpn-ck"
     codes      = "ja", "jpn"
-    english    = "Japanese(C.K.)"
+    english    = "Japanese (C.K.)"
     korean     = "일본어(최영애-김용옥)"
     script     = "kana"
     pronouncer = "furigana"
@@ -116,24 +116,24 @@ rewrite:
 
     "ン" -> "N"
     "ッ" -> "T"
-
-    # Not in the official rules.
     "ヴ" -> "b"
 
+    # Small Vowels
+    "u'o"     -> "o"
+    "o'u"     -> "o"
+    "i'e"     -> "je"
+    "(u|e)'i" -> "i"
+
+    # Long Vowel Sign
     "{a}ー" -> "a"
     "{i}ー" -> "i"
     "{u}ー" -> "u"
     "{e}ー" -> "i"
     "{o}ー" -> "o"
 
-    "{(y|j)o}o" -> "O"
+    # Long Vowels
+    "{(y|j)o}o" -> "o"
     "{o}u"      -> "o"
-    "O"         -> "o"
-
-    "u'o"     -> "o"
-    "o'u"     -> "o"
-    "i'e"     -> "je"
-    "(u|e)'i" -> "i"
 
 transcribe:
     "cu" -> "ㅆㅡ"
