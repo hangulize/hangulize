@@ -146,7 +146,7 @@ rewrite:
 transcribe:
     "{c|z}iju" -> "ㅜ"
 
-    "cu" -> "ㅆㅡ"
+    "cu" -> "쓰"
     "wa" -> "ㅘ"
 
     "{s|z}u" -> "ㅡ"
