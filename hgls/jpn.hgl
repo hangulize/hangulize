@@ -119,6 +119,11 @@ rewrite:
     "ッ" -> "T"
     "ヴ" -> "b"
 
+    # Plosive at Beginning
+    "^k"      -> "g"
+    "^t"      -> "d"
+    "^c{a|i}" -> "z"
+
     # Small Vowels
     "u'o"     -> "o"
     "o'u"     -> "o"
@@ -133,11 +138,6 @@ rewrite:
     "{e}e"      -> ""
     "{o}o"      -> ""
     "O"         -> "o"
-
-    # Plosive at Beginning
-    "^k"      -> "g"
-    "^t"      -> "d"
-    "^c{a|i}" -> "z"
 
     # Diphthong after "ㅈ" and "ㅊ"
     "{c|z}ija" -> "a"
