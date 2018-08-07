@@ -117,14 +117,20 @@ rewrite:
 
     "ン" -> "N"
     "ッ" -> "T"
-
-    # Not in the official rules.
     "ヴ" -> "b"
 
+    # Plosive at Beginning
     "^k"      -> "g"
     "^t"      -> "d"
     "^c{a|i}" -> "z"
 
+    # Small Vowels
+    "u'o"     -> "o"
+    "o'u"     -> "o"
+    "i'e"     -> "je"
+    "(u|e)'i" -> "i"
+
+    # Long Vowels
     "{(y|j)o}o" -> "O"
     "{a}a"      -> ""
     "{i}i"      -> ""
@@ -133,18 +139,14 @@ rewrite:
     "{o}o"      -> ""
     "O"         -> "o"
 
-    "u'o"     -> "o"
-    "o'u"     -> "o"
-    "i'e"     -> "je"
-    "(u|e)'i" -> "i"
-
+    # Diphthong after "ㅈ" and "ㅊ"
     "{c|z}ija" -> "a"
     "{c|z}ijo" -> "o"
 
 transcribe:
     "{c|z}iju" -> "ㅜ"
 
-    "cu" -> "ㅆㅡ"
+    "cu" -> "쓰"
     "wa" -> "ㅘ"
 
     "{s|z}u" -> "ㅡ"

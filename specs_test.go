@@ -25,6 +25,7 @@ func ExampleListLangs() {
 	// isl
 	// ita
 	// jpn
+	// jpn-ck
 	// kat-1
 	// kat-2
 	// lat

@@ -146,7 +146,9 @@ type _Kana struct{}
 
 // Is checks whether the character is either Hiragana or Katakana.
 func (_Kana) Is(ch rune) bool {
-	return unicode.Is(unicode.Hiragana, ch) || unicode.Is(unicode.Katakana, ch)
+	return (ch == 'ー' ||
+		unicode.Is(unicode.Hiragana, ch) ||
+		unicode.Is(unicode.Katakana, ch))
 }
 
 // Normalize converts Hiragana to Katakana.
