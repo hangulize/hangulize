@@ -105,6 +105,9 @@ func (rp *RPattern) Interpolate(p *Pattern, word string, m []int) string {
 
 		case toVar:
 			// var-to-var: <var> in Pattern to <var> in RPattern.
+			if varIndex > len(p.usedVars)-1 {
+				panic("mapped vars have different length")
+			}
 			fromVar := p.usedVars[varIndex]
 			fromVal := captured(word, m, varIndex+1)
 
