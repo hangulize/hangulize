@@ -116,6 +116,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 	offset := 0
 	length := len(word)
+	prevMatch := []int{-1, -1}
 
 	for offset < length && (n < 0 || len(matches) < n) {
 		// Erase visited characters on the word with "\x00". Because of
@@ -134,6 +135,12 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		if len(m) < 10 {
 			panic(fmt.Errorf("unexpected submatches: %v", m))
 		}
+
+		if m[1]-m[0] == 0 && m[0] == prevMatch[0] && m[1] == prevMatch[1] {
+			// A stagnate zero-width match leads to an infinite loop.
+			break
+		}
+		prevMatch = m
 
 		start := m[5]
 		if start == -1 {
