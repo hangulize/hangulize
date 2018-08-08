@@ -113,16 +113,18 @@ func (p *Pattern) Explain() string {
 // matches. The result is an array of submatch locations.
 func (p *Pattern) Find(word string, n int) [][]int {
 	var matches [][]int
-	offset := 0
 
-	for n < 0 || len(matches) < n {
+	offset := 0
+	length := len(word)
+
+	for offset < length && (n < 0 || len(matches) < n) {
 		// Erase visited characters on the word with "\x00". Because of
 		// lookaround, the search cursor should be calculated manually.
-		erased := strings.Repeat(".", offset) + word[offset:]
+		erased := strings.Repeat("\x00", offset) + word[offset:]
 
 		m := p.re.FindStringSubmatchIndex(erased)
 
-		if len(m) == 0 || m[1]-m[0] == 0 {
+		if len(m) == 0 {
 			// No more match.
 			break
 		}
@@ -148,8 +150,8 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// Test highlight with p.neg to determine whether skip or not.
 		negM := p.neg.FindStringSubmatchIndex(highlight)
 
-		// If no negative match, this match is successful.
-		if len(negM) == 0 {
+		// If zero-width match or no negative match, this match is successful.
+		if len(highlight) == 0 || len(negM) == 0 {
 			match := []int{start, stop}
 
 			// Keep content ()...
