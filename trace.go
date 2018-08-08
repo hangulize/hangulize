@@ -68,7 +68,7 @@ func (tr *tracer) RuleTracer(subwords []subword) *ruleTracer {
 		subwords,
 		make(map[int][]*string),
 		make(map[int]*Rule),
-		0,
+		-1,
 	}
 }
 
