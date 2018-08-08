@@ -119,7 +119,6 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 	offset := 0
 	length := len(word)
-	prevMatch := []int{-1, -1}
 
 	for offset < length && (n < 0 || len(matches) < n) {
 		// Erase visited characters on the word with "\x00". Because of
@@ -127,31 +126,26 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		erased := strings.Repeat("\x00", offset) + word[offset:]
 
 		m := p.re.FindStringSubmatchIndex(erased)
-
 		if len(m) == 0 {
 			// No more match.
 			break
 		}
 
 		// p.re looks like (edge)(look)abc(look)(edge).
-		// Hold only non-zero-width matches.
 		if len(m) < 10 {
-			panic(fmt.Errorf("unexpected submatches: %v", m))
+			panic(fmt.Errorf("unexpected submatches from %v: %v", p, m))
 		}
 
-		if m[1]-m[0] == 0 && m[0] == prevMatch[0] && m[1] == prevMatch[1] {
-			// A stagnated zero-width match leads to an infinite loop.
-			break
+		// The match MUST NOT be zero-width.
+		if m[1]-m[0] == 0 {
+			panic(fmt.Errorf("zero-width match from %v", p))
 		}
-		prevMatch = m
 
-		start := m[5]
-		if start == -1 {
-			start = m[0]
-		}
-		stop := m[len(m)-4]
-		if stop == -1 {
-			stop = m[1]
+		// Pick the actual start and stop.
+		start, stop := pickStartStop(m)
+
+		if stop-start == 0 {
+			panic(fmt.Errorf("zero-width match from %v", p))
 		}
 
 		// Pick matched word. Call it "highlight".
@@ -160,8 +154,8 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// Test highlight with p.neg to determine whether skip or not.
 		negM := p.neg.FindStringSubmatchIndex(highlight)
 
-		// If zero-width match or no negative match, this match is successful.
-		if len(highlight) == 0 || len(negM) == 0 {
+		// If no negative match, this match is successful.
+		if len(negM) == 0 {
 			match := []int{start, stop}
 
 			// Keep content ()...
@@ -179,4 +173,18 @@ func (p *Pattern) Find(word string, n int) [][]int {
 	}
 
 	return matches
+}
+
+func pickStartStop(m []int) (int, int) {
+	start := m[5]
+	if start == -1 {
+		start = m[0]
+	}
+
+	stop := m[len(m)-4]
+	if stop == -1 {
+		stop = m[1]
+	}
+
+	return start, stop
 }

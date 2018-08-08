@@ -312,10 +312,10 @@ func TestComplexLookaround(t *testing.T) {
 		x, "xxacx",
 	})
 
-	p = fixturePattern(`{foo}{bar}`)
+	p = fixturePattern(`{foo}o{bar}`)
 	assertMatch(t, p, []string{
-		o, "foobar",
-		"         ",
+		o, "fooobar",
+		"      ^   ",
 	})
 }
 
@@ -337,6 +337,26 @@ func TestBugs(t *testing.T) {
 		o, "inJazio",
 		"    ^     ",
 	})
+}
+
+func TestEmptyPatternPanic(t *testing.T) {
+	assert.Panics(t, func() { fixturePattern("") })
+}
+
+func TestZeroWidthMatchPanic(t *testing.T) {
+	var p *Pattern
+
+	p = fixturePattern("^")
+	assert.Panics(t, func() { p.Find("abc", -1) })
+
+	p = fixturePattern("$")
+	assert.Panics(t, func() { p.Find("abc", -1) })
+
+	p = fixturePattern("{a}")
+	assert.Panics(t, func() { p.Find("abc", -1) })
+
+	p = fixturePattern("{a}{b}")
+	assert.Panics(t, func() { p.Find("abc", -1) })
 }
 
 // -----------------------------------------------------------------------------

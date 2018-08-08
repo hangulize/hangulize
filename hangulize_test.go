@@ -165,20 +165,6 @@ func TestVarToVar(t *testing.T) {
 	assert.Equal(t, "ei", hangulize(spec, "bc"))
 }
 
-func TestZeroWidthMatch(t *testing.T) {
-	spec := mustParseSpec(`
-	rewrite:
-		"^" -> "START"
-		"$" -> "END"
-
-	transcribe:
-		"123"   -> "123"
-		"START" -> "START"
-		"END"   -> "END"
-	`)
-	assertHangulize(t, spec, "START123END", "123")
-}
-
 // -----------------------------------------------------------------------------
 // Language-specific edge cases
 
