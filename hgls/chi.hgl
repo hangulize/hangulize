@@ -18,31 +18,30 @@ vars:
 rewrite:
     "{c|ch|r|s|sh|z|zh}i" -> "i,"
 
-    "{<jqx>}ue" -> "yue"
-    "{<jqx>}uan" -> "yuan"
-    "{<jqx>}un" -> "yun"
-    "{<jqx>}u" -> "yu"
+    "{<jqx>}ue"   -> "yue"
+    "{<jqx>}uan"  -> "yuan"
+    "{<jqx>}un"   -> "yun"
+    "{<jqx>}u"    -> "yu"
     "{<jqx>}iong" -> "yong"
 
-    "{<jqx>|<nojqx>}iao" -> "yao"
+    "{<jqx>|<nojqx>}iao"  -> "yao"
     "{<jqx>|<nojqx>}iang" -> "yang"
-    "{<jqx>|<nojqx>}ian" -> "yan"
-    "{<jqx>|<nojqx>}ia" -> "ya"
-    "{<jqx>|<nojqx>}ie" -> "ye"
-    "{<jqx>|<nojqx>}iou" -> "you"
-    "{<jqx>|<nojqx>}iu" -> "you"
-    "{<jqx>|<nojqx>}ing" -> "ying"
-    "{<jqx>|<nojqx>}in" -> "yin"
-    "{<jqx>|<nojqx>}i" -> "yi"
+    "{<jqx>|<nojqx>}ian"  -> "yan"
+    "{<jqx>|<nojqx>}ia"   -> "ya"
+    "{<jqx>|<nojqx>}ie"   -> "ye"
+    "{<jqx>|<nojqx>}iou"  -> "you"
+    "{<jqx>|<nojqx>}iu"   -> "you"
+    "{<jqx>|<nojqx>}ing"  -> "ying"
+    "{<jqx>|<nojqx>}in"   -> "yin"
+    "{<jqx>|<nojqx>}i"    -> "yi"
 
-    "{<jqx>|<nojqx>}uai" -> "wai"
+    "{<jqx>|<nojqx>}uai"  -> "wai"
     "{<jqx>|<nojqx>}uang" -> "wang"
-    "{<jqx>|<nojqx>}uan" -> "wan"
-    "{<jqx>|<nojqx>}ua" -> "wa"
-    "{<jqx>|<nojqx>}uo" -> "wo"
-    # "{<jqx>|<nojqx>}ui" -> "wei"
-    # "{<jqx>|<nojqx>}un" -> "wen"
-    "{<jqx>|<nojqx>}ong" -> "ung"
+    "{<jqx>|<nojqx>}uan"  -> "wan"
+    "{<jqx>|<nojqx>}ua"   -> "wa"
+    "{<jqx>|<nojqx>}uo"   -> "wo"
+    "{<jqx>|<nojqx>}ong"  -> "ung"
+
     "{<nojqx>}u" -> "wu"
 
     "{<jqx>|<nojqx>}r" -> "er"
@@ -52,9 +51,9 @@ rewrite:
 
 transcribe:
     # 촬구류
-    "yue" -> "ㅞ"
+    "yue"  -> "ㅞ"
     "yuan" -> "ㅟ안"
-    "yun" -> "ㅟ-ㄴ"
+    "yun"  -> "ㅟ-ㄴ"
     "yong" -> "ㅠ-ㅇ"
 
     # 단운
@@ -62,50 +61,50 @@ transcribe:
 
     # 합구류
     "wang" -> "ㅘ-ㅇ"
-    "weng"     -> "ㅝ-ㅇ"
-    "ung"      -> "ㅜ-ㅇ"
+    "weng" -> "ㅝ-ㅇ"
+    "ung"  -> "ㅜ-ㅇ"
 
-    "wan"  -> "ㅘ-ㄴ"
-    "wen"      -> "ㅝ-ㄴ"
-    "un" -> "ㅜ-ㄴ"
+    "wan" -> "ㅘ-ㄴ"
+    "wen" -> "ㅝ-ㄴ"
+    "un"  -> "ㅜ-ㄴ"
 
-    "wa"   -> "ㅘ"
-    "wo"   -> "ㅝ"
-    "wai"  -> "ㅘ이"
-    "wei"      -> "ㅞ이"
-    "ui"       -> "ㅜ이"
-
-    # 합구류
-    # "un" -> "ㅜ-ㄴ"
+    "wa"  -> "ㅘ"
+    "wo"  -> "ㅝ"
+    "wai" -> "ㅘ이"
+    "wei" -> "ㅞ이"
+    "ui"  -> "ㅜ이"
 
     # 제치류
     "{<J>}yang" -> "ㅏ-ㅇ"
-    "yang" -> "ㅑ-ㅇ"
-    "ying"  -> "ㅣ-ㅇ"
-
     "{<J>}yan"  -> "ㅔ-ㄴ"
-    "yan"  -> "ㅖ-ㄴ"
-    "yin"   -> "ㅣ-ㄴ"
-
     "{<J>}you" -> "ㅜ"
-    "you" -> "ㅠ"
     "{<J>}yai" -> "ㅏㅑ"
-    "yai"        -> "ㅑㅣ"
     "{<J>}yao" -> "ㅏㅗ"
-    "yao"    -> "ㅑㅗ"
-    "{<J>}ya" -> "ㅏ"
-    "ya"     -> "ㅑ"
-    "{<J>}yo" -> "ㅗ"
-    "yo"         -> "ㅛ"
-    "{<J>}ye" -> "ㅔ"
-    "ye"     -> "ㅖ"
+    "{<J>}ya"  -> "ㅏ"
+    "{<J>}yo"  -> "ㅗ"
+    "{<J>}ye"  -> "ㅔ"
+
+    "yang" -> "ㅑ-ㅇ"
+    "yan"  -> "ㅖ-ㄴ"
+    "ying" -> "ㅣ-ㅇ"
+    "yin"  -> "ㅣ-ㄴ"
+    "you"  -> "ㅠ"
+    "yai"  -> "ㅑㅣ"
+    "yao"  -> "ㅑㅗ"
+    "ya"   -> "ㅑ"
+    "yo"   -> "ㅛ"
+    "ye"   -> "ㅖ"
 
     # 부성운
     "ang" -> "ㅏ-ㅇ"
     "eng" -> "ㅓ-ㅇ"
-
     "an"  -> "ㅏ-ㄴ"
     "en"  -> "ㅓ-ㄴ"
+
+    # 종성
+    "ng," -> "-ㅇ"
+    "n,"  -> "-ㄴ"
+    "r,"  -> "-ㄹ"
 
     # 복운
     "ai" -> "ㅏㅣ"
@@ -114,32 +113,27 @@ transcribe:
     "ou" -> "ㅓㅜ"
 
     # 단운
-    "a"     -> "ㅏ"
-    "o"     -> "ㅗ"
-    "e"     -> "ㅓ"
-    "ê"     -> "ㅔ"
-    "i,"    -> "ㅡ"
-    "i" -> "ㅣ"
+    "a"  -> "ㅏ"
+    "o"  -> "ㅗ"
+    "e"  -> "ㅓ"
+    "ê"  -> "ㅔ"
+    "i," -> "ㅡ"
+    "i"  -> "ㅣ"
     "wu" -> "ㅜ"
 
     # 권설운
     "er" -> "ㅓ-ㄹ"
 
-    "ng," -> "-ㅇ"
-    "n," -> "-ㄴ"
-
     # 교설첨성
-    "r,"  -> "-ㄹ"
-
     "zh" -> "ㅈ"
     "ch" -> "ㅊ"
     "sh" -> "ㅅ"
     "r"  -> "ㄹ"
 
     # 설치성
-    "z"  -> "ㅉ"
-    "c"  -> "ㅊ"
-    "s"  -> "ㅆ"
+    "z" -> "ㅉ"
+    "c" -> "ㅊ"
+    "s" -> "ㅆ"
 
     # 중순성
     "b" -> "ㅂ"
@@ -150,8 +144,6 @@ transcribe:
     "f" -> "ㅍ"
 
     # 설첨성
-    "n," -> "-ㄴ"
-
     "d" -> "ㄷ"
     "t" -> "ㅌ"
     "n" -> "ㄴ"
