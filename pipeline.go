@@ -301,6 +301,11 @@ func (p *pipeline) transliterate(word string) string {
 	var buf bytes.Buffer
 
 	for i, ch := range chars {
+		// Skip ZWSP.
+		if ch == '\u200B' {
+			continue
+		}
+
 		if !isPunct[i] {
 			buf.WriteRune(ch)
 			continue
