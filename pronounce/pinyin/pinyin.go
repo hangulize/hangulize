@@ -46,5 +46,5 @@ func (p *pinyinPronouncer) Pronounce(word string) string {
 		chunks = append(chunks, buf.String())
 	}
 
-	return strings.Join(chunks, " ")
+	return strings.Join(chunks, "\u200b")
 }
