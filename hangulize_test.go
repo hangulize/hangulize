@@ -165,6 +165,17 @@ func TestVarToVar(t *testing.T) {
 	assert.Equal(t, "ei", hangulize(spec, "bc"))
 }
 
+func TestSingleDollar(t *testing.T) {
+	spec := mustParseSpec(`
+	rewrite:
+		"$" -> "END"
+	transcribe:
+		"123" -> "123"
+		"END" -> "END"
+	`)
+	assertHangulize(t, spec, "123END", "123")
+}
+
 // -----------------------------------------------------------------------------
 // Language-specific edge cases
 
