@@ -10,48 +10,95 @@ config:
     author = "Heungsub Lee <sub@subl.ee>"
     stage  = "draft"
 
+vars:
+    jqx   = "j", "q", "x"
+    nojqx = "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "r", "z", "c", "s"
+    J     = "j", "q", "zh", "ch", "c"
+
 rewrite:
-    "{j|q|x}u" -> "yu"
     "{c|ch|r|s|sh|z|zh}i" -> "i,"
 
+    "{<jqx>}ue" -> "yue"
+    "{<jqx>}uan" -> "yuan"
+    "{<jqx>}un" -> "yun"
+    "{<jqx>}u" -> "yu"
+    "{<jqx>}iong" -> "yong"
+
+    "{<jqx>|<nojqx>}iao" -> "yao"
+    "{<jqx>|<nojqx>}iang" -> "yang"
+    "{<jqx>|<nojqx>}ian" -> "yan"
+    "{<jqx>|<nojqx>}ia" -> "ya"
+    "{<jqx>|<nojqx>}ie" -> "ye"
+    "{<jqx>|<nojqx>}iou" -> "you"
+    "{<jqx>|<nojqx>}iu" -> "you"
+    "{<jqx>|<nojqx>}ing" -> "ying"
+    "{<jqx>|<nojqx>}in" -> "yin"
+    "{<jqx>|<nojqx>}i" -> "yi"
+
+    "{<jqx>|<nojqx>}uai" -> "wai"
+    "{<jqx>|<nojqx>}uang" -> "wang"
+    "{<jqx>|<nojqx>}uan" -> "wan"
+    "{<jqx>|<nojqx>}ua" -> "wa"
+    "{<jqx>|<nojqx>}uo" -> "wo"
+    # "{<jqx>|<nojqx>}ui" -> "wei"
+    # "{<jqx>|<nojqx>}un" -> "wen"
+    "{<jqx>|<nojqx>}ong" -> "ung"
+    "{<nojqx>}u" -> "wu"
+
+    "{<jqx>|<nojqx>}r" -> "er"
+
+    "n$" -> "n,"
+    "r$" -> "r,"
+
 transcribe:
+    # 촬구류
+    "yue" -> "ㅞ"
+    "yuan" -> "ㅟ안"
+    "yun" -> "ㅟ-ㄴ"
+    "yong" -> "ㅠ-ㅇ"
+
     # 단운
     "yu" -> "ㅟ"
 
     # 합구류
-    "(w|u)ang" -> "ㅘ-ㅇ"
+    "wang" -> "ㅘ-ㅇ"
     "weng"     -> "ㅝ-ㅇ"
-    "ong"      -> "ㅜ-ㅇ"
+    "ung"      -> "ㅜ-ㅇ"
 
-    "(w|u)an"  -> "ㅘ-ㄴ"
+    "wan"  -> "ㅘ-ㄴ"
     "wen"      -> "ㅝ-ㄴ"
+    "un" -> "ㅜ-ㄴ"
 
-    "(w|u)a"   -> "ㅘ"
-    "(w|u)o"   -> "ㅝ"
-    "(w|u)ai"  -> "ㅘ이"
+    "wa"   -> "ㅘ"
+    "wo"   -> "ㅝ"
+    "wai"  -> "ㅘ이"
     "wei"      -> "ㅞ이"
     "ui"       -> "ㅜ이"
-
-    # 촬구류
-    "(y|i)ong" -> "ㅠ-ㅇ"
-    "(y|)ue"   -> "ㅞ"
 
     # 합구류
     # "un" -> "ㅜ-ㄴ"
 
     # 제치류
-    "(y|i)ang" -> "ㅑ-ㅇ"
-    "(y|)ing"  -> "ㅣ-ㅇ"
+    "{<J>}yang" -> "ㅏ-ㅇ"
+    "yang" -> "ㅑ-ㅇ"
+    "ying"  -> "ㅣ-ㅇ"
 
-    "(y|i)an"  -> "ㅖ-ㄴ"
-    "(y|)in"   -> "ㅣ-ㄴ"
+    "{<J>}yan"  -> "ㅔ-ㄴ"
+    "yan"  -> "ㅖ-ㄴ"
+    "yin"   -> "ㅣ-ㄴ"
 
-    "(y|i)a"   -> "ㅑ"
-    "yo"       -> "ㅛ"
-    "(y|i)e"   -> "ㅖ"
-    "yai"      -> "ㅑㅣ"
-    "(y|i)ao"  -> "ㅑㅗ"
-    "(yo|io)u" -> "ㅠ"
+    "{<J>}you" -> "ㅜ"
+    "you" -> "ㅠ"
+    "{<J>}yai" -> "ㅏㅑ"
+    "yai"        -> "ㅑㅣ"
+    "{<J>}yao" -> "ㅏㅗ"
+    "yao"    -> "ㅑㅗ"
+    "{<J>}ya" -> "ㅏ"
+    "ya"     -> "ㅑ"
+    "{<J>}yo" -> "ㅗ"
+    "yo"         -> "ㅛ"
+    "{<J>}ye" -> "ㅔ"
+    "ye"     -> "ㅖ"
 
     # 부성운
     "ang" -> "ㅏ-ㅇ"
@@ -72,16 +119,18 @@ transcribe:
     "e"     -> "ㅓ"
     "ê"     -> "ㅔ"
     "i,"    -> "ㅡ"
-    "(y|)i" -> "ㅣ"
-    "(w|)u" -> "ㅜ"
+    "i" -> "ㅣ"
+    "wu" -> "ㅜ"
 
     # 권설운
     "er" -> "ㅓ-ㄹ"
 
-    "ng$" -> "-ㅇ"
-    "n$" -> "-ㄴ"
+    "ng," -> "-ㅇ"
+    "n," -> "-ㄴ"
 
     # 교설첨성
+    "r,"  -> "-ㄹ"
+
     "zh" -> "ㅈ"
     "ch" -> "ㅊ"
     "sh" -> "ㅅ"
@@ -101,6 +150,8 @@ transcribe:
     "f" -> "ㅍ"
 
     # 설첨성
+    "n," -> "-ㄴ"
+
     "d" -> "ㄷ"
     "t" -> "ㅌ"
     "n" -> "ㄴ"
@@ -115,8 +166,6 @@ transcribe:
     "j" -> "ㅈ"
     "q" -> "ㅊ"
     "x" -> "ㅅ"
-
-    " " -> ""
 
 test:
     "郭廣昌"     -> "궈광창"
