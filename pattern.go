@@ -136,14 +136,10 @@ func (p *Pattern) Find(word string, n int) [][]int {
 			panic(fmt.Errorf("unexpected submatches from %v: %v", p, m))
 		}
 
-		// The match MUST NOT be zero-width.
-		if m[1]-m[0] == 0 {
-			panic(fmt.Errorf("zero-width match from %v", p))
-		}
-
 		// Pick the actual start and stop.
 		start, stop := pickStartStop(m)
 
+		// The match MUST NOT be zero-width.
 		if stop-start == 0 {
 			panic(fmt.Errorf("zero-width match from %v", p))
 		}
