@@ -137,7 +137,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		}
 
 		if m[1]-m[0] == 0 && m[0] == prevMatch[0] && m[1] == prevMatch[1] {
-			// A stagnate zero-width match leads to an infinite loop.
+			// A stagnated zero-width match leads to an infinite loop.
 			break
 		}
 		prevMatch = m
