@@ -27,8 +27,8 @@ $ go get -u github.com/hangulize/hangulize
 ```go
 import "github.com/hangulize/hangulize"
 
-hangulize.Hangulize("deu", "Hefeweizen")
-// output: "헤페바이첸"
+hangulize.Hangulize("ita", "Espresso")
+// output: "에스프레소"
 ```
 
 ## 리부트
