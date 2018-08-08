@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/hangulize/hangulize/pronounce/furigana"
+	"github.com/hangulize/hangulize/pronounce/pinyin"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -12,6 +13,7 @@ import (
 
 func init() {
 	UsePronouncer(&furigana.P)
+	UsePronouncer(&pinyin.P)
 }
 
 // -----------------------------------------------------------------------------
