@@ -48,13 +48,13 @@ type rPart struct {
 // -----------------------------------------------------------------------------
 
 // newRPattern parses the given expression and creates an RPattern.
-func newRPattern(expr string,
+func newRPattern(
+	expr string,
 
 	macros map[string]string,
 	vars map[string][]string,
 
 ) *RPattern {
-
 	_expr := expandMacros(expr, macros)
 
 	// Split expr into several parts.
