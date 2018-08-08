@@ -16,6 +16,7 @@ func ExampleListLangs() {
 	// bul
 	// cat
 	// ces
+	// chi
 	// cym
 	// deu
 	// ell
