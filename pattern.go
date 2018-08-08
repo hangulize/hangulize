@@ -60,6 +60,9 @@ func newPattern(
 	vars map[string][]string,
 
 ) (*Pattern, error) {
+	if len(expr) == 0 {
+		return nil, errors.New("empty pattern not allowed")
+	}
 
 	reExpr := expr
 
