@@ -16,6 +16,9 @@ vars:
     J     = "j", "q", "zh", "ch", "c"
 
 rewrite:
+    # "v" means "ü" in unofficial Pinyin.
+    "v" -> "u"
+
     "{c|ch|r|s|sh|z|zh}i" -> "i,"
 
     "{<jqx>}ue"   -> "yue"
@@ -24,16 +27,16 @@ rewrite:
     "{<jqx>}u"    -> "yu"
     "{<jqx>}iong" -> "yong"
 
-    "{<jqx>|<nojqx>}iao"  -> "yao"
-    "{<jqx>|<nojqx>}iang" -> "yang"
-    "{<jqx>|<nojqx>}ian"  -> "yan"
-    "{<jqx>|<nojqx>}ia"   -> "ya"
-    "{<jqx>|<nojqx>}ie"   -> "ye"
-    "{<jqx>|<nojqx>}iou"  -> "you"
-    "{<jqx>|<nojqx>}iu"   -> "you"
-    "{<jqx>|<nojqx>}ing"  -> "ying"
-    "{<jqx>|<nojqx>}in"   -> "yin"
-    "{<jqx>|<nojqx>}i"    -> "yi"
+    "{<jqx>|<nojqx>}iao"   -> "yao"
+    "{<jqx>|<nojqx>}iang"  -> "yang"
+    "{<jqx>|<nojqx>}ian"   -> "yan"
+    "{<jqx>|<nojqx>}ia"    -> "ya"
+    "{<jqx>|<nojqx>}ie"    -> "ye"
+    "{<jqx>|<nojqx>}iou"   -> "you"
+    "{<jqx>|<nojqx>}iu"    -> "you"
+    "{<jqx>|<nojqx>}ing"   -> "ying"
+    "{<jqx>|<nojqx>}in"    -> "yin"
+    "{<jqx>|<nojqx>}i{~,}" -> "yi"
 
     "{<jqx>|<nojqx>}uai"  -> "wai"
     "{<jqx>|<nojqx>}uang" -> "wang"
@@ -43,7 +46,6 @@ rewrite:
     "{<jqx>|<nojqx>}ong"  -> "ung"
 
     "{<nojqx>}u" -> "wu"
-
     "{<jqx>|<nojqx>}r" -> "er"
 
     "n$" -> "n,"
@@ -77,12 +79,12 @@ transcribe:
     # 제치류
     "{<J>}yang" -> "ㅏ-ㅇ"
     "{<J>}yan"  -> "ㅔ-ㄴ"
-    "{<J>}you" -> "ㅜ"
-    "{<J>}yai" -> "ㅏㅑ"
-    "{<J>}yao" -> "ㅏㅗ"
-    "{<J>}ya"  -> "ㅏ"
-    "{<J>}yo"  -> "ㅗ"
-    "{<J>}ye"  -> "ㅔ"
+    "{<J>}you"  -> "ㅜ"
+    "{<J>}yai"  -> "ㅏㅑ"
+    "{<J>}yao"  -> "ㅏㅗ"
+    "{<J>}ya"   -> "ㅏ"
+    "{<J>}yo"   -> "ㅗ"
+    "{<J>}ye"   -> "ㅔ"
 
     "yang" -> "ㅑ-ㅇ"
     "yan"  -> "ㅖ-ㄴ"
