@@ -16,6 +16,7 @@ func ExampleListLangs() {
 	// bul
 	// cat
 	// ces
+	// chi
 	// cym
 	// deu
 	// ell
@@ -93,4 +94,39 @@ func TestJpnKatakanaLongVowel(t *testing.T) {
 	assertHangulize(t, jpn, "디티", "ティティ")
 	assertHangulize(t, jpn, "도토", "トゥトゥ")
 	assertHangulize(t, jpn, "제체", "チェチェ")
+}
+
+// -----------------------------------------------------------------------------
+// Chinese
+
+func TestChiUan(t *testing.T) {
+	// From namu.wiki: https://namu.wiki/w/외래어%20표기법/중국어#s-3
+	// u, uan, un이 j, q, x 뒤에 온다면 '위', '위안', '윈'으로 표기하고(예: ju
+	// 쥐, quan 취안, xun 쉰), 다른 자음 뒤에 온다면 '우', '완', '운'으로
+	// 표기한다(예: bu 부, duan 돤, hun 훈).
+	chi := loadSpec("chi")
+
+	assertHangulize(t, chi, "쥐", "ju")
+	assertHangulize(t, chi, "취안", "quan")
+	assertHangulize(t, chi, "쉰", "xun")
+	assertHangulize(t, chi, "부", "bu")
+	assertHangulize(t, chi, "돤", "duan")
+	assertHangulize(t, chi, "훈", "hun")
+}
+
+func TestChiI(t *testing.T) {
+	// From namu.wiki: https://namu.wiki/w/외래어%20표기법/중국어#s-3
+	// i는 c, ch, r, s, sh, z, zh 뒤에 올 때는 ㅡ로 표기하며(예: chi 츠, ri 르,
+	// shi 스, zi 쯔), 다른 자음 뒤에 올 때는 ㅣ로 표기한다(예: bi 비, ji 지,
+	// li 리, ti 티).
+	chi := loadSpec("chi")
+
+	assertHangulize(t, chi, "츠", "chi")
+	assertHangulize(t, chi, "르", "ri")
+	assertHangulize(t, chi, "스", "shi")
+	assertHangulize(t, chi, "쯔", "zi")
+	assertHangulize(t, chi, "비", "bi")
+	assertHangulize(t, chi, "지", "ji")
+	assertHangulize(t, chi, "리", "li")
+	assertHangulize(t, chi, "티", "ti")
 }
