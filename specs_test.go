@@ -55,7 +55,7 @@ func ExampleListLangs() {
 // -----------------------------------------------------------------------------
 // Japanese
 
-func TestJpnIgnoresRoman(t *testing.T) {
+func TestJpnIgnoresLatin(t *testing.T) {
 	assertHangulize(t, loadSpec("jpn"), "abc아", "abcあ")
 }
 

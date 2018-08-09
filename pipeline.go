@@ -72,7 +72,7 @@ PronouncerFound:
 //
 // This step eliminates letter case to make the next steps work easier.
 //
-// For example, "Hello" in Roman script will be normalized to "hello".
+// For example, "Hello" in Latin script will be normalized to "hello".
 //
 func (p *pipeline) normalize(word string) string {
 	word = p.h.spec.normReplacer.Replace(word)
