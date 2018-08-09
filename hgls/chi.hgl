@@ -305,20 +305,3 @@ test:
     "李開復"     -> "리카이푸"
     "田原"       -> "톈위안"
     "卓琳"       -> "줘린"
-
-    # TODO(sublee): Remove or move the below cases.
-    # From namu.wiki: https://namu.wiki/w/외래어%20표기법/중국어#s-3
-    "ju"   -> "쥐"
-    "quan" -> "취안"
-    "xun"  -> "쉰"
-    "bu"   -> "부"
-    "duan" -> "돤"
-    "hun"  -> "훈"
-    "chi"  -> "츠"
-    "ri"   -> "르"
-    "shi"  -> "스"
-    "zi"   -> "쯔"
-    "bi"   -> "비"
-    "ji"   -> "지"
-    "li"   -> "리"
-    "ti"   -> "티"
