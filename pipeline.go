@@ -72,7 +72,7 @@ PronouncerFound:
 //
 // This step eliminates letter case to make the next steps work easier.
 //
-// For example, "Hello" in Roman script will be normalized to "hello".
+// For example, "Hello" in Latin script will be normalized to "hello".
 //
 func (p *pipeline) normalize(word string) string {
 	word = p.h.spec.normReplacer.Replace(word)
@@ -85,7 +85,7 @@ func (p *pipeline) normalize(word string) string {
 	var buf bytes.Buffer
 
 	for _, ch := range word {
-		if except.HasRune(ch) {
+		if except.HasRune(ch) || !script.Is(ch) {
 			buf.WriteRune(ch)
 		} else {
 			buf.WriteRune(script.Normalize(ch))
@@ -301,6 +301,11 @@ func (p *pipeline) transliterate(word string) string {
 	var buf bytes.Buffer
 
 	for i, ch := range chars {
+		// Skip ZWSP.
+		if ch == '\u200B' {
+			continue
+		}
+
 		if !isPunct[i] {
 			buf.WriteRune(ch)
 			continue

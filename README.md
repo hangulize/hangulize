@@ -27,8 +27,8 @@ $ go get -u github.com/hangulize/hangulize
 ```go
 import "github.com/hangulize/hangulize"
 
-hangulize.Hangulize("ita", "gloria")
-// output: "글로리아"
+hangulize.Hangulize("ita", "Espresso")
+// output: "에스프레소"
 ```
 
 ## 리부트
@@ -62,6 +62,7 @@ bel      draft    Belarusian               벨라루스어
 bul      draft    Bulgarian                불가리아어
 cat      draft    Catalan                  카탈로니아어
 ces      draft    Czech                    체코어
+chi      draft    Chinese                  중국어
 cym      draft    Welsh                    웨일스어
 deu      draft    German                   독일어
 ell      draft    Greek                    그리스어

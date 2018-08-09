@@ -68,7 +68,7 @@ func (tr *tracer) RuleTracer(subwords []subword) *ruleTracer {
 		subwords,
 		make(map[int][]*string),
 		make(map[int]*Rule),
-		0,
+		-1,
 	}
 }
 
@@ -95,7 +95,7 @@ func (rtr *ruleTracer) Commit(step string) {
 	subwords := make([]subword, len(rtr.subwords))
 	copy(subwords, rtr.subwords)
 
-	for ruleIndex := 0; ruleIndex < rtr.maxRuleIndex; ruleIndex++ {
+	for ruleIndex := 0; ruleIndex <= rtr.maxRuleIndex; ruleIndex++ {
 		dirty := false
 
 		rule := rtr.rules[ruleIndex]

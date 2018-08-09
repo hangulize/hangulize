@@ -9,7 +9,7 @@ import (
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
 
-// P is the Furigana dictator.
+// P is the Furigana pronouncer.
 var P furiganaPronouncer
 
 // ----------------------------------------------------------------------------

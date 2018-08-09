@@ -60,6 +60,9 @@ func newPattern(
 	vars map[string][]string,
 
 ) (*Pattern, error) {
+	if len(expr) == 0 {
+		return nil, errors.New("empty pattern not allowed")
+	}
 
 	reExpr := expr
 
@@ -113,33 +116,32 @@ func (p *Pattern) Explain() string {
 // matches. The result is an array of submatch locations.
 func (p *Pattern) Find(word string, n int) [][]int {
 	var matches [][]int
-	offset := 0
 
-	for n < 0 || len(matches) < n {
+	offset := 0
+	length := len(word)
+
+	for offset < length && (n < 0 || len(matches) < n) {
 		// Erase visited characters on the word with "\x00". Because of
 		// lookaround, the search cursor should be calculated manually.
-		erased := strings.Repeat(".", offset) + word[offset:]
+		erased := strings.Repeat("\x00", offset) + word[offset:]
 
 		m := p.re.FindStringSubmatchIndex(erased)
-
-		if len(m) == 0 || m[1]-m[0] == 0 {
+		if len(m) == 0 {
 			// No more match.
 			break
 		}
 
 		// p.re looks like (edge)(look)abc(look)(edge).
-		// Hold only non-zero-width matches.
 		if len(m) < 10 {
-			panic(fmt.Errorf("unexpected submatches: %v", m))
+			panic(fmt.Errorf("unexpected submatches from %v: %v", p, m))
 		}
 
-		start := m[5]
-		if start == -1 {
-			start = m[0]
-		}
-		stop := m[len(m)-4]
-		if stop == -1 {
-			stop = m[1]
+		// Pick the actual start and stop.
+		start, stop := pickStartStop(m)
+
+		// The match MUST NOT be zero-width.
+		if stop-start == 0 {
+			panic(fmt.Errorf("zero-width match from %v", p))
 		}
 
 		// Pick matched word. Call it "highlight".
@@ -167,4 +169,18 @@ func (p *Pattern) Find(word string, n int) [][]int {
 	}
 
 	return matches
+}
+
+func pickStartStop(m []int) (int, int) {
+	start := m[5]
+	if start == -1 {
+		start = m[0]
+	}
+
+	stop := m[len(m)-4]
+	if stop == -1 {
+		stop = m[1]
+	}
+
+	return start, stop
 }
