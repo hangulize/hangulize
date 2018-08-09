@@ -85,7 +85,7 @@ func (p *pipeline) normalize(word string) string {
 	var buf bytes.Buffer
 
 	for _, ch := range word {
-		if except.HasRune(ch) {
+		if except.HasRune(ch) || !script.Is(ch) {
 			buf.WriteRune(ch)
 		} else {
 			buf.WriteRune(script.Normalize(ch))
