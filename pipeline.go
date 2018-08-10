@@ -39,9 +39,10 @@ func (p *pipeline) input(word string) {
 
 // 1. Phonemize (Word -> Word)
 //
-// This step guesses the pronunciation from the spelling based on lexical
-// analysis. Most languages don't require this step. But some languages, such
-// as English, just the spelling is not enough to guess the pronunciation.
+// This step converts the spelling to the phonograms, usually based on lexical
+// analysis. Most languages already use phonograms which are sufficient to
+// represent the exact pronunciation. But in some languages, such as American
+// English or Chinese, it's not true.
 //
 func (p *pipeline) phonemize(word string) (string, bool) {
 	id := p.h.spec.Lang.Phonemizer
@@ -136,10 +137,6 @@ func (p *pipeline) group(word string) []subword {
 // called "rewrite".
 //
 // For example, "hello" can be rewritten to "heˈlō".
-//
-// NOTE(sublee): But this step has a limitation. It guesses a pronunciation
-// from the spelling. But it can be too hard for some script systems, such as
-// English or Franch.
 //
 func (p *pipeline) rewrite(subwords []subword) []subword {
 	var swBuf subwordsBuilder

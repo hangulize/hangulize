@@ -1,7 +1,7 @@
 package hangulize
 
-// Phonemizer is an interface to guess the pronunciation from a spelling based
-// on lexical analysis.
+// Phonemizer is an interface to guess phonograms from a spelling based on
+// lexical analysis.
 //
 // The lexical analysis may require large size of dictionary data. To keep
 // Hangulize lightweight, phonemizers are implemented out of this package.
