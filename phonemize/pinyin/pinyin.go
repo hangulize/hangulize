@@ -1,7 +1,7 @@
 /*
-Package pinyin implements the hangulize.Pronouncer interface for Chinese
+Package pinyin implements the hangulize.Phonemizer interface for Chinese
 Hanzu. Hanzu has very broad characters so they need a dictionary to be
-pronounced.
+converted to a phonogram.
 */
 package pinyin
 
@@ -12,18 +12,18 @@ import (
 	goPinyin "github.com/mozillazg/go-pinyin"
 )
 
-// P is the Pinyin pronouncer.
-var P pinyinPronouncer
+// P is the Pinyin phonemizer.
+var P pinyinPhonemizer
 
 // ----------------------------------------------------------------------------
 
-type pinyinPronouncer struct{}
+type pinyinPhonemizer struct{}
 
-func (pinyinPronouncer) ID() string {
+func (pinyinPhonemizer) ID() string {
 	return "pinyin"
 }
 
-func (p *pinyinPronouncer) Pronounce(word string) string {
+func (p *pinyinPhonemizer) Phonemize(word string) string {
 	var chunks []string
 	var buf bytes.Buffer
 

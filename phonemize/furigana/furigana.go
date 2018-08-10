@@ -1,7 +1,7 @@
 /*
-Package furigana implements the hangulize.Pronouncer interface for Japanese
+Package furigana implements the hangulize.Phonemizer interface for Japanese
 Kanji. Kanji has very broad characters so they need a dictionary to be
-pronounced. This pronouncer uses IPADIC in Kagome to analyze Kanji.
+converted to Kana. This phonemizer uses IPADIC in Kagome to analyze Kanji.
 */
 package furigana
 
@@ -9,21 +9,21 @@ import (
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
 
-// P is the Furigana pronouncer.
-var P furiganaPronouncer
+// P is the Furigana phonemizer.
+var P furiganaPhonemizer
 
 // ----------------------------------------------------------------------------
 
-type furiganaPronouncer struct {
+type furiganaPhonemizer struct {
 	kagome *kagome.Tokenizer
 }
 
-func (furiganaPronouncer) ID() string {
+func (furiganaPhonemizer) ID() string {
 	return "furigana"
 }
 
 // Kagome caches d Kagome tokenizer because it is expensive.
-func (p *furiganaPronouncer) Kagome() *kagome.Tokenizer {
+func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
 	if p.kagome == nil {
 		t := kagome.New()
 		p.kagome = &t
@@ -31,7 +31,7 @@ func (p *furiganaPronouncer) Kagome() *kagome.Tokenizer {
 	return p.kagome
 }
 
-func (p *furiganaPronouncer) Pronounce(word string) string {
+func (p *furiganaPhonemizer) Phonemize(word string) string {
 	const (
 		kanjiMin = rune(0x4e00)
 		kanjiMax = rune(0x9faf)

@@ -4,7 +4,7 @@ lang:
     english    = "Chinese"
     korean     = "중국어"
     script     = "latin"
-    pronouncer = "pinyin"
+    phonemizer = "pinyin"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"

@@ -171,14 +171,14 @@ func (p *stubFurigana) ID() string {
 	return "furigana"
 }
 
-func (p *stubFurigana) Pronounce(word string) string {
+func (p *stubFurigana) Phonemize(word string) string {
 	return "スタブ"
 }
 
-func TestInstancePronouncers(t *testing.T) {
+func TestInstancePhonemizers(t *testing.T) {
 	spec, _ := LoadSpec("jpn")
 	h := NewHangulizer(spec)
-	h.UsePronouncer(&stubFurigana{})
+	h.UsePhonemizer(&stubFurigana{})
 	assert.Equal(t, "스타부", h.Hangulize("1234"))
 }
 
@@ -232,8 +232,8 @@ func ExampleHangulize_nietzsche() {
 }
 
 func ExampleHangulize_shinkaiMakoto() {
-	// import "github.com/hangulize/hangulize/pronounce/furigana"
-	// UsePronouncer(&furigana.P)
+	// import "github.com/hangulize/hangulize/phonemize/furigana"
+	// UsePhonemizer(&furigana.P)
 
 	fmt.Println(Hangulize("jpn", "新海誠"))
 	// Output: 신카이 마코토

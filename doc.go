@@ -42,13 +42,13 @@ Finally, it composes Jamo phonemes to Hangul syllables and joins all groups.
 
 Extended Pipeline
 
-Some languages, such as Japanese, may require 2 more steps: "Pronounce" and
+Some languages, such as Japanese, may require 2 more steps: "Phonemize" and
 "Transliterate". The prior is before the Normalize step, and the latter is
 after the Compose step.
 
 Japanese uses Kanji which is an ideogram. There is the Kanji-to-Kana mapping
 called Furigana. To get Furigana from Kanji, we need a lexical analysis based
-on several dictionaries. The Pronounce step guesses the pronunciation from a
+on several dictionaries. The Phonemize step guesses the pronunciation from a
 spelling based on lexical analysis.
 
 	"日本語" -> "ニホンゴ"
