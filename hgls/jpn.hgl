@@ -4,7 +4,7 @@ lang:
     english    = "Japanese"
     korean     = "일본어"
     script     = "kana"
-    pronouncer = "furigana"
+    phonemizer = "furigana"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"
