@@ -45,6 +45,14 @@ Hangulize 프로젝트는 2010년에 Python으로 처음 구현되었고, 웹 �
 이 프로젝트는 처음에 "Hangulize 2"로 명명했으나 기존 Hangulize를 충분히 대체할
 수 있을 것으로 보여 숫자 2를 뗀 "Hangulize"로 이름을 바꿨습니다.
 
+## 성능
+
+| 환경 | `ita` `Cappuccino` | `nld` `Friedrich Wilhelm Nietzsche` |
+| - | - | - |
+| 옛 한글라이즈 CPython 3.6.3 | 398 µs | 1.46 ms |
+| 옛 한글라이즈 PyPy 3.5 v5.8.0 | 208 µs | 9.79 ms |
+| **새 한글라이즈 Go 1.10.2** | 85 µs | 1.05 ms |
+
 ## 목표
 
 - [x] 기존 Hangulize(Python 구현)의 기능을 모두 계승
