@@ -138,7 +138,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// test
-	test := make([][2]string, 0)
+	var test [][2]string
 	if sec, ok := h["test"]; ok {
 		for _, pair := range sec.(*hgl.ListSection).Array() {
 			word := pair.Left()
