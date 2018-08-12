@@ -207,6 +207,17 @@ func BenchmarkCappuccinoTrace(b *testing.B) {
 	}
 }
 
+func BenchmarkJulianaLouiseEmmaMarieWilhelmina(b *testing.B) {
+	spec, _ := LoadSpec("nld")
+	h := NewHangulizer(spec)
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		h.Hangulize("Juliana Louise Emma Marie Wilhelmina")
+	}
+}
+
 // -----------------------------------------------------------------------------
 // Examples
 
