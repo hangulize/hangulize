@@ -3,7 +3,7 @@ lang:
     codes      = "zh", "chi"
     english    = "Chinese"
     korean     = "중국어"
-    script     = "latin"
+    script     = "pinyin"
     phonemizer = "pinyin"
 
 config:
