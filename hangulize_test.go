@@ -185,25 +185,25 @@ func TestInstancePhonemizers(t *testing.T) {
 // -----------------------------------------------------------------------------
 // Benchmarks
 
-func BenchmarkGloria(b *testing.B) {
+func BenchmarkCappoccino(b *testing.B) {
 	spec, _ := LoadSpec("ita")
 	h := NewHangulizer(spec)
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		h.Hangulize("GLORIA")
+		h.Hangulize("Cappuccino")
 	}
 }
 
-func BenchmarkGloriaTrace(b *testing.B) {
+func BenchmarkCappuccinoTrace(b *testing.B) {
 	spec, _ := LoadSpec("ita")
 	h := NewHangulizer(spec)
 
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		h.HangulizeTrace("GLORIA")
+		h.HangulizeTrace("Cappuccino")
 	}
 }
 
@@ -221,9 +221,9 @@ func Example() {
 	// 비토르 콘스탄시우
 }
 
-func ExampleHangulize_gloria() {
-	fmt.Println(Hangulize("ita", "gloria"))
-	// Output: 글로리아
+func ExampleHangulize_cappuccino() {
+	fmt.Println(Hangulize("ita", "Cappuccino"))
+	// Output: 카푸치노
 }
 
 func ExampleHangulize_nietzsche() {
