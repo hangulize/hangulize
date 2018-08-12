@@ -110,6 +110,7 @@ wlm      draft    Middle Welsh             웨일스어(중세)
 ## 만든이
 
 - 이흥섭, Heungsub Lee <<sub@subl.ee>>
+- 박종성, Brian Jongseong Park <<iceager@gmail.com>>
 
 ## 라이선스
 
