@@ -45,3 +45,7 @@ func TestVowel(t *testing.T) {
 	assert.Equal(t, "ハウルノタベモノ", P.Phonemize("ハウルの食べ物"))
 	assert.Equal(t, "ハウルノ・ウゴクシロ", P.Phonemize("ハウルの動く城"))
 }
+
+func TestAmbiguousLinkedShortVowels(t *testing.T) {
+	assert.Equal(t, "カワイ・イ", P.Phonemize("可愛い"))
+}
