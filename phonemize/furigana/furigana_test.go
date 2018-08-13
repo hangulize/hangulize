@@ -13,7 +13,7 @@ func TestPhonemizer(t *testing.T) {
 }
 
 func TestKana(t *testing.T) {
-	assert.Equal(t, "ない", P.Phonemize("ない"))
+	assert.Equal(t, "ナイ", P.Phonemize("ない"))
 	assert.Equal(t, "ゲーム", P.Phonemize("ゲーム"))
 }
 
