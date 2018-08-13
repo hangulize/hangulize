@@ -102,6 +102,7 @@ func interpretToken(tok *kagome.Token) (string, category) {
 			partOfSpeech  = fs[0]
 			subClass1     = fs[1]
 			subClass2     = fs[2]
+			rootForm      = fs[6]
 			pronunciation = fs[8]
 		)
 
@@ -112,6 +113,14 @@ func interpretToken(tok *kagome.Token) (string, category) {
 			cat = filler
 		} else if partOfSpeech == "記号" {
 			cat = punct
+		} else if partOfSpeech == "助詞" {
+			// Keep the root form of particles.
+			switch rootForm {
+			case "は":
+				str = "ハ"
+			case "へ":
+				str = "ヘ"
+			}
 		} else if subClass2 == "人名" {
 			cat = personName
 		} else if subClass1 == "固有名詞" {
