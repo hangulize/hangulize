@@ -19,7 +19,7 @@ func TestKana(t *testing.T) {
 
 func TestRepeatKana(t *testing.T) {
 	assert.Equal(t, "バナナ", P.Phonemize("バナヽ"))
-	assert.Equal(t, "イスズジドウシャ", P.Phonemize("いすゞ自動車"))
+	assert.Equal(t, "イスズジドーシャ", P.Phonemize("いすゞ自動車"))
 }
 
 func TestPersonNames(t *testing.T) {
@@ -33,7 +33,7 @@ func TestDeduplicateSpaces(t *testing.T) {
 }
 
 func TestProperNouns(t *testing.T) {
-	assert.Equal(t, "トオイ・ホッカイドウ", P.Phonemize("遠い北海道"))
+	assert.Equal(t, "トーイ・ホッカイドー", P.Phonemize("遠い北海道"))
 }
 
 func TestPunct(t *testing.T) {
@@ -47,5 +47,8 @@ func TestVowel(t *testing.T) {
 }
 
 func TestAmbiguousLinkedShortVowels(t *testing.T) {
-	assert.Equal(t, "カワイ・イ", P.Phonemize("可愛い"))
+	assert.Equal(t, "カワイイ", P.Phonemize("可愛い"))
+	assert.Equal(t, "オモウ", P.Phonemize("思う"))
+	assert.Equal(t, "ヌウ", P.Phonemize("縫う"))
+	assert.Equal(t, "キイテ", P.Phonemize("聞いて"))
 }
