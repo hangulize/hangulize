@@ -3,7 +3,6 @@ package furigana
 import (
 	"bytes"
 	"strings"
-	"unicode/utf8"
 
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
@@ -70,27 +69,10 @@ func (t *typewriter) Typewrite() string {
 			continue
 		}
 
-		// Choose a proper separator.
+		// Split between a first name and a last name.
 		sep := ""
-		switch cat {
-
-		// Insert a Nakaguro before a proper noun.
-		case properNoun:
-			sep = "・"
-
-		// Insert a space between first/last names.
-		case personName:
-			if prevCat == personName {
-				sep = " "
-			}
-
-		// Insert a Nakaguro before a morphem which starts with a vowel.
-		case morpheme:
-			ch, _ := utf8.DecodeRuneInString(str)
-			startsWithVowel := ch%2 == 0 && in(ch, 'ア', 'オ')
-			if startsWithVowel {
-				sep = "・"
-			}
+		if cat == personName && prevCat == personName {
+			sep = " "
 		}
 
 		// Write the separator and string.
