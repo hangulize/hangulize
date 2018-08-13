@@ -33,17 +33,17 @@ func TestDeduplicateSpaces(t *testing.T) {
 }
 
 func TestProperNouns(t *testing.T) {
-	assert.Equal(t, "トーイ・ホッカイドー", P.Phonemize("遠い北海道"))
+	assert.Equal(t, "トーイホッカイドー", P.Phonemize("遠い北海道"))
 }
 
 func TestPunct(t *testing.T) {
-	assert.Equal(t, "ヤサシイ・マリオ", P.Phonemize("優しいマリオ"))
+	assert.Equal(t, "ヤサシイマリオ", P.Phonemize("優しいマリオ"))
 	assert.Equal(t, "ヤサシイ、マリオ", P.Phonemize("優しい、マリオ"))
 }
 
 func TestVowel(t *testing.T) {
 	assert.Equal(t, "ハウルノタベモノ", P.Phonemize("ハウルの食べ物"))
-	assert.Equal(t, "ハウルノ・ウゴクシロ", P.Phonemize("ハウルの動く城"))
+	assert.Equal(t, "ハウルノウゴクシロ", P.Phonemize("ハウルの動く城"))
 }
 
 func TestAmbiguousLinkedShortVowels(t *testing.T) {
