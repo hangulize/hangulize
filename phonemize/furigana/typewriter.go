@@ -117,13 +117,14 @@ func interpretToken(tok *kagome.Token) (string, category) {
 		// 8: pronunciation
 		fs := tok.Features()
 		var (
-			partOfSpeech = fs[0]
-			subClass1    = fs[1]
-			subClass2    = fs[2]
-			reading      = fs[7]
+			partOfSpeech  = fs[0]
+			subClass1     = fs[1]
+			subClass2     = fs[2]
+			pronunciation = fs[8]
 		)
 
-		str = reading
+		str = pronunciation
+		cat = morpheme
 
 		if partOfSpeech == "フィラー" {
 			cat = filler
@@ -133,8 +134,6 @@ func interpretToken(tok *kagome.Token) (string, category) {
 			cat = personName
 		} else if subClass1 == "固有名詞" {
 			cat = properNoun
-		} else {
-			cat = morpheme
 		}
 	} else {
 		isSpace := strings.TrimSpace(str) == ""
