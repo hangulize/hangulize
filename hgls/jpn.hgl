@@ -130,15 +130,6 @@ rewrite:
     "i'e"     -> "je"
     "(u|e)'i" -> "i"
 
-    # Long Vowels
-    "{(y|j)o}o" -> "O"
-    "{a}a"      -> ""
-    "{i}i"      -> ""
-    "{u|o}u"    -> ""
-    "{e}e"      -> ""
-    "{o}o"      -> ""
-    "O"         -> "o"
-
     # Diphthong after "ㅈ" and "ㅊ"
     "{c|z}ija" -> "a"
     "{c|z}ijo" -> "o"
