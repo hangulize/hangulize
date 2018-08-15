@@ -306,6 +306,9 @@ test:
     "バナヽ" -> "바나나"
     "いすゞ自動車" -> "이스즈지도샤"
 
+    # Long vowels
+    "いいえ" -> "이에"
+
     # Ambiguous linked short vowels
     "かわいい" -> "가와이이"
     "思う"     -> "오모우"
