@@ -18,7 +18,9 @@ var longVowelRels = map[rune]string{
 	'オ': "ォオコゴソゾトドノホボポモョヨロヲヺ",
 }
 
-func mergeLongVowels(word string, from int) string {
+// mergeLongVowels replaces Katakana long vowels with 'ー' after the given
+// offset.
+func mergeLongVowels(word string, offset int) string {
 	var buf bytes.Buffer
 	var prevCh rune
 
@@ -26,8 +28,8 @@ func mergeLongVowels(word string, from int) string {
 	for _, ch := range word {
 		isLongVowel := false
 
-		// Detect if the letter is a long vowel after the from.
-		if from <= i {
+		// Detect if the letter is a long vowel, only after the offset.
+		if offset <= i {
 			prior, ok := longVowelRels[ch]
 			if ok {
 				if strings.IndexRune(prior, prevCh) != -1 {
