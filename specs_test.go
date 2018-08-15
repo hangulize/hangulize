@@ -60,8 +60,9 @@ func TestJpnIgnoresLatin(t *testing.T) {
 	assertHangulize(t, loadSpec("jpn"), "abc아", "abcあ")
 }
 
-func TestJpnKatakanaLongVowel(t *testing.T) {
+func TestJpnAdditionalSounds(t *testing.T) {
 	// http://www.textfugu.com/season-3/learn-katakana/2-3/
+	// http://www.guidetojapanese.org/learn/grammar/katakana
 	jpn := loadSpec("jpn")
 
 	assertHangulize(t, jpn, "위", "ウィ")
@@ -88,11 +89,11 @@ func TestJpnKatakanaLongVowel(t *testing.T) {
 	assertHangulize(t, jpn, "보", "ブォ")
 
 	assertHangulize(t, jpn, "디", "ディ")
-	assertHangulize(t, jpn, "도", "ドゥ")
+	assertHangulize(t, jpn, "두", "ドゥ")
 	assertHangulize(t, jpn, "제", "ヂェ")
 
 	assertHangulize(t, jpn, "디티", "ティティ")
-	assertHangulize(t, jpn, "도토", "トゥトゥ")
+	assertHangulize(t, jpn, "두투", "トゥトゥ")
 	assertHangulize(t, jpn, "제체", "チェチェ")
 }
 

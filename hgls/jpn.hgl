@@ -125,10 +125,11 @@ rewrite:
     "^c{a|i}" -> "z"
 
     # Small Vowels
-    "u'o"     -> "o"
-    "o'u"     -> "o"
-    "i'e"     -> "je"
-    "(u|e)'i" -> "i"
+    "{t|d}o'u" -> "u"
+    "o'u"      -> "o"
+    "u'o"      -> "o"
+    "i'e"      -> "je"
+    "(u|e)'i"  -> "i"
 
     # Diphthong after "ㅈ" and "ㅊ"
     "{c|z}ija" -> "a"
