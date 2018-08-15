@@ -10,7 +10,6 @@ func TestMergeLongVowels(t *testing.T) {
 	assert.Equal(t, "オー", mergeLongVowels("オウ", 0))
 	assert.Equal(t, "オー", mergeLongVowels("オオ", 0))
 	assert.Equal(t, "ケー", mergeLongVowels("ケェ", 0))
-	assert.Equal(t, "ケー", mergeLongVowels("ケイ", 0))
 }
 
 func TestMergeLongVowelsOffset(t *testing.T) {
