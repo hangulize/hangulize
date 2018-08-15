@@ -20,3 +20,14 @@ func TestMergeLongVowelsOffset(t *testing.T) {
 	assert.Equal(t, "ホウオー", mergeLongVowels("ホウオウ", 3))
 	assert.Equal(t, "ホウオウ", mergeLongVowels("ホウオウ", 4))
 }
+
+func TestMergeLongVowelsAdditionalSounds(t *testing.T) {
+	// http://www.guidetojapanese.org/learn/grammar/katakana
+	assert.Equal(t, "ヴァヴィヴェヴォ", mergeLongVowels("ヴァヴィヴェヴォ", 0))
+	assert.Equal(t, "ウィウェウォ", mergeLongVowels("ウィウェウォ", 0))
+	assert.Equal(t, "ファフィフェフォ", mergeLongVowels("ファフィフェフォ", 0))
+	assert.Equal(t, "チェ", mergeLongVowels("チェ", 0))
+	assert.Equal(t, "ディドゥ", mergeLongVowels("ディドゥ", 0))
+	assert.Equal(t, "ティトゥ", mergeLongVowels("ティトゥ", 0))
+	assert.Equal(t, "ジェシェ", mergeLongVowels("ジェシェ", 0))
+}
