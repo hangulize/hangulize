@@ -25,8 +25,8 @@ func (furiganaPhonemizer) ID() string {
 // Kagome caches d Kagome tokenizer because it is expensive.
 func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
 	if p.kagome == nil {
-		t := kagome.New()
-		p.kagome = &t
+		k := kagome.New()
+		p.kagome = &k
 	}
 	return p.kagome
 }
