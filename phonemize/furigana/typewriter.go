@@ -13,14 +13,12 @@ type category int
 // Categories in a typewriter.
 const (
 	illegal category = iota
-	space
-	filler
-	punct
+	meta
 	morpheme
 	auxiliary
 	properNoun
 	personName
-	unknownText
+	unknown
 )
 
 // typewriter writes a whole pronunciation from the Kagome tokens.
@@ -63,6 +61,9 @@ func (t *typewriter) Typewrite() string {
 func (t *typewriter) scanMorpheme() (sep string, str string) {
 	var buf bytes.Buffer
 
+	// -------------------------------------------------------------------------
+	// 1. The Core Morpheme
+
 	tok := t.read()
 	if tok == nil {
 		return
@@ -71,23 +72,23 @@ func (t *typewriter) scanMorpheme() (sep string, str string) {
 	str, cat := interpretToken(tok)
 	buf.WriteString(str)
 
-	// Keep the length of the core morpheme.
-	coreLen := utf8.RuneCountInString(str)
-
-	// Determine a separator which will be prepended.
-	switch t.lastCat {
-	case space, filler, punct, illegal:
+	if t.lastCat == meta || t.lastCat == illegal {
 		// If here's a head of a word, any separator not required.
 		sep = ""
-	case personName:
+
+	} else if cat == personName && t.lastCat == personName {
 		// Split between a first name and a last name.
-		if cat == personName {
-			sep = " "
-		}
+		sep = " "
 	}
 
 	// Remember this category.
 	t.lastCat = cat
+
+	// Keep the length of the core morpheme.
+	coreLen := utf8.RuneCountInString(str)
+
+	// -------------------------------------------------------------------------
+	// 2. Following Auxiliary Morphemes
 
 	// If the next tokens are auxiliary morphemes, merge them.
 	for {
@@ -136,7 +137,7 @@ func (t *typewriter) unread() {
 // interpretToken picks a pronunciation and category from a Kagome token.
 func interpretToken(tok *kagome.Token) (string, category) {
 	str := tok.Surface
-	cat := unknownText
+	cat := unknown
 
 	if tok.Class == kagome.KNOWN {
 		// 0: part-of-speech
@@ -162,11 +163,8 @@ func interpretToken(tok *kagome.Token) (string, category) {
 
 		switch partOfSpeech {
 
-		case "フィラー":
-			cat = filler
-
-		case "記号":
-			cat = punct
+		case "フィラー", "記号":
+			cat = meta
 
 		case "助動詞":
 			cat = auxiliary
@@ -191,7 +189,7 @@ func interpretToken(tok *kagome.Token) (string, category) {
 	} else {
 		isSpace := strings.TrimSpace(str) == ""
 		if isSpace {
-			cat = space
+			cat = meta
 		}
 	}
 
