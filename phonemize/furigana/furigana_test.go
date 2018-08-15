@@ -52,3 +52,7 @@ func TestAmbiguousLinkedShortVowels(t *testing.T) {
 	assert.Equal(t, "ヌウ", P.Phonemize("縫う"))
 	assert.Equal(t, "キイテ", P.Phonemize("聞いて"))
 }
+
+func TestLongVowelAcrossMorphemes(t *testing.T) {
+	assert.Equal(t, "ハナサナカロー", P.Phonemize("話さなかろう"))
+}

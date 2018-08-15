@@ -3,89 +3,141 @@ package furigana
 import (
 	"bytes"
 	"strings"
+	"unicode/utf8"
 
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
 
 type category int
 
+// Categories in a typewriter.
 const (
 	illegal category = iota
-	space
-	filler
-	punct
+	meta
 	morpheme
+	auxiliary
 	properNoun
 	personName
-	unknownText
+	unknown
 )
 
+// typewriter writes a whole pronunciation from the Kagome tokens.
 type typewriter struct {
 	tokens  []kagome.Token
+	result  string
 	cur     int
 	lastCat category
 }
 
+// newTypewriter initializes a typewriter for the Kagome tokens.
 func newTypewriter(tokens []kagome.Token) *typewriter {
-	return &typewriter{tokens, -1, illegal}
+	return &typewriter{tokens, "", -1, illegal}
 }
 
-func (t *typewriter) read() (string, category, category) {
-	var tok kagome.Token
-
-	// Scan the next non-dummy token.
-	for tok.Class == kagome.DUMMY {
-		t.cur++
-
-		if t.cur >= len(t.tokens) {
-			return "", illegal, illegal
-		}
-
-		tok = t.tokens[t.cur]
+// Typewrite returns a whole pronunciation from the Kagome tokens.
+func (t *typewriter) Typewrite() string {
+	// Re-use the cached result if already processed.
+	if t.cur != -1 {
+		return t.result
 	}
 
-	str, cat := interpretToken(&tok)
-
-	prevCat := t.lastCat
-	t.lastCat = cat
-
-	return str, cat, prevCat
-}
-
-func (t *typewriter) Typewrite() string {
 	var buf bytes.Buffer
 
 	for {
-		str, cat, prevCat := t.read()
-
-		if cat == illegal {
+		sep, str := t.scanMorpheme()
+		if str == "" {
 			break
 		}
 
-		// Prevent a redundant separator.
-		switch prevCat {
-		case space, filler, punct, illegal:
-			buf.WriteString(str)
-			continue
-		}
-
-		// Split between a first name and a last name.
-		sep := ""
-		if cat == personName && prevCat == personName {
-			sep = " "
-		}
-
-		// Write the separator and string.
 		buf.WriteString(sep)
 		buf.WriteString(str)
 	}
 
-	return buf.String()
+	t.result = buf.String()
+	return t.result
 }
 
+// scanMorpheme consumes the Kagome tokens one by one.
+func (t *typewriter) scanMorpheme() (sep string, str string) {
+	var buf bytes.Buffer
+
+	// -------------------------------------------------------------------------
+	// 1. The Core Morpheme
+
+	tok := t.read()
+	if tok == nil {
+		return
+	}
+
+	str, cat := interpretToken(tok)
+	buf.WriteString(str)
+
+	if t.lastCat == meta || t.lastCat == illegal {
+		// If here's a head of a word, any separator not required.
+		sep = ""
+
+	} else if cat == personName && t.lastCat == personName {
+		// Split between a first name and a last name.
+		sep = " "
+	}
+
+	// Remember this category.
+	t.lastCat = cat
+
+	// Keep the length of the core morpheme.
+	coreLen := utf8.RuneCountInString(str)
+
+	// -------------------------------------------------------------------------
+	// 2. Following Auxiliary Morphemes
+
+	// If the next tokens are auxiliary morphemes, merge them.
+	for {
+		tok := t.read()
+		if tok == nil {
+			break
+		}
+
+		str, cat := interpretToken(tok)
+		if cat == auxiliary {
+			buf.WriteString(str)
+		} else {
+			t.unread()
+			break
+		}
+	}
+
+	// Merge long vowels in auxiliary morphemes.
+	str = buf.String()
+	str = mergeLongVowels(str, coreLen)
+
+	return sep, str
+}
+
+func (t *typewriter) read() *kagome.Token {
+	var tok *kagome.Token
+
+	// Scan the next non-dummy token.
+	for tok == nil || tok.Class == kagome.DUMMY {
+		t.cur++
+
+		if t.cur >= len(t.tokens) {
+			return nil
+		}
+
+		tok = &t.tokens[t.cur]
+	}
+
+	return tok
+}
+
+func (t *typewriter) unread() {
+	t.cur--
+}
+
+// interpretToken picks a pronunciation and category from a Kagome token.
 func interpretToken(tok *kagome.Token) (string, category) {
 	str := tok.Surface
-	cat := unknownText
+	cat := unknown
 
 	if tok.Class == kagome.KNOWN {
 		// 0: part-of-speech
@@ -109,11 +161,15 @@ func interpretToken(tok *kagome.Token) (string, category) {
 		str = pronunciation
 		cat = morpheme
 
-		if partOfSpeech == "フィラー" {
-			cat = filler
-		} else if partOfSpeech == "記号" {
-			cat = punct
-		} else if partOfSpeech == "助詞" {
+		switch partOfSpeech {
+
+		case "フィラー", "記号":
+			cat = meta
+
+		case "助動詞":
+			cat = auxiliary
+
+		case "助詞":
 			// Keep the root form of particles.
 			switch rootForm {
 			case "は":
@@ -121,15 +177,19 @@ func interpretToken(tok *kagome.Token) (string, category) {
 			case "へ":
 				str = "ヘ"
 			}
-		} else if subClass2 == "人名" {
-			cat = personName
-		} else if subClass1 == "固有名詞" {
-			cat = properNoun
+
+		default:
+			if subClass2 == "人名" {
+				cat = personName
+			} else if subClass1 == "固有名詞" {
+				cat = properNoun
+			}
+
 		}
 	} else {
 		isSpace := strings.TrimSpace(str) == ""
 		if isSpace {
-			cat = space
+			cat = meta
 		}
 	}
 
