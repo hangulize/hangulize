@@ -22,15 +22,21 @@ const (
 
 type typewriter struct {
 	tokens  []kagome.Token
+	result  string
 	cur     int
 	lastCat category
 }
 
 func newTypewriter(tokens []kagome.Token) *typewriter {
-	return &typewriter{tokens, -1, illegal}
+	return &typewriter{tokens, "", -1, illegal}
 }
 
 func (t *typewriter) Typewrite() string {
+	// Re-use the cached result if already processed.
+	if t.cur != -1 {
+		return t.result
+	}
+
 	var buf bytes.Buffer
 
 	for {
@@ -58,7 +64,8 @@ func (t *typewriter) Typewrite() string {
 		buf.WriteString(str)
 	}
 
-	return buf.String()
+	t.result = buf.String()
+	return t.result
 }
 
 func (t *typewriter) read() (string, category, category) {
