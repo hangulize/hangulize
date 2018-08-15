@@ -2,7 +2,9 @@ package furigana
 
 import (
 	"bytes"
+	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 )
@@ -16,6 +18,7 @@ const (
 	filler
 	punct
 	morpheme
+	auxiliary
 	properNoun
 	personName
 	unknownText
@@ -44,26 +47,12 @@ func (t *typewriter) Typewrite() string {
 	var buf bytes.Buffer
 
 	for {
-		str, cat, prevCat := t.read()
-
-		if cat == illegal {
+		sep, str := t.scanMorpheme()
+		fmt.Println(sep, str)
+		if str == "" {
 			break
 		}
 
-		// Prevent a redundant separator.
-		switch prevCat {
-		case space, filler, punct, illegal:
-			buf.WriteString(str)
-			continue
-		}
-
-		// Split between a first name and a last name.
-		sep := ""
-		if cat == personName && prevCat == personName {
-			sep = " "
-		}
-
-		// Write the separator and string.
 		buf.WriteString(sep)
 		buf.WriteString(str)
 	}
@@ -72,27 +61,78 @@ func (t *typewriter) Typewrite() string {
 	return t.result
 }
 
-// read consumes the Kagome tokens one by one.
-func (t *typewriter) read() (string, category, category) {
-	var tok kagome.Token
+// scanMorpheme consumes the Kagome tokens one by one.
+func (t *typewriter) scanMorpheme() (sep string, str string) {
+	var buf bytes.Buffer
+
+	tok := t.read()
+	if tok == nil {
+		return
+	}
+
+	str, cat := interpretToken(tok)
+	buf.WriteString(str)
+
+	// Keep the length of the core morpheme.
+	coreLen := utf8.RuneCountInString(str)
+
+	// Determine a separator which will be prepended.
+	switch t.lastCat {
+	case space, filler, punct, illegal:
+		// If here's a head of a word, any separator not required.
+		sep = ""
+	case personName:
+		// Split between a first name and a last name.
+		if cat == personName {
+			sep = " "
+		}
+	}
+
+	// Remember this category.
+	t.lastCat = cat
+
+	// If the next tokens are auxiliary morphemes, merge them.
+	for {
+		tok := t.read()
+		if tok == nil {
+			break
+		}
+
+		str, cat := interpretToken(tok)
+		if cat == auxiliary {
+			buf.WriteString(str)
+		} else {
+			t.unread()
+			break
+		}
+	}
+
+	// Merge long vowels in auxiliary morphemes.
+	str = buf.String()
+	str = mergeLongVowels(str, coreLen)
+
+	return sep, str
+}
+
+func (t *typewriter) read() *kagome.Token {
+	var tok *kagome.Token
 
 	// Scan the next non-dummy token.
-	for tok.Class == kagome.DUMMY {
+	for tok == nil || tok.Class == kagome.DUMMY {
 		t.cur++
 
 		if t.cur >= len(t.tokens) {
-			return "", illegal, illegal
+			return nil
 		}
 
-		tok = t.tokens[t.cur]
+		tok = &t.tokens[t.cur]
 	}
 
-	str, cat := interpretToken(&tok)
+	return tok
+}
 
-	prevCat := t.lastCat
-	t.lastCat = cat
-
-	return str, cat, prevCat
+func (t *typewriter) unread() {
+	t.cur--
 }
 
 // interpretToken picks a pronunciation and category from a Kagome token.
@@ -129,6 +169,9 @@ func interpretToken(tok *kagome.Token) (string, category) {
 
 		case "記号":
 			cat = punct
+
+		case "助動詞":
+			cat = auxiliary
 
 		case "助詞":
 			// Keep the root form of particles.
