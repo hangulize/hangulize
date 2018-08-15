@@ -31,3 +31,8 @@ func TestMergeLongVowelsAdditionalSounds(t *testing.T) {
 	assert.Equal(t, "ティトゥ", mergeLongVowels("ティトゥ", 0))
 	assert.Equal(t, "ジェシェ", mergeLongVowels("ジェシェ", 0))
 }
+
+func TestMergeLongVowelsEI(t *testing.T) {
+	assert.Equal(t, "エイ", mergeLongVowels("エイ", 0))
+	assert.Equal(t, "エー", mergeLongVowels("エィ", 0))
+}
