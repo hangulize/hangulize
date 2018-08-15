@@ -70,7 +70,12 @@ func (t *typewriter) scanMorpheme() (sep string, str string) {
 	}
 
 	str, cat := interpretToken(tok)
-	buf.WriteString(str)
+
+	// Merge long vowels in an unknown word. Because Kagome didn't detect the
+	// pronunciation of this word.
+	if cat == unknown {
+		str = mergeLongVowels(str, 0)
+	}
 
 	if t.lastCat == meta || t.lastCat == illegal {
 		// If here's a head of a word, any separator not required.
@@ -86,6 +91,8 @@ func (t *typewriter) scanMorpheme() (sep string, str string) {
 
 	// Keep the length of the core morpheme.
 	coreLen := utf8.RuneCountInString(str)
+
+	buf.WriteString(str)
 
 	// -------------------------------------------------------------------------
 	// 2. Following Auxiliary Morphemes
