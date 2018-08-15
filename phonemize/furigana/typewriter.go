@@ -30,28 +30,6 @@ func newTypewriter(tokens []kagome.Token) *typewriter {
 	return &typewriter{tokens, -1, illegal}
 }
 
-func (t *typewriter) read() (string, category, category) {
-	var tok kagome.Token
-
-	// Scan the next non-dummy token.
-	for tok.Class == kagome.DUMMY {
-		t.cur++
-
-		if t.cur >= len(t.tokens) {
-			return "", illegal, illegal
-		}
-
-		tok = t.tokens[t.cur]
-	}
-
-	str, cat := interpretToken(&tok)
-
-	prevCat := t.lastCat
-	t.lastCat = cat
-
-	return str, cat, prevCat
-}
-
 func (t *typewriter) Typewrite() string {
 	var buf bytes.Buffer
 
@@ -81,6 +59,28 @@ func (t *typewriter) Typewrite() string {
 	}
 
 	return buf.String()
+}
+
+func (t *typewriter) read() (string, category, category) {
+	var tok kagome.Token
+
+	// Scan the next non-dummy token.
+	for tok.Class == kagome.DUMMY {
+		t.cur++
+
+		if t.cur >= len(t.tokens) {
+			return "", illegal, illegal
+		}
+
+		tok = t.tokens[t.cur]
+	}
+
+	str, cat := interpretToken(&tok)
+
+	prevCat := t.lastCat
+	t.lastCat = cat
+
+	return str, cat, prevCat
 }
 
 func interpretToken(tok *kagome.Token) (string, category) {
