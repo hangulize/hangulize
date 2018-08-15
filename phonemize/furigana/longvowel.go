@@ -18,17 +18,21 @@ var longVowelRels = map[rune]string{
 	'オ': "ォオコゴソゾトドノホボポモョヨロヲヺ",
 }
 
-func markLongVowels(word string) string {
+func mergeLongVowels(word string, from int) string {
 	var buf bytes.Buffer
 	var prevCh rune
 
+	i := 0
 	for _, ch := range word {
 		isLongVowel := false
 
-		prior, ok := longVowelRels[ch]
-		if ok {
-			if strings.IndexRune(prior, prevCh) != -1 {
-				isLongVowel = true
+		// Detect if the letter is a long vowel after the from.
+		if from <= i {
+			prior, ok := longVowelRels[ch]
+			if ok {
+				if strings.IndexRune(prior, prevCh) != -1 {
+					isLongVowel = true
+				}
 			}
 		}
 
@@ -39,6 +43,7 @@ func markLongVowels(word string) string {
 		}
 
 		prevCh = ch
+		i++
 	}
 
 	return buf.String()

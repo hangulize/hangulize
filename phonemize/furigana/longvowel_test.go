@@ -6,9 +6,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMarkLongVowels(t *testing.T) {
-	assert.Equal(t, "オー", markLongVowels("オウ"))
-	assert.Equal(t, "オー", markLongVowels("オオ"))
-	assert.Equal(t, "ケー", markLongVowels("ケェ"))
-	assert.Equal(t, "ケー", markLongVowels("ケイ"))
+func TestMergeLongVowels(t *testing.T) {
+	assert.Equal(t, "オー", mergeLongVowels("オウ", -1))
+	assert.Equal(t, "オー", mergeLongVowels("オオ", -1))
+	assert.Equal(t, "ケー", mergeLongVowels("ケェ", -1))
+	assert.Equal(t, "ケー", mergeLongVowels("ケイ", -1))
+}
+
+func TestMergeLongVowelsAfter(t *testing.T) {
+	assert.Equal(t, "オウオー", mergeLongVowels("オウオウ", 2))
 }
