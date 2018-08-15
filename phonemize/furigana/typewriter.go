@@ -109,11 +109,15 @@ func interpretToken(tok *kagome.Token) (string, category) {
 		str = pronunciation
 		cat = morpheme
 
-		if partOfSpeech == "フィラー" {
+		switch partOfSpeech {
+
+		case "フィラー":
 			cat = filler
-		} else if partOfSpeech == "記号" {
+
+		case "記号":
 			cat = punct
-		} else if partOfSpeech == "助詞" {
+
+		case "助詞":
 			// Keep the root form of particles.
 			switch rootForm {
 			case "は":
@@ -121,10 +125,14 @@ func interpretToken(tok *kagome.Token) (string, category) {
 			case "へ":
 				str = "ヘ"
 			}
-		} else if subClass2 == "人名" {
-			cat = personName
-		} else if subClass1 == "固有名詞" {
-			cat = properNoun
+
+		default:
+			if subClass2 == "人名" {
+				cat = personName
+			} else if subClass1 == "固有名詞" {
+				cat = properNoun
+			}
+
 		}
 	} else {
 		isSpace := strings.TrimSpace(str) == ""
