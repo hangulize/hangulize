@@ -13,13 +13,13 @@ func TestPhonemizer(t *testing.T) {
 }
 
 func TestKana(t *testing.T) {
-	assert.Equal(t, "ない", P.Phonemize("ない"))
+	assert.Equal(t, "ナイ", P.Phonemize("ない"))
 	assert.Equal(t, "ゲーム", P.Phonemize("ゲーム"))
 }
 
 func TestRepeatKana(t *testing.T) {
 	assert.Equal(t, "バナナ", P.Phonemize("バナヽ"))
-	assert.Equal(t, "イスズジドウシャ", P.Phonemize("いすゞ自動車"))
+	assert.Equal(t, "イスズジドーシャ", P.Phonemize("いすゞ自動車"))
 }
 
 func TestPersonNames(t *testing.T) {
@@ -33,15 +33,26 @@ func TestDeduplicateSpaces(t *testing.T) {
 }
 
 func TestProperNouns(t *testing.T) {
-	assert.Equal(t, "トオイ・ホッカイドウ", P.Phonemize("遠い北海道"))
+	assert.Equal(t, "トーイホッカイドー", P.Phonemize("遠い北海道"))
 }
 
 func TestPunct(t *testing.T) {
-	assert.Equal(t, "ヤサシイ・マリオ", P.Phonemize("優しいマリオ"))
+	assert.Equal(t, "ヤサシイマリオ", P.Phonemize("優しいマリオ"))
 	assert.Equal(t, "ヤサシイ、マリオ", P.Phonemize("優しい、マリオ"))
 }
 
 func TestVowel(t *testing.T) {
 	assert.Equal(t, "ハウルノタベモノ", P.Phonemize("ハウルの食べ物"))
-	assert.Equal(t, "ハウルノ・ウゴクシロ", P.Phonemize("ハウルの動く城"))
+	assert.Equal(t, "ハウルノウゴクシロ", P.Phonemize("ハウルの動く城"))
+}
+
+func TestAmbiguousLinkedShortVowels(t *testing.T) {
+	assert.Equal(t, "カワイイ", P.Phonemize("可愛い"))
+	assert.Equal(t, "オモウ", P.Phonemize("思う"))
+	assert.Equal(t, "ヌウ", P.Phonemize("縫う"))
+	assert.Equal(t, "キイテ", P.Phonemize("聞いて"))
+}
+
+func TestLongVowelAcrossMorphemes(t *testing.T) {
+	assert.Equal(t, "ハナサナカロー", P.Phonemize("話さなかろう"))
 }

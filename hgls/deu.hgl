@@ -287,3 +287,4 @@ test:
     "Max"         -> "막스"
     "Fuggerei"    -> "푸게라이"
     "Hefeweizen"  -> "헤페바이첸"
+    "Friedrich Wilhelm Nietzsche" -> "프리드리히 빌헬름 니체"

@@ -25,34 +25,18 @@ func (furiganaPhonemizer) ID() string {
 // Kagome caches d Kagome tokenizer because it is expensive.
 func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
 	if p.kagome == nil {
-		t := kagome.New()
-		p.kagome = &t
+		k := kagome.New()
+		p.kagome = &k
 	}
 	return p.kagome
 }
 
 func (p *furiganaPhonemizer) Phonemize(word string) string {
-	const (
-		kanjiMin = rune(0x4e00)
-		kanjiMax = rune(0x9faf)
-	)
-
-	kanjiFound := false
-	for _, ch := range word {
-		if ch >= kanjiMin && ch <= kanjiMax {
-			kanjiFound = true
-			break
-		}
-	}
-
-	// Don't initialize the Kagome tokenizer if there's no Kanji because
-	// Kagome is expensive.
-	if kanjiFound {
-		tokens := p.Kagome().Tokenize(word)
-		tw := newTypewriter(tokens)
-		word = tw.Typewrite()
-	}
-
 	word = repeatKana(word)
+
+	tokens := p.Kagome().Tokenize(word)
+	tw := newTypewriter(tokens)
+	word = tw.Typewrite()
+
 	return word
 }

@@ -23,6 +23,7 @@ var scripts = map[string]script{
 	"greek":    &_Greek{},
 	"kana":     &_Kana{},
 	"latin":    &_Latin{},
+	"pinyin":   &_Pinyin{},
 }
 
 // getScript chooses a script by the script name.
@@ -191,4 +192,24 @@ func (_Kana) TransliteratePunct(punct rune) string {
 	}
 
 	return string(punct)
+}
+
+// -----------------------------------------------------------------------------
+
+// _Pinyin represents the Latin script for Chinese Pinyin.
+type _Pinyin struct {
+	_Latin
+}
+
+// Normalize converts a Latin character for Pinyin into ISO basic Latin lower
+// alphabet [a-z]. Especially, it converts "ü" to "v":
+//
+//   lüè -> lve
+//
+func (s *_Pinyin) Normalize(ch rune) rune {
+	switch ch {
+	case 'ü', 'Ü':
+		return 'v'
+	}
+	return s._Latin.Normalize(ch)
 }
