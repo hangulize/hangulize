@@ -2,7 +2,6 @@ package furigana
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"unicode/utf8"
 
@@ -48,7 +47,6 @@ func (t *typewriter) Typewrite() string {
 
 	for {
 		sep, str := t.scanMorpheme()
-		fmt.Println(sep, str)
 		if str == "" {
 			break
 		}
