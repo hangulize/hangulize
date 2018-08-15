@@ -9,6 +9,7 @@ import (
 
 type category int
 
+// Categories in a typewriter.
 const (
 	illegal category = iota
 	space
@@ -20,6 +21,7 @@ const (
 	unknownText
 )
 
+// typewriter writes a whole pronunciation from the Kagome tokens.
 type typewriter struct {
 	tokens  []kagome.Token
 	result  string
@@ -27,10 +29,12 @@ type typewriter struct {
 	lastCat category
 }
 
+// newTypewriter initializes a typewriter for the Kagome tokens.
 func newTypewriter(tokens []kagome.Token) *typewriter {
 	return &typewriter{tokens, "", -1, illegal}
 }
 
+// Typewrite returns a whole pronunciation from the Kagome tokens.
 func (t *typewriter) Typewrite() string {
 	// Re-use the cached result if already processed.
 	if t.cur != -1 {
@@ -68,6 +72,7 @@ func (t *typewriter) Typewrite() string {
 	return t.result
 }
 
+// read consumes the Kagome tokens one by one.
 func (t *typewriter) read() (string, category, category) {
 	var tok kagome.Token
 
@@ -90,6 +95,7 @@ func (t *typewriter) read() (string, category, category) {
 	return str, cat, prevCat
 }
 
+// interpretToken picks a pronunciation and category from a Kagome token.
 func interpretToken(tok *kagome.Token) (string, category) {
 	str := tok.Surface
 	cat := unknownText
