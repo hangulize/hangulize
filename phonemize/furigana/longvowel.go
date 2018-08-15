@@ -39,17 +39,6 @@ func markLongVowels(word string) string {
 		}
 
 		prevCh = ch
-
-		// switch ch {
-		// case 'ァ', 'ア':
-		// 	switch prevCh {
-		// 	case 'ァアカガサザタダナハバパマャヤラヮワ':
-		// 	}
-		// case 'ィ', 'イ':
-		// case 'ゥ', 'ウ':
-		// case 'ェ', 'エ':
-		// case 'ォ', 'オ':
-		// }
 	}
 
 	return buf.String()
