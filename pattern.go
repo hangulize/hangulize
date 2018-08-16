@@ -171,6 +171,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		if !neg {
 			// No negative lookaround matches.
 			match := []int{start, stop}
+			// Keep submatches in the core match.
 			match = append(match, m[6:lenM-4]...)
 
 			matches = append(matches, match)
