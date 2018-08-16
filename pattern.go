@@ -175,7 +175,6 @@ func (p *Pattern) Find(word string, n int) [][]int {
 			match = append(match, m[6:lenM-4]...)
 
 			matches = append(matches, match)
-
 		}
 
 		// Shift the cursor.
