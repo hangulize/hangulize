@@ -137,9 +137,9 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 		// Submatches look like:
 		//
-		//  ┌(edge)(look)abc(look)(edge)┐
-		//  0│    │└4   │   │  -3┘│    │1
-		//   2    3     5  -4    -2   -1
+		// 0      ┌4   ┌5      -2┐  -1┐
+		// └(edge)(look)abc(look)(edge)┐
+		//  └2   └3      -4┘  -3┘      1
 		//
 		m := p.re.FindStringSubmatchIndex(erased)
 
