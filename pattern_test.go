@@ -321,6 +321,12 @@ func TestComplexLookaround(t *testing.T) {
 	})
 }
 
+func TestMultipleLookaround(t *testing.T) {
+	p := fixturePattern("{~foo}foo")
+	w := "barfoofoobarfoo"
+	assert.Equal(t, [][]int{[]int{3, 6}, []int{12, 15}}, p.Find(w, -1))
+}
+
 func TestMalformedPattern(t *testing.T) {
 	p, err := newPattern(`{a} {b} {c}`, nil, nil)
 	assert.Error(t, err, p.Explain())
