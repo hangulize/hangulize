@@ -2,6 +2,8 @@ package hangulize
 
 import (
 	"fmt"
+	"math"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -357,6 +359,23 @@ func TestZeroWidthMatchPanic(t *testing.T) {
 
 	p = fixturePattern("{a}{b}")
 	assert.Panics(t, func() { p.Find("abc", -1) })
+}
+
+// -----------------------------------------------------------------------------
+// Benchmarks
+
+func BenchmarkFind(b *testing.B) {
+	p := fixturePattern("foo")
+
+	for n := 0; n < 5; n++ {
+		t := strings.Repeat("foo", int(math.Pow10(n)))
+
+		b.Run(fmt.Sprintf("10**%d", n), func(b *testing.B) {
+			for i := 0; i < b.N; i++ {
+				p.Find(t, -1)
+			}
+		})
+	}
 }
 
 // -----------------------------------------------------------------------------
