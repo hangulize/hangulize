@@ -378,6 +378,20 @@ func BenchmarkFind(b *testing.B) {
 	}
 }
 
+func BenchmarkFindLookaround(b *testing.B) {
+	p := fixturePattern("{~foo}foo")
+	t := "barfoofoobarfoo"
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		assert.Equal(b, [][]int{
+			[]int{3, 6},
+			[]int{12, 15},
+		}, p.Find(t, -1))
+	}
+}
+
 // -----------------------------------------------------------------------------
 // Examples
 
