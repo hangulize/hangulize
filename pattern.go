@@ -3,7 +3,6 @@ package hangulize
 import (
 	"fmt"
 	"regexp"
-	"strings"
 
 	"github.com/pkg/errors"
 )
@@ -140,9 +139,11 @@ func (p *Pattern) Find(word string, n int) [][]int {
 	length := len(word)
 
 	for offset < length && (n < 0 || len(matches) < n) {
-		// Erase visited characters on the word with "\x00". Because of
-		// lookaround, the search cursor should be calculated manually.
-		erased := strings.Repeat("\x00", offset) + word[offset:]
+		// Find submatches on a shifted word.
+		m := p.re.FindStringSubmatchIndex(word[offset:])
+		for i := range m {
+			m[i] += offset
+		}
 
 		// Submatches look like:
 		//
@@ -150,13 +151,13 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// └(edge)(look)abc(look)(edge)┐
 		//  └2   └3      -4┘  -3┘      1
 		//
-		m := p.re.FindStringSubmatchIndex(erased)
-
 		lenM := len(m)
+
 		if lenM == 0 {
 			// No more match.
 			break
 		}
+
 		if lenM < 10 {
 			// Not expected number of groups.
 			panic(fmt.Errorf("unexpected submatches from %v: %v", p, m))
@@ -175,16 +176,14 @@ func (p *Pattern) Find(word string, n int) [][]int {
 
 		// Test negative lookahead.
 		if p.negA != nil {
-			ahead := safeSlice(word, m[lenM-4], m[lenM-3])
-			if p.negA.MatchString(ahead) {
+			if p.negA.MatchString(safeSlice(word, m[lenM-4], length)) {
 				continue
 			}
 		}
 
 		// Test negative lookbehind.
 		if p.negB != nil {
-			behind := safeSlice(word, m[4], m[5])
-			if p.negB.MatchString(behind) {
+			if p.negB.MatchString(safeSlice(word, 0, m[5])) {
 				continue
 			}
 		}
@@ -194,6 +193,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// Keep submatches in the core match.
 		match = append(match, m[6:lenM-4]...)
 
+		// Export the match.
 		matches = append(matches, match)
 	}
 
