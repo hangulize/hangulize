@@ -38,8 +38,9 @@ import (
 type Pattern struct {
 	expr string
 
-	re  *regexp.Regexp // positive regexp
-	neg *regexp.Regexp // negative regexp
+	re   *regexp.Regexp // positive regexp
+	negB *regexp.Regexp // negative behind regexp
+	negA *regexp.Regexp // negative ahead regexp
 
 	// Letters used in the positive/negative regexps.
 	letters stringSet
@@ -70,7 +71,7 @@ func newPattern(
 
 	reExpr, usedVars := expandVars(reExpr, vars)
 
-	reExpr, negExpr, err := expandLookaround(reExpr)
+	reExpr, negBExpr, negAExpr, err := expandLookaround(reExpr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
@@ -78,7 +79,8 @@ func newPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	letters := newStringSet(splitLetters(regexpLetters(reExpr + negExpr))...)
+	combinedExpr := reExpr + negBExpr + negAExpr
+	letters := newStringSet(splitLetters(regexpLetters(combinedExpr))...)
 
 	// Compile regexp.
 	re, err := regexp.Compile(reExpr)
@@ -86,12 +88,17 @@ func newPattern(
 		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
 
-	neg, err := regexp.Compile(negExpr)
+	negB, err := regexp.Compile(negBExpr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
 
-	p := &Pattern{expr, re, neg, letters, usedVars}
+	negA, err := regexp.Compile(negAExpr)
+	if err != nil {
+		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+	}
+
+	p := &Pattern{expr, re, negB, negA, letters, usedVars}
 	return p, nil
 }
 
@@ -107,7 +114,10 @@ func (p *Pattern) Explain() string {
 	if p == nil {
 		return fmt.Sprintf("%#v", nil)
 	}
-	return fmt.Sprintf("expr:/%s/, re:/%s/, neg:/%s/", p.expr, p.re, p.neg)
+	return fmt.Sprintf(
+		"expr:/%s/, re:/%s/, negB:/%s/, negA:/%s/",
+		p.expr, p.re, p.negB, p.negA,
+	)
 }
 
 // -----------------------------------------------------------------------------
@@ -125,53 +135,55 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// lookaround, the search cursor should be calculated manually.
 		erased := strings.Repeat("\x00", offset) + word[offset:]
 
+		//                      0                         1
+		//                      │                         │
+		// Submatches look like (edge)(look)abc(look)(edge).
+		//                      │    ││    │   │    ││    │
+		//                      2    34    5  -4   -3-2  -1
 		m := p.re.FindStringSubmatchIndex(erased)
-		if len(m) == 0 {
+
+		lenM := len(m)
+		if lenM == 0 {
 			// No more match.
 			break
 		}
-
-		// p.re looks like (edge)(look)abc(look)(edge).
-		if len(m) < 10 {
+		if lenM < 10 {
+			// Not expected number of groups.
 			panic(fmt.Errorf("unexpected submatches from %v: %v", p, m))
 		}
 
 		// Pick the actual start and stop.
-		start, stop := pickStartStop(m)
+		start, stop := p.pickStartStop(m)
 
 		// The match MUST NOT be zero-width.
 		if stop-start == 0 {
 			panic(fmt.Errorf("zero-width match from %v", p))
 		}
 
-		// Pick matched word. Call it "highlight".
-		highlight := erased[m[0]:m[1]]
+		// Test negative lookaround.
+		var (
+			behind = safeSlice(word, m[4], m[5])
+			ahead  = safeSlice(word, m[6], m[7])
+		)
 
-		// Test highlight with p.neg to determine whether skip or not.
-		negM := p.neg.FindStringSubmatchIndex(highlight)
+		neg := p.negB.MatchString(behind) || p.negA.MatchString(ahead)
 
-		// If no negative match, this match is successful.
-		if len(negM) == 0 {
+		if !neg {
+			// No negative lookaround matches.
 			match := []int{start, stop}
-
-			// Keep content ()...
 			match = append(match, m[6:len(m)-4]...)
 
 			matches = append(matches, match)
 		}
 
 		// Shift the cursor.
-		if len(negM) == 0 {
-			offset = stop
-		} else {
-			offset = m[0] + negM[1]
-		}
+		offset = stop
 	}
 
 	return matches
 }
 
-func pickStartStop(m []int) (int, int) {
+func (Pattern) pickStartStop(m []int) (int, int) {
 	start := m[5]
 	if start == -1 {
 		start = m[0]

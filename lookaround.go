@@ -62,21 +62,16 @@ var (
 	`)
 )
 
-func expandLookaround(expr string) (string, string, error) {
-	posExpr, negExpr := expandLookbehind(expr)
-	posExpr, negExpr = expandLookahead(posExpr, negExpr)
+func expandLookaround(expr string) (string, string, string, error) {
+	posExpr, negBExpr := expandLookbehind(expr)
+	posExpr, negAExpr := expandLookahead(posExpr)
 
 	err := mustNoZeroWidth(posExpr)
 	if err != nil {
-		return "", "", err
+		return ``, ``, ``, err
 	}
 
-	if negExpr == `` {
-		// This regexp has a paradox. So it never matches with any text.
-		negExpr = `$^`
-	}
-
-	return posExpr, negExpr, nil
+	return posExpr, negBExpr, negAExpr, nil
 }
 
 // Lookbehind: {...} on the left-side.
@@ -87,7 +82,7 @@ func expandLookbehind(expr string) (string, string) {
 	// └─ edge
 
 	posExpr := expr
-	negExpr := ``
+	negBExpr := `$.` // will never be matched by anything
 
 	// This pattern always matches.
 	m := reLookbehind.FindStringSubmatchIndex(posExpr)
@@ -104,27 +99,29 @@ func expandLookbehind(expr string) (string, string) {
 
 	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookbehind
-		negExpr = fmt.Sprintf(`(%s)%s`, lookExpr[1:], otherExpr)
+		negBExpr = fmt.Sprintf(`(%s)$`, lookExpr[1:])
 
-		lookExpr = `.*` // require greedy matching
+		// Lookbehind requires non-greedy matching, unlike lookahead.
+		lookExpr = `.*?`
 	}
 
 	// Replace lookbehind with 2 parentheses:
 	//  (^)(han)gul
 	posExpr = fmt.Sprintf(`(%s)(%s)%s`, edgeExpr, lookExpr, otherExpr)
 
-	return posExpr, negExpr
+	return posExpr, negBExpr
 }
 
 // Lookahead: {...} on the right-side.
 // negExpr should be passed from expandLookbehind.
-func expandLookahead(expr string, negExpr string) (string, string) {
+func expandLookahead(expr string) (string, string) {
 	// han{gul}$
 	//  │   │  └─ edge
 	//  │   └─ look
 	//  └─ other
 
 	posExpr := expr
+	negAExpr := `$.` // will never be matched by anything
 
 	// This pattern always matches.
 	m := reLookahead.FindStringSubmatchIndex(posExpr)
@@ -139,28 +136,19 @@ func expandLookahead(expr string, negExpr string) (string, string) {
 	edgeExpr = noCapture(edgeExpr)
 	lookExpr = noCapture(lookExpr)
 
-	// Lookahead can be remaining in the negative regexp
-	// the lookbehind determined.
-	if negExpr != `` {
-		lookaheadLen := len(posExpr) - m[0]
-		negExpr = negExpr[:len(negExpr)-lookaheadLen]
-	}
-
 	if strings.HasPrefix(lookExpr, `~`) {
 		// negative lookahead
-		if negExpr != `` {
-			negExpr += `|`
-		}
-		negExpr += fmt.Sprintf(`^%s(%s)`, otherExpr, lookExpr[1:])
+		negAExpr = fmt.Sprintf(`^(%s)`, lookExpr[1:])
 
-		lookExpr = `.*` // require greedy matching
+		// Lookahead requires greedy matching, unlike lookbehind.
+		lookExpr = `.*`
 	}
 
 	// Replace lookahead with 2 parentheses:
 	//  han(gul)($)
 	posExpr = fmt.Sprintf(`%s(%s)(%s)`, otherExpr, lookExpr, edgeExpr)
 
-	return posExpr, negExpr
+	return posExpr, negAExpr
 }
 
 func mustNoZeroWidth(expr string) error {
