@@ -163,7 +163,7 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// Test negative lookaround.
 		var (
 			behind = safeSlice(word, m[4], m[5])
-			ahead  = safeSlice(word, m[6], m[7])
+			ahead  = safeSlice(word, m[lenM-4], m[lenM-3])
 		)
 
 		neg := p.negB.MatchString(behind) || p.negA.MatchString(ahead)
@@ -171,9 +171,10 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		if !neg {
 			// No negative lookaround matches.
 			match := []int{start, stop}
-			match = append(match, m[6:len(m)-4]...)
+			match = append(match, m[6:lenM-4]...)
 
 			matches = append(matches, match)
+
 		}
 
 		// Shift the cursor.
