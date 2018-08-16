@@ -239,6 +239,7 @@ func BenchmarkVeryLongWord(b *testing.B) {
 	b.Run("10", genFunc(10))
 	b.Run("100", genFunc(100))
 	b.Run("1000", genFunc(1000))
+	b.Run("10000", genFunc(10000))
 }
 
 // -----------------------------------------------------------------------------
