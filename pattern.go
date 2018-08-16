@@ -32,15 +32,14 @@ import (
 //  "$$"     // end of string
 //  "{...}"  // zero-width match
 //  "{~...}" // zero-width negative match
-//  "{}"     // zero-width space
 //  "<var>"  // one of var values (defined in spec)
 //
 type Pattern struct {
 	expr string
 
 	re   *regexp.Regexp // positive regexp
-	negB *regexp.Regexp // negative behind regexp
 	negA *regexp.Regexp // negative ahead regexp
+	negB *regexp.Regexp // negative behind regexp
 
 	// Letters used in the positive/negative regexps.
 	letters stringSet
@@ -71,7 +70,7 @@ func newPattern(
 
 	reExpr, usedVars := expandVars(reExpr, vars)
 
-	reExpr, negBExpr, negAExpr, err := expandLookaround(reExpr)
+	reExpr, negAExpr, negBExpr, err := expandLookaround(reExpr)
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
@@ -79,7 +78,7 @@ func newPattern(
 	reExpr = expandEdges(reExpr)
 
 	// Collect letters in the regexps.
-	combinedExpr := reExpr + negBExpr + negAExpr
+	combinedExpr := reExpr + negAExpr + negBExpr
 	letters := newStringSet(splitLetters(regexpLetters(combinedExpr))...)
 
 	// Compile regexp.
@@ -88,17 +87,27 @@ func newPattern(
 		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
 	}
 
-	negB, err := regexp.Compile(negBExpr)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+	// Compile negative lookahead/behind regexps.
+	var negA *regexp.Regexp
+	var negB *regexp.Regexp
+
+	if negAExpr != `` {
+		negA, err = regexp.Compile(negAExpr)
+		if err != nil {
+			err = errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+			return nil, err
+		}
 	}
 
-	negA, err := regexp.Compile(negAExpr)
-	if err != nil {
-		return nil, errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+	if negBExpr != `` {
+		negB, err = regexp.Compile(negBExpr)
+		if err != nil {
+			err = errors.Wrapf(err, "failed to compile pattern: %#v", expr)
+			return nil, err
+		}
 	}
 
-	p := &Pattern{expr, re, negB, negA, letters, usedVars}
+	p := &Pattern{expr, re, negA, negB, letters, usedVars}
 	return p, nil
 }
 
@@ -115,8 +124,8 @@ func (p *Pattern) Explain() string {
 		return fmt.Sprintf("%#v", nil)
 	}
 	return fmt.Sprintf(
-		"expr:/%s/, re:/%s/, negB:/%s/, negA:/%s/",
-		p.expr, p.re, p.negB, p.negA,
+		"expr:/%s/, re:/%s/, negA:/%s/, negB:/%s/",
+		p.expr, p.re, p.negA, p.negB,
 	)
 }
 
@@ -161,25 +170,31 @@ func (p *Pattern) Find(word string, n int) [][]int {
 			panic(fmt.Errorf("zero-width match from %v", p))
 		}
 
-		// Test negative lookaround.
-		var (
-			behind = safeSlice(word, m[4], m[5])
-			ahead  = safeSlice(word, m[lenM-4], m[lenM-3])
-		)
+		// Shift the cursor for the next iteration.
+		offset = stop
 
-		neg := p.negB.MatchString(behind) || p.negA.MatchString(ahead)
-
-		if !neg {
-			// No negative lookaround matches.
-			match := []int{start, stop}
-			// Keep submatches in the core match.
-			match = append(match, m[6:lenM-4]...)
-
-			matches = append(matches, match)
+		// Test negative lookahead.
+		if p.negA != nil {
+			ahead := safeSlice(word, m[lenM-4], m[lenM-3])
+			if p.negA.MatchString(ahead) {
+				continue
+			}
 		}
 
-		// Shift the cursor.
-		offset = stop
+		// Test negative lookbehind.
+		if p.negB != nil {
+			behind := safeSlice(word, m[4], m[5])
+			if p.negB.MatchString(behind) {
+				continue
+			}
+		}
+
+		// Successfully matched.
+		match := []int{start, stop}
+		// Keep submatches in the core match.
+		match = append(match, m[6:lenM-4]...)
+
+		matches = append(matches, match)
 	}
 
 	return matches
