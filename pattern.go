@@ -135,11 +135,12 @@ func (p *Pattern) Find(word string, n int) [][]int {
 		// lookaround, the search cursor should be calculated manually.
 		erased := strings.Repeat("\x00", offset) + word[offset:]
 
-		//                      0                         1
-		//                      │                         │
-		// Submatches look like (edge)(look)abc(look)(edge).
-		//                      │    ││    │   │    ││    │
-		//                      2    34    5  -4   -3-2  -1
+		// Submatches look like:
+		//
+		//  ┌(edge)(look)abc(look)(edge)┐
+		//  0│    │└4   │   │  -3┘│    │1
+		//   2    3     5  -4    -2   -1
+		//
 		m := p.re.FindStringSubmatchIndex(erased)
 
 		lenM := len(m)
