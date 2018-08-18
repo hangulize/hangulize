@@ -160,28 +160,20 @@ func mustNoZeroWidth(expr string) error {
 
 func expandEdges(expr string) string {
 	expr = reLeftEdge.ReplaceAllStringFunc(expr, func(e string) string {
-		switch e {
-		case ``:
-			return ``
-		case `^`:
+		if e == `^` {
 			// "{}" is a zero-width space which is injected by an RPattern.
 			return `(?:^|\s+|{})`
-		default:
-			// ^^...
-			return `^`
 		}
+		// ^^...
+		return `^`
 	})
 	expr = reRightEdge.ReplaceAllStringFunc(expr, func(e string) string {
-		switch e {
-		case ``:
-			return ``
-		case `$`:
+		if e == `$` {
 			// "{}" is a zero-width space which is injected by an RPattern.
 			return `(?:$|\s+|{})`
-		default:
-			// $$...
-			return `$`
 		}
+		// $$...
+		return `$`
 	})
 	return expr
 }
