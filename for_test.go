@@ -9,9 +9,6 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// -----------------------------------------------------------------------------
-// create or panic
-
 func loadSpec(lang string) *Spec {
 	spec, ok := LoadSpec(lang)
 	if !ok {
@@ -27,9 +24,6 @@ func mustParseSpec(hgl string) *Spec {
 	}
 	return spec
 }
-
-// -----------------------------------------------------------------------------
-// hangulize assertion
 
 func assertHangulize(t *testing.T, spec *Spec, expected string, word string) {
 	h := NewHangulizer(spec)
