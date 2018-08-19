@@ -34,7 +34,7 @@ hangulize.Hangulize("ita", "Cappuccino")
 ## 리부트
 
 한글라이즈 프로젝트는 2010년에 Python으로 처음 구현되었고, 웹 상에서 누구나 쉽게
-사용할 수 있도록 [hangulize.org](http://hangulize.org/) 서비스를
+사용할 수 있도록 [hangulize.org](https://hangulize.org/) 서비스를
 제공해왔습니다. 이 Python 구현의 소스코드와 관련 자료는
 [sublee/hangulize](https://github.com/sublee/hangulize)에서 확인할 수 있습니다.
 
@@ -62,7 +62,8 @@ hangulize.Hangulize("ita", "Cappuccino")
 - [x] 규칙 설계에 정적 파일(`.hgl`) 사용
 - [ ] 간편한 규칙 설계환경
 - [ ] 규칙 설계법 꼼꼼히 문서화
-- [ ] [hangulize.org](http://hangulize.org) 개편
+- [x] [hangulize.org](https://hangulize.org)에 적용
+- [ ] [hangulize.org](https://hangulize.org) 개편
 
 ## 지원하는 언어
 
