@@ -186,7 +186,7 @@ func TestInstancePhonemizers(t *testing.T) {
 // -----------------------------------------------------------------------------
 // Benchmarks
 
-func BenchmarkCappoccino(b *testing.B) {
+func BenchmarkCappuccino(b *testing.B) {
 	spec, _ := LoadSpec("ita")
 	h := NewHangulizer(spec)
 
