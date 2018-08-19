@@ -2,9 +2,22 @@ package hangulize
 
 import (
 	"bytes"
+	"regexp"
 	"strings"
 	"unicode"
 )
+
+var reSpace = regexp.MustCompile(`\s`)
+
+func isSpace(word string) bool {
+	return strings.TrimSpace(word) == ""
+}
+
+func hasSpace(word string) bool {
+	return reSpace.MatchString(word)
+}
+
+// -----------------------------------------------------------------------------
 
 type pipeline struct {
 	h  *Hangulizer
@@ -30,6 +43,8 @@ func (p *pipeline) forward(word string) string {
 
 	return word
 }
+
+// -----------------------------------------------------------------------------
 
 // 0. Just recording beginning (Word)
 //

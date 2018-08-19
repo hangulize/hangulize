@@ -11,6 +11,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/hangulize/hgl"
+	"github.com/hangulize/hre"
+	"github.com/hangulize/stringset"
 )
 
 // Spec represents a transactiption specification for a language.
@@ -36,11 +38,11 @@ type Spec struct {
 
 	// Prepared stuffs
 	script script
-	puncts stringSet
+	puncts stringset.StringSet
 
 	// Custom normalization
 	normReplacer *strings.Replacer
-	normLetters  stringSet
+	normLetters  stringset.StringSet
 }
 
 func (s *Spec) String() string {
@@ -165,7 +167,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	normLetters := make(stringSet)
+	normLetters := make(stringset.StringSet)
 	for to := range normalize {
 		normLetters[to] = true
 	}
@@ -266,13 +268,13 @@ func newRules(
 	rules := make([]*Rule, len(pairs))
 
 	for i, pair := range pairs {
-		from, err := newPattern(pair.Left(), macros, vars)
+		from, err := hre.NewPattern(pair.Left(), macros, vars)
 		if err != nil {
 			return nil, err
 		}
 
 		right := pair.Right()
-		to := newRPattern(right[0], macros, vars)
+		to := hre.NewRPattern(right[0], macros, vars)
 
 		rules[i] = &Rule{from, to}
 	}
@@ -284,12 +286,12 @@ func newRules(
 
 // collectPuncts collects punctuation characters from rewrite/transcribe rules.
 // It discards the punctuations that is used only for rewriting hints.
-func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringSet {
+func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringset.StringSet {
 	var puncts []string
 	rletters := make(map[string]bool)
 
 	collectFrom := func(rule *Rule) {
-		for let := range rule.From.letters {
+		for _, let := range rule.From.Letters() {
 			ch, _ := utf8.DecodeRuneInString(let)
 
 			// Collect only punctuation characters. (category P)
@@ -309,7 +311,7 @@ func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringSet {
 
 	for _, rule := range rewrite {
 		// Mark letters in RPatterns.
-		for let := range rule.To.letters {
+		for _, let := range rule.To.Letters() {
 			rletters[let] = true
 		}
 
@@ -320,5 +322,5 @@ func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringSet {
 		collectFrom(rule)
 	}
 
-	return newStringSet(puncts...)
+	return stringset.NewStringSet(puncts...)
 }
