@@ -1,8 +1,13 @@
 package hangulize
 
-// Hangulize is the most simple and useful API of thie package. It transcribes
-// a non-Korean word into Hangul, which is the Korean alphabet. For example, it
-// will transcribe "Владивосто́к" in Russian into "블라디보스토크".
+// Hangulize transcribes a non-Korean word into Hangul, which is the Korean
+// alphabet.
+//
+// For example, it will transcribe "Владивосто́к" in Russian into
+// "블라디보스토크".
+//
+// It is the most simple and useful API of thie package.
+//
 func Hangulize(lang string, word string) string {
 	spec, ok := LoadSpec(lang)
 	if !ok {
@@ -46,13 +51,13 @@ func (h *Hangulizer) GetPhonemizer(id string) (Phonemizer, bool) {
 	return p, ok
 }
 
-// Hangulize transcribes a loanword into Hangul.
+// Hangulize transcribes a loanword from the bound language into Hangul.
 func (h *Hangulizer) Hangulize(word string) string {
 	p := pipeline{h, nil}
 	return p.forward(word)
 }
 
-// HangulizeTrace transcribes a loanword into Hangul
+// HangulizeTrace transcribes a loanword from the bound language into Hangul
 // and returns the traced internal events too.
 func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
 	var tr tracer
