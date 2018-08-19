@@ -51,13 +51,13 @@ func (h *Hangulizer) GetPhonemizer(id string) (Phonemizer, bool) {
 	return p, ok
 }
 
-// Hangulize transcribes a loanword from the bound language into Hangul.
+// Hangulize transcribes a loanword into Hangul.
 func (h *Hangulizer) Hangulize(word string) string {
 	p := pipeline{h, nil}
 	return p.forward(word)
 }
 
-// HangulizeTrace transcribes a loanword from the bound language into Hangul
+// HangulizeTrace transcribes a loanword into Hangul
 // and returns the traced internal events too.
 func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
 	var tr tracer
