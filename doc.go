@@ -109,7 +109,7 @@ the next rule:
 
 Pattern is based on Regular Expression but it has it's own custom syntax. We
 call it "HRE" which means "Hangulize-specific Regular Expression". For the
-detail, see the documentation of Pattern.
+detail, see the documentation of "github.com/hangulize/hre".
 
 "transcribe" rules are exactly same with "rewrite" rules. But it's RPatterns
 represent Hangul Jamo phonemes. In contrast to "rewrite", a replaced word
