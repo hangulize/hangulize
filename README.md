@@ -47,6 +47,9 @@ hangulize.Hangulize("ita", "Cappuccino")
 
 ## 성능
 
+새 한글라이즈의 시간복잡도는 평균적으로 O(n), 최악의 경우 O(n²)입니다. 한편 옛
+한글라이즈는 언제나 O(n²)이었습니다.
+
 | 환경 | `ita` `Cappuccino` | `nld` `Friedrich Wilhelm Nietzsche` |
 | - | - | - |
 | 옛 한글라이즈 CPython 3.6.3 | 398 µs | 1.46 ms |
