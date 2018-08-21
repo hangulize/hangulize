@@ -7,7 +7,7 @@ Hangulize was inspired by Brian Jongseong Park
 (http://iceager.egloos.com/2610028). Based on this idea,
 the original Hangulize was developed in Python and went out in 2010
 (https://github.com/sublee/hangulize). Since then, serving as a web application
-on http://hangulize.org/, it has been of great help for Korean translators.
+on https://hangulize.org/, it has been of great help for Korean translators.
 
 This Go re-implementation is a reboot of Hangulize with feature improvements.
 

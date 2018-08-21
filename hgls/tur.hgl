@@ -81,7 +81,7 @@ rewrite:
     "^l"                -> "l;"
     "^m"                -> "m;"
     "^n"                -> "n;"
-    "{@}n{g|k}$"        -> "N"
+    "{@}n{g|k$}"        -> "N"
     "{@}n{g<cs>|k<cs>}" -> "N"
     "ng{@}"             -> "Ng"
     "nk{@}"             -> "Nk"
@@ -223,4 +223,3 @@ test:
     "Sertab Erener"             -> "세르타브 에레네르"
     "Krikor Balyan"             -> "크리코르 발리안"
     "Garabet Amira Balyan"      -> "가라베트 아미라 발리안"
-
