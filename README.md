@@ -1,3 +1,7 @@
+<a href="https://hangulize.org/">
+  <img src="brand/logo-horizontal.png" height="48" align="right" />
+</a>
+
 # 한글라이즈
 
 [![GoDoc](https://godoc.org/github.com/hangulize/hangulize?status.svg)](https://godoc.org/github.com/hangulize/hangulize)
@@ -5,8 +9,6 @@
 [![Build Status](https://travis-ci.org/hangulize/hangulize.svg?branch=develop)](https://travis-ci.org/hangulize/hangulize)
 
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
-
-![한글라이즈](brand/logo-horizontal.png)
 
 > 외국어의 한글 표기 체계가 제대로 서려면 일반인이 외국어를 한글로 표기하고
 > 싶을 때 바로바로 쉽게 용례를 찾을 수 있어야 한다. 정기적으로 회의를 열어
