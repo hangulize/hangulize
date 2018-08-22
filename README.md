@@ -1,5 +1,5 @@
 <a href="https://hangulize.org/">
-  <img src="brand/logo-horizontal.png" height="48" align="right" />
+  <img src="brand/logo-horizontal.png" height="64" align="right" />
 </a>
 
 # 한글라이즈
