@@ -64,3 +64,8 @@ func LoadSpec(lang string) (*Spec, bool) {
 	specs[lang] = spec
 	return spec, true
 }
+
+// UnloadSpec flushes a cached spec to get free memory.
+func UnloadSpec(lang string) {
+	delete(specs, lang)
+}
