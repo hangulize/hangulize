@@ -1,6 +1,6 @@
 lang:
     id         = "yue"
-    codes      = "yue"
+    codes      = "", "yue"
     english    = "Cantonese"
     korean     = "광둥어"
     script     = "jyutping"
