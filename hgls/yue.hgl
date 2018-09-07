@@ -3,7 +3,7 @@ lang:
     codes      = "", "yue"
     english    = "Cantonese"
     korean     = "광둥어"
-    script     = "jyutping"
+    script     = "latin"
     phonemizer = "jyutping"
 
 config:
