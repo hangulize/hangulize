@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/hangulize/hangulize/phonemize/furigana"
+	"github.com/hangulize/hangulize/phonemize/jyutping"
 	"github.com/hangulize/hangulize/phonemize/pinyin"
 	"github.com/stretchr/testify/assert"
 )
@@ -14,6 +15,7 @@ import (
 func init() {
 	UsePhonemizer(&furigana.P)
 	UsePhonemizer(&pinyin.P)
+	UsePhonemizer(&jyutping.P)
 }
 
 // -----------------------------------------------------------------------------
