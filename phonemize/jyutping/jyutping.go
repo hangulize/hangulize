@@ -11,18 +11,18 @@ import (
 	goJyutping "github.com/sublee/go-jyutping"
 )
 
-// P is the Pinyin phonemizer.
-var P pinyinPhonemizer
+// P is the Jyutping phonemizer.
+var P jyutpingPhonemizer
 
 // ----------------------------------------------------------------------------
 
-type pinyinPhonemizer struct{}
+type jyutpingPhonemizer struct{}
 
-func (pinyinPhonemizer) ID() string {
-	return "pinyin"
+func (jyutpingPhonemizer) ID() string {
+	return "jyutping"
 }
 
-func (p *pinyinPhonemizer) Phonemize(word string) string {
+func (p *jyutpingPhonemizer) Phonemize(word string) string {
 	var chunks []string
 	var buf bytes.Buffer
 
