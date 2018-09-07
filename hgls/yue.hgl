@@ -16,7 +16,7 @@ vars:
     J     = "j", "q", "zh", "ch", "c"
 
 rewrite:
-    # Collapse vowel differences that are ignored in hangul transcription.
+    # Collapse vowel differences that are ignored in Hangul transcription.
     "aa" -> "a"
     "oe" -> "eo"
     "ou" -> "o"
