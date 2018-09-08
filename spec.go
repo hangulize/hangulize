@@ -273,6 +273,12 @@ func newRules(
 			return nil, err
 		}
 
+		negAWidth, negBWidth := from.NegativeLookaroundWidths()
+		if negAWidth == -1 || negBWidth == -1 {
+			return nil, errors.Errorf(
+				"%s contains unlimited negative lookaround", from)
+		}
+
 		right := pair.Right()
 		to := hre.NewRPattern(right[0], macros, vars)
 
