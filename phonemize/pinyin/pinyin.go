@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	goPinyin "github.com/mozillazg/go-pinyin"
+	"golang.org/x/text/unicode/norm"
 )
 
 // P is the Pinyin phonemizer.
@@ -24,6 +25,10 @@ func (pinyinPhonemizer) ID() string {
 }
 
 func (p *pinyinPhonemizer) Phonemize(word string) string {
+	// Normalize into CJK unified ideographs.
+	word = norm.NFC.String(word)
+
+	// Pick Pinyin.
 	var chunks []string
 	var buf bytes.Buffer
 

@@ -113,6 +113,12 @@ vie      draft    Vietnamese               베트남어
 wlm      draft    Middle Welsh             웨일스어(중세)
 ```
 
+## 읽을거리
+
+- [한글라이즈 재제작기][remake-of-hangulize](이흥섭, 고랭코리아 2018년 8월 밋업)
+
+[remake-of-hangulize]: https://subl.ee/~gokr1808
+
 ## 만든이
 
 - 이흥섭, Heungsub Lee <<sub@subl.ee>>
