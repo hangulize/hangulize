@@ -8,8 +8,10 @@ package pinyin
 import (
 	"bytes"
 	"strings"
+	"unicode"
 
 	goPinyin "github.com/mozillazg/go-pinyin"
+	"golang.org/x/text/unicode/norm"
 )
 
 // P is the Pinyin phonemizer.
@@ -30,6 +32,12 @@ func (p *pinyinPhonemizer) Phonemize(word string) string {
 	a := goPinyin.NewArgs()
 
 	for _, ch := range word {
+		// Normalize into CJK unified ideographs.
+		if unicode.Is(unicode.Han, ch) {
+			ch = []rune(norm.NFC.String(string(ch)))[0]
+		}
+
+		// Pick Pinyin.
 		pyn := goPinyin.SinglePinyin(ch, a)
 
 		if len(pyn) == 0 {

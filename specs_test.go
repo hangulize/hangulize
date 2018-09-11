@@ -138,3 +138,10 @@ func TestChiV(t *testing.T) {
 	assertHangulize(t, chi, "뤼", "Lv")
 	assertHangulize(t, chi, "뤼", "Lü")
 }
+
+func TestChiCJKUnified(t *testing.T) {
+	chi := loadSpec("chi")
+
+	assertHangulize(t, chi, "리", "李")
+	assertHangulize(t, chi, "러", "樂")
+}
