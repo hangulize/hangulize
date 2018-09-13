@@ -7,8 +7,9 @@
 #
 set -euo pipefail
 
-# NOTE(sublee): gopkg.in responds with "422 Unprocessable Entity" for Travis CI
-# deployment's GIT_HTTP_USER_AGENT (travis/0.1.0 dpl/1.10.0 git/2.15.1).
+# NOTE(sublee): "go get" from GitHub fails due to "422 Unprocessable Entity"
+# if GIT_HTTP_USER_AGENT='travis/0.1.0 dpl/1.10.0 git/2.15.1' is remaining.
+# The deploy stage of Travis CI sets the environment variable.
 unset GIT_HTTP_USER_AGENT
 
 # ------------------------------------------------------------------------------
