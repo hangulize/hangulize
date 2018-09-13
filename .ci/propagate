@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#
+# propagate triggers a build at an external repository.
+#
+# Several repositories depend on "github.com/hangulize/hangulize".
+# When "hangulize" is patched, they should also be re-built.
+#
+set -euo pipefail
+
+# NOTE(sublee): "go get" from GitHub fails due to "422 Unprocessable Entity"
+# if GIT_HTTP_USER_AGENT='travis/0.1.0 dpl/1.10.0 git/2.15.1' is remaining.
+# The deploy stage of Travis CI sets the environment variable.
+unset GIT_HTTP_USER_AGENT
+
+# ------------------------------------------------------------------------------
+# Parse Arguments
+
+REPO=''
+TAG=''
+BRANCH=''
+DEP=false
+
+while getopts 'r:t:b:d' opt; do
+  case "$opt" in
+    r)
+      # -r REPO
+      # repository name under github.com/hangulize/
+      REPO="$OPTARG"
+      ;;
+    t)
+      # -t TAG
+      # the tag to be created.
+      TAG="$OPTARG"
+      ;;
+    b)
+      # -b BRANCH
+      # the branch to be updated.
+      BRANCH="$OPTARG"
+      ;;
+    d)
+      # -d
+      # whether it will update Gopkg.lock by Dep or not.
+      DEP=true
+      ;;
+    \?)
+      >&2 echo "Usage: $0 -r REPO [-t TAG] [-b BRANCH] [-d]"
+      exit 1
+      ;;
+  esac
+done
+
+readonly REPO
+readonly TAG
+readonly BRANCH
+readonly DEP
+
+# ------------------------------------------------------------------------------
+# Prepare the Repo
+
+readonly REPO_PATH="$GOPATH/src/github.com/hangulize/$REPO"
+git clone "https://github.com/hangulize/${REPO}.git" "$REPO_PATH"
+cd "$REPO_PATH"
+
+if [[ -n "$BRANCH" ]]; then
+  git checkout "$BRANCH"
+fi
+
+if [[ "$DEP" = true ]]; then
+  # Install Dep.
+  curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+
+  # Update the Hangulize dependency.
+  dep ensure -v -update 'github.com/hangulize/hangulize'
+  git add Gopkg.lock
+
+  # https://stackoverflow.com/questions/5143795
+  if git diff-index --quiet HEAD --; then
+    >&2 echo 'already up-to-date'
+    exit
+  fi
+fi
+
+git config user.name 'Travis CI'
+git commit --allow-empty --allow-empty-message -m "$TRAVIS_COMMIT_MESSAGE"
+
+# ------------------------------------------------------------------------------
+# Trigger a Build
+
+if [[ -n "$TAG" ]]; then
+  git tag -f "$TAG"
+  git push origin -f "$TAG"
+fi
+
+if [[ -n "$BRANCH" ]]; then
+  git push origin "$BRANCH"
+fi
