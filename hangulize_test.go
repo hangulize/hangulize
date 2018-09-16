@@ -26,6 +26,15 @@ func TestLang(t *testing.T) {
 }
 
 // -----------------------------------------------------------------------------
+// Basic cases
+
+func TestHangulizerSpec(t *testing.T) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+	assert.Equal(t, spec, h.Spec())
+}
+
+// -----------------------------------------------------------------------------
 // Edge cases
 
 func hangulize(spec *Spec, word string) string {
@@ -163,6 +172,10 @@ func TestVarToVar(t *testing.T) {
 	`)
 	assert.Equal(t, "dg", hangulize(spec, "aa"))
 	assert.Equal(t, "ei", hangulize(spec, "bc"))
+}
+
+func TestUnknownLang(t *testing.T) {
+	assert.Equal(t, "hello", Hangulize("unknown", "hello"))
 }
 
 type stubFurigana struct{}
