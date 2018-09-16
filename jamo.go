@@ -110,7 +110,6 @@ func ComposeHangul(word string) string {
 			// Write a letter.
 			if score <= prevScore {
 				writeLetter()
-				prevScore = -1
 			}
 
 			if score != -1 {
