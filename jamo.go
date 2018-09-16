@@ -93,17 +93,18 @@ func ComposeHangul(word string) string {
 			}
 		} else {
 			// Decomposed Jamo.
-			if isJaeum {
+			switch true {
+
+			case isJaeum:
 				if isTail {
 					score = tail
 				} else {
 					score = lead
 				}
-			} else if isMoeum {
+
+			case isMoeum:
 				score = medial
-			} else {
-				// never reaches.
-				panic("neither Jaeum nor Moeum")
+
 			}
 
 			// Write a letter.
