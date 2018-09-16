@@ -178,8 +178,12 @@ func (p *stubFurigana) Phonemize(word string) string {
 func TestInstancePhonemizers(t *testing.T) {
 	spec, _ := LoadSpec("jpn")
 	h := NewHangulizer(spec)
+
 	h.UsePhonemizer(&stubFurigana{})
 	assert.Equal(t, "스타부", h.Hangulize("1234"))
+
+	h.UnusePhonemizer("furigana")
+	assert.Equal(t, "1234", h.Hangulize("1234"))
 }
 
 // -----------------------------------------------------------------------------
