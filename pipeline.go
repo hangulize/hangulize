@@ -289,7 +289,7 @@ func (p *pipeline) compose(subwords []subword) string {
 // Finally, this step converts foreign punctuations to fit it Korean.
 //
 // Korean has adapted the European punctuations. Those are the most common in
-// the world. But a few langauges, such as Japanese or Chinese, use different
+// the world. But a few languages, such as Japanese or Chinese, use different
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
 // For example, "「...」" will be "'...'".

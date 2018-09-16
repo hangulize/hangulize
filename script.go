@@ -39,7 +39,7 @@ func getScript(name string) script {
 
 // -----------------------------------------------------------------------------
 
-// _Latin represents the Latin or Roman script. Most langauges Hangulize
+// _Latin represents the Latin or Roman script. Most languages Hangulize
 // supports use this script system. So it's the default script.
 type _Latin struct{}
 
