@@ -7,6 +7,7 @@
 [![GoDoc](https://godoc.org/github.com/hangulize/hangulize?status.svg)](https://godoc.org/github.com/hangulize/hangulize)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hangulize/hangulize)](https://goreportcard.com/report/github.com/hangulize/hangulize)
 [![Build Status](https://travis-ci.org/hangulize/hangulize.svg?branch=develop)](https://travis-ci.org/hangulize/hangulize)
+[![Coverage Status](https://coveralls.io/repos/github/hangulize/hangulize/badge.svg?branch=develop)](https://coveralls.io/github/hangulize/hangulize)
 
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
