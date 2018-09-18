@@ -154,7 +154,10 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 
 	// -------------------------------------------------------------------------
 
-	script := getScript(lang.Script)
+	script, ok := getScript(lang.Script)
+	if !ok {
+		return nil, errors.Errorf("script not found: %s", lang.Script)
+	}
 	puncts := collectPuncts(rewrite, transcribe)
 
 	// custom normalization

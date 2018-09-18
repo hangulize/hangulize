@@ -27,14 +27,9 @@ var scripts = map[string]script{
 }
 
 // getScript chooses a script by the script name.
-func getScript(name string) script {
+func getScript(name string) (script, bool) {
 	script, ok := scripts[name]
-	if !ok {
-		// Get the default.
-		latin := scripts[""]
-		return latin
-	}
-	return script
+	return script, ok
 }
 
 // -----------------------------------------------------------------------------
