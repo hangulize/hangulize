@@ -26,7 +26,8 @@ func (r *Rule) replacements(word string) []replacement {
 		repl, err := r.To.Interpolate(r.From, word, m)
 
 		if err != nil {
-			repl = word[start:stop]
+			// FIXME(sublee): Shouldn't it throw an error?
+			continue
 		}
 
 		repls = append(repls, replacement{start, stop, repl})

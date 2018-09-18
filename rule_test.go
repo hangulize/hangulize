@@ -33,3 +33,17 @@ func TestRuleReplace(t *testing.T) {
 	r := Rule{p, rp}
 	assert.Equal(t, "abcbardef", r.Replace("abcfoodef"))
 }
+
+func TestRuleUnmatchedVar(t *testing.T) {
+	vars := map[string][]string{
+		"foo": {"foo"},
+		"bar": {"b", "a", "r"},
+		"baz": {"b", "a", "z"},
+	}
+	p, _ := hre.NewPattern("<foo>", nil, vars)
+	rp := hre.NewRPattern("<bar><baz>", nil, vars)
+	r := Rule{p, rp}
+
+	// Silently, keep the original.
+	assert.Equal(t, "abcfoodef", r.Replace("abcfoodef"))
+}
