@@ -26,3 +26,10 @@ func TestRuleReplacements(t *testing.T) {
 	assert.Equal(t, 6, repls[0].stop)
 	assert.Equal(t, "bar", repls[0].word)
 }
+
+func TestRuleReplace(t *testing.T) {
+	p, _ := hre.NewPattern("foo", nil, nil)
+	rp := hre.NewRPattern("bar", nil, nil)
+	r := Rule{p, rp}
+	assert.Equal(t, "abcbardef", r.Replace("abcfoodef"))
+}

@@ -34,3 +34,11 @@ func (r *Rule) replacements(word string) []replacement {
 
 	return repls
 }
+
+// Replace matches the word with the Pattern and replaces with the RPattern.
+func (r *Rule) Replace(word string) string {
+	rep := newSubwordReplacer(word, 0, 0)
+	repls := r.replacements(word)
+	rep.ReplaceBy(repls...)
+	return rep.String()
+}
