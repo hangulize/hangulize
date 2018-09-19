@@ -22,9 +22,12 @@ func (t *Trace) String() string {
 
 // -----------------------------------------------------------------------------
 
+// Traces is an array of Trace.
 type Traces []Trace
 
+// Render generates a report text.
 func (ts Traces) Render(w io.Writer) {
+	// Detect the max rune width of the words.
 	var width, maxWidth int
 	widths := make([]int, len(ts))
 
@@ -37,6 +40,7 @@ func (ts Traces) Render(w io.Writer) {
 		}
 	}
 
+	// Render the report.
 	var step Step
 
 	for i, t := range ts {
