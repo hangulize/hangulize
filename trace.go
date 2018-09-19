@@ -90,6 +90,8 @@ func (tr *tracer) TraceSubwords(step Step, why string, subwords []subword) {
 	tr.trace(step, why, word)
 }
 
+// -----------------------------------------------------------------------------
+
 type ruleTracer struct {
 	tr           *tracer
 	subwords     []subword

@@ -345,7 +345,7 @@ func (p *pipeline) compose(subwords []subword) string {
 
 // 7. Transliterate (Word -> Word)
 //
-// Finally, this step converts foreign punctuations to fit it Korean.
+// Finally, this step converts foreign punctuations to fit in Korean.
 //
 // Korean has adapted the European punctuations. Those are the most common in
 // the world. But a few languages, such as Japanese or Chinese, use different
