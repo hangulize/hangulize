@@ -19,6 +19,65 @@ func hasSpace(word string) bool {
 
 // -----------------------------------------------------------------------------
 
+// Step is an identifier for the each pipeline step.
+type Step int
+
+const (
+	_ Step = iota * 10
+
+	// Input step just records the beginning.
+	Input
+
+	// Phonemize step converts the spelling to the phonograms.
+	Phonemize
+
+	// Normalize step eliminates letter case to make the next steps work easier.
+	Normalize
+
+	// Group step associates meaningful letters.
+	Group
+
+	// Rewrite step minimizes the gap between pronunciation and spelling.
+	Rewrite
+
+	// Transcribe step determines Hangul spelling for the pronunciation.
+	Transcribe
+
+	// Compose step converts decomposed Jamo phonemes to composed Hangul
+	// syllables.
+	Compose
+
+	// Transliterate step converts foreign punctuations to fit in Korean.
+	Transliterate
+)
+
+// AllSteps is the array of all steps.
+var AllSteps = []Step{
+	Input,
+	Phonemize,
+	Normalize,
+	Group,
+	Rewrite,
+	Transcribe,
+	Compose,
+	Transliterate,
+}
+
+func (s Step) String() string {
+	return map[Step]string{
+		Input:         "Input",
+		Phonemize:     "Phonemize",
+		Normalize:     "Normalize",
+		Group:         "Group",
+		Rewrite:       "Rewrite",
+		Transcribe:    "Transcribe",
+		Compose:       "Compose",
+		Transliterate: "Transliterate",
+	}[s]
+}
+
+// -----------------------------------------------------------------------------
+
 type pipeline struct {
 	h  *Hangulizer
 	tr *tracer
