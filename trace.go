@@ -1,6 +1,7 @@
 package hangulize
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"strings"
@@ -18,13 +19,16 @@ type Trace struct {
 }
 
 func (t *Trace) String() string {
-	why := t.Why
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, "[%s] %#v", t.Step, t.Word)
 
 	if t.Rule != nil {
-		why = t.Rule.String()
+		fmt.Fprintf(&buf, " | %s", t.Rule)
+	} else if t.Why != "" {
+		fmt.Fprintf(&buf, " | (%s)", t.Why)
 	}
 
-	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, why)
+	return buf.String()
 }
 
 // -----------------------------------------------------------------------------

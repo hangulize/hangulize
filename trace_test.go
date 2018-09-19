@@ -17,6 +17,15 @@ func TestHangulizeTrace(t *testing.T) {
 	assert.NotEqual(t, 0, len(traces))
 }
 
+func TestTraceString(t *testing.T) {
+	spec, _ := LoadSpec("ita")
+	h := NewHangulizer(spec)
+	_, traces := h.HangulizeTrace("Cappuccino")
+
+	assert.Equal(t, `[Input] "Cappuccino"`, traces[0].String())
+	assert.Equal(t, `[Normalize] "cappuccino" | (latin)`, traces[1].String())
+}
+
 func TestTracesRender(t *testing.T) {
 	spec, _ := LoadSpec("ita")
 	h := NewHangulizer(spec)
