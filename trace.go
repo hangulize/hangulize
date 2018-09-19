@@ -20,12 +20,48 @@ func (t *Trace) String() string {
 	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, t.Why)
 }
 
+// -----------------------------------------------------------------------------
+
+type Traces []Trace
+
+func (ts Traces) Render(w io.Writer) {
+	var width, maxWidth int
+	widths := make([]int, len(ts))
+
+	for i, t := range ts {
+		width = runewidth.StringWidth(t.Word)
+		widths[i] = width
+
+		if maxWidth < width {
+			maxWidth = width
+		}
+	}
+
+	var step Step
+
+	for i, t := range ts {
+		if step != t.Step {
+			step = t.Step
+			fmt.Fprintf(w, "[%s]\n", step)
+		}
+
+		fmt.Fprintf(w, "  %s", t.Word)
+		fmt.Fprintf(w, strings.Repeat(" ", maxWidth-widths[i]))
+		if t.Why != "" {
+			fmt.Fprintf(w, " | %s", t.Why)
+		}
+		fmt.Fprintf(w, "\n")
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 type tracer struct {
-	traces   []Trace
+	traces   Traces
 	lastWord string
 }
 
-func (tr *tracer) Traces() []Trace {
+func (tr *tracer) Traces() Traces {
 	return tr.traces
 }
 
