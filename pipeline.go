@@ -154,10 +154,12 @@ PhonemizerFound:
 // For example, "Hello" in Latin script will be normalized to "hello".
 //
 func (p *pipeline) normalize(word string) string {
+	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
 
-	p.tr.TraceWord(Normalize, word, "spec", nil)
+	p.tr.TraceWord(Normalize, word, "", nil)
 
+	// Per-script normalization.
 	script := p.h.spec.script
 	except := p.h.spec.normLetters
 
