@@ -33,7 +33,7 @@ func assertHangulize(t *testing.T, spec *Spec, expected string, word string) {
 	}
 
 	// Trace only when failed to fast passing for most cases.
-	got, tr := h.HangulizeTrace(word)
+	got, traces := h.HangulizeTrace(word)
 
 	// Trace result to understand the failure reason.
 	f := bytes.NewBufferString("")
@@ -46,9 +46,7 @@ func assertHangulize(t *testing.T, spec *Spec, expected string, word string) {
 	fmt.Fprintf(f, `word: %#v`, word)
 	fmt.Fprintln(f)
 	fmt.Fprintln(f, hr)
-	for _, t := range tr {
-		fmt.Fprintln(f, t.String())
-	}
+	traces.Render(f)
 	fmt.Fprintln(f, hr)
 
 	assert.Equal(t, expected, got, f.String())

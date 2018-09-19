@@ -59,7 +59,7 @@ func (h *Hangulizer) Hangulize(word string) string {
 
 // HangulizeTrace transcribes a loanword into Hangul
 // and returns the traced internal events too.
-func (h *Hangulizer) HangulizeTrace(word string) (string, []Trace) {
+func (h *Hangulizer) HangulizeTrace(word string) (string, Traces) {
 	var tr tracer
 	p := pipeline{h, &tr}
 
