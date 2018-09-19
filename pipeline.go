@@ -43,9 +43,8 @@ const (
 	// Transcribe step determines Hangul spelling for the pronunciation.
 	Transcribe
 
-	// Compose step converts decomposed Jamo phonemes to composed Hangul
-	// syllables.
-	Compose
+	// Syllabify step composes Jamo phonemes into Hangul syllabic blocks.
+	Syllabify
 
 	// Transliterate step converts foreign punctuations to fit in Korean.
 	Transliterate
@@ -59,7 +58,7 @@ var AllSteps = []Step{
 	Group,
 	Rewrite,
 	Transcribe,
-	Compose,
+	Syllabify,
 	Transliterate,
 }
 
@@ -71,7 +70,7 @@ func (s Step) String() string {
 		Group:         "Group",
 		Rewrite:       "Rewrite",
 		Transcribe:    "Transcribe",
-		Compose:       "Compose",
+		Syllabify:     "Syllabify",
 		Transliterate: "Transliterate",
 	}[s]
 }
@@ -97,7 +96,7 @@ func (p *pipeline) forward(word string) string {
 	subwords = p.transcribe(subwords)
 
 	// finalizing phase
-	word = p.compose(subwords)
+	word = p.syllabify(subwords)
 	word = p.transliterate(word)
 
 	return word
@@ -318,13 +317,13 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	return subwords
 }
 
-// 6. Compose (Subwords -> Word)
+// 6. Syllabify (Subwords -> Word)
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) compose(subwords []subword) string {
+func (p *pipeline) syllabify(subwords []subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
@@ -344,7 +343,7 @@ func (p *pipeline) compose(subwords []subword) string {
 
 	word := buf.String()
 
-	p.tr.TraceWord(Compose, word, "", nil)
+	p.tr.TraceWord(Syllabify, word, "", nil)
 
 	return word
 }
