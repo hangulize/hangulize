@@ -404,5 +404,9 @@ func (p *pipeline) transliterate(word string) string {
 		buf.WriteString(punct)
 	}
 
-	return buf.String()
+	word = buf.String()
+
+	p.tr.TraceWord(Transliterate, word, p.h.spec.Lang.Script, nil)
+
+	return word
 }
