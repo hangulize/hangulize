@@ -2,13 +2,16 @@ package hangulize
 
 import (
 	"fmt"
+	"io"
 	"strings"
+
+	runewidth "github.com/mattn/go-runewidth"
 )
 
 // Trace is emitted when a replacement occurs. It is used for tracing of
 // Hangulize pipeline internal.
 type Trace struct {
-	Step string
+	Step Step
 	Why  string
 	Word string
 }
@@ -26,7 +29,7 @@ func (tr *tracer) Traces() []Trace {
 	return tr.traces
 }
 
-func (tr *tracer) trace(step, why, word string) {
+func (tr *tracer) trace(step Step, why, word string) {
 	if word == tr.lastWord {
 		return
 	}
@@ -34,14 +37,14 @@ func (tr *tracer) trace(step, why, word string) {
 	tr.lastWord = word
 }
 
-func (tr *tracer) TraceWord(step, why, word string) {
+func (tr *tracer) TraceWord(step Step, why, word string) {
 	if tr == nil {
 		return
 	}
 	tr.trace(step, why, word)
 }
 
-func (tr *tracer) TraceSubwords(step, why string, subwords []subword) {
+func (tr *tracer) TraceSubwords(step Step, why string, subwords []subword) {
 	if tr == nil {
 		return
 	}
@@ -88,7 +91,7 @@ func (rtr *ruleTracer) Trace(
 	rtr.maxRuleIndex = ruleIndex
 }
 
-func (rtr *ruleTracer) Commit(step string) {
+func (rtr *ruleTracer) Commit(step Step) {
 	if rtr == nil {
 		return
 	}

@@ -108,7 +108,7 @@ func (p *pipeline) forward(word string) string {
 // 0. Just recording beginning (Word)
 //
 func (p *pipeline) input(word string) {
-	p.tr.TraceWord("input", "", word)
+	p.tr.TraceWord(Input, "", word)
 }
 
 // 1. Phonemize (Word -> Word)
@@ -152,7 +152,7 @@ PhonemizerFound:
 func (p *pipeline) normalize(word string) string {
 	word = p.h.spec.normReplacer.Replace(word)
 
-	p.tr.TraceWord("normalize", "custom", word)
+	p.tr.TraceWord(Normalize, "custom", word)
 
 	script := p.h.spec.script
 	except := p.h.spec.normLetters
@@ -169,7 +169,7 @@ func (p *pipeline) normalize(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord("normalize", p.h.spec.Lang.Script, word)
+	p.tr.TraceWord(Normalize, p.h.spec.Lang.Script, word)
 
 	return word
 }
@@ -236,7 +236,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit("rewrite")
+	rtr.Commit(Rewrite)
 
 	return subwords
 }
@@ -307,7 +307,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit("transcribe")
+	rtr.Commit(Transcribe)
 
 	return subwords
 }
@@ -338,7 +338,7 @@ func (p *pipeline) compose(subwords []subword) string {
 
 	word := buf.String()
 
-	p.tr.TraceWord("compose hangul", "", word)
+	p.tr.TraceWord(Compose, "", word)
 
 	return word
 }
