@@ -140,7 +140,11 @@ func (p *pipeline) phonemize(word string) (string, bool) {
 	return word, false
 
 PhonemizerFound:
-	return pron.Phonemize(word), true
+	word = pron.Phonemize(word)
+
+	p.tr.TraceWord(Phonemize, word, id, nil)
+
+	return word, true
 }
 
 // 2. Normalize (Word -> Word)
