@@ -12,12 +12,19 @@ import (
 // Hangulize pipeline internal.
 type Trace struct {
 	Step Step
-	Why  string
 	Word string
+	Why  string
+	Rule *Rule
 }
 
 func (t *Trace) String() string {
-	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, t.Why)
+	why := t.Why
+
+	if t.Rule != nil {
+		why = t.Rule.String()
+	}
+
+	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, why)
 }
 
 // -----------------------------------------------------------------------------
@@ -52,7 +59,9 @@ func (ts Traces) Render(w io.Writer) {
 		fmt.Fprintf(w, "  %s", t.Word)
 		fmt.Fprintf(w, strings.Repeat(" ", maxWidth-widths[i]))
 		if t.Why != "" {
-			fmt.Fprintf(w, " | %s", t.Why)
+			fmt.Fprintf(w, " | (%s)", t.Why)
+		} else if t.Rule != nil {
+			fmt.Fprintf(w, " | %s", t.Rule)
 		}
 		fmt.Fprintf(w, "\n")
 	}
@@ -69,29 +78,38 @@ func (tr *tracer) Traces() Traces {
 	return tr.traces
 }
 
-func (tr *tracer) trace(step Step, why, word string) {
+func (tr *tracer) trace(
+	step Step, word string,
+	why string, rule *Rule,
+) {
 	if word == tr.lastWord {
 		return
 	}
-	tr.traces = append(tr.traces, Trace{step, why, word})
+	tr.traces = append(tr.traces, Trace{step, word, why, rule})
 	tr.lastWord = word
 }
 
-func (tr *tracer) TraceWord(step Step, why, word string) {
+func (tr *tracer) TraceWord(
+	step Step, word string,
+	why string, rule *Rule,
+) {
 	if tr == nil {
 		return
 	}
-	tr.trace(step, why, word)
+	tr.trace(step, word, why, rule)
 }
 
-func (tr *tracer) TraceSubwords(step Step, why string, subwords []subword) {
+func (tr *tracer) TraceSubwords(
+	step Step, subwords []subword,
+	why string, rule *Rule,
+) {
 	if tr == nil {
 		return
 	}
 	b := subwordsBuilder{subwords}
 	word := b.String()
 	word = strings.Replace(word, "\x00", ".", -1)
-	tr.trace(step, why, word)
+	tr.trace(step, word, why, rule)
 }
 
 // -----------------------------------------------------------------------------
@@ -155,7 +173,7 @@ func (rtr *ruleTracer) Commit(step Step) {
 		}
 
 		if dirty {
-			rtr.tr.TraceSubwords(step, rule.String(), subwords)
+			rtr.tr.TraceSubwords(step, subwords, "", rule)
 		}
 	}
 }
