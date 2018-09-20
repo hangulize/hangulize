@@ -57,8 +57,10 @@ readonly DEP
 # ------------------------------------------------------------------------------
 # Prepare the Repo
 
+readonly REPO_URL="https://${GITHUB_TOKEN}@github.com/hangulize/${REPO}.git"
 readonly REPO_PATH="$GOPATH/src/github.com/hangulize/$REPO"
-git clone "https://github.com/hangulize/${REPO}.git" "$REPO_PATH"
+
+git clone "$REPO_URL" "$REPO_PATH"
 cd "$REPO_PATH"
 
 if [[ -n "$BRANCH" ]]; then
