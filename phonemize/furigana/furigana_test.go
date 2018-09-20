@@ -10,6 +10,7 @@ import (
 
 func TestPhonemizer(t *testing.T) {
 	assert.Implements(t, (*hangulize.Phonemizer)(nil), &P)
+	assert.Equal(t, "furigana", P.ID())
 }
 
 func TestKana(t *testing.T) {

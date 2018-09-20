@@ -27,19 +27,14 @@ var scripts = map[string]script{
 }
 
 // getScript chooses a script by the script name.
-func getScript(name string) script {
+func getScript(name string) (script, bool) {
 	script, ok := scripts[name]
-	if !ok {
-		// Get the default.
-		latin := scripts[""]
-		return latin
-	}
-	return script
+	return script, ok
 }
 
 // -----------------------------------------------------------------------------
 
-// _Latin represents the Latin or Roman script. Most langauges Hangulize
+// _Latin represents the Latin or Roman script. Most languages Hangulize
 // supports use this script system. So it's the default script.
 type _Latin struct{}
 

@@ -19,6 +19,64 @@ func hasSpace(word string) bool {
 
 // -----------------------------------------------------------------------------
 
+// Step is an identifier for the each pipeline step.
+type Step int
+
+const (
+	_ Step = iota * 10
+
+	// Input step just records the beginning.
+	Input
+
+	// Phonemize step converts the spelling to the phonograms.
+	Phonemize
+
+	// Normalize step eliminates letter case to make the next steps work easier.
+	Normalize
+
+	// Group step associates meaningful letters.
+	Group
+
+	// Rewrite step minimizes the gap between pronunciation and spelling.
+	Rewrite
+
+	// Transcribe step determines Hangul spelling for the pronunciation.
+	Transcribe
+
+	// Syllabify step composes Jamo phonemes into Hangul syllabic blocks.
+	Syllabify
+
+	// Transliterate step converts foreign punctuations to fit in Korean.
+	Transliterate
+)
+
+// AllSteps is the array of all steps.
+var AllSteps = []Step{
+	Input,
+	Phonemize,
+	Normalize,
+	Group,
+	Rewrite,
+	Transcribe,
+	Syllabify,
+	Transliterate,
+}
+
+func (s Step) String() string {
+	return map[Step]string{
+		Input:         "Input",
+		Phonemize:     "Phonemize",
+		Normalize:     "Normalize",
+		Group:         "Group",
+		Rewrite:       "Rewrite",
+		Transcribe:    "Transcribe",
+		Syllabify:     "Syllabify",
+		Transliterate: "Transliterate",
+	}[s]
+}
+
+// -----------------------------------------------------------------------------
+
 type pipeline struct {
 	h  *Hangulizer
 	tr *tracer
@@ -38,7 +96,7 @@ func (p *pipeline) forward(word string) string {
 	subwords = p.transcribe(subwords)
 
 	// finalizing phase
-	word = p.compose(subwords)
+	word = p.syllabify(subwords)
 	word = p.transliterate(word)
 
 	return word
@@ -49,7 +107,7 @@ func (p *pipeline) forward(word string) string {
 // 0. Just recording beginning (Word)
 //
 func (p *pipeline) input(word string) {
-	p.tr.TraceWord("input", "", word)
+	p.tr.TraceWord(Input, word, "", nil)
 }
 
 // 1. Phonemize (Word -> Word)
@@ -81,7 +139,11 @@ func (p *pipeline) phonemize(word string) (string, bool) {
 	return word, false
 
 PhonemizerFound:
-	return pron.Phonemize(word), true
+	word = pron.Phonemize(word)
+
+	p.tr.TraceWord(Phonemize, word, id, nil)
+
+	return word, true
 }
 
 // 2. Normalize (Word -> Word)
@@ -91,10 +153,12 @@ PhonemizerFound:
 // For example, "Hello" in Latin script will be normalized to "hello".
 //
 func (p *pipeline) normalize(word string) string {
+	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
 
-	p.tr.TraceWord("normalize", "custom", word)
+	p.tr.TraceWord(Normalize, word, "", nil)
 
+	// Per-script normalization.
 	script := p.h.spec.script
 	except := p.h.spec.normLetters
 
@@ -110,7 +174,7 @@ func (p *pipeline) normalize(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord("normalize", p.h.spec.Lang.Script, word)
+	p.tr.TraceWord(Normalize, word, p.h.spec.Lang.Script, nil)
 
 	return word
 }
@@ -177,7 +241,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit("rewrite")
+	rtr.Commit(Rewrite)
 
 	return subwords
 }
@@ -248,18 +312,18 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit("transcribe")
+	rtr.Commit(Transcribe)
 
 	return subwords
 }
 
-// 6. Compose (Subwords -> Word)
+// 6. Syllabify (Subwords -> Word)
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) compose(subwords []subword) string {
+func (p *pipeline) syllabify(subwords []subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
@@ -279,17 +343,17 @@ func (p *pipeline) compose(subwords []subword) string {
 
 	word := buf.String()
 
-	p.tr.TraceWord("compose hangul", "", word)
+	p.tr.TraceWord(Syllabify, word, "", nil)
 
 	return word
 }
 
 // 7. Transliterate (Word -> Word)
 //
-// Finally, this step converts foreign punctuations to fit it Korean.
+// Finally, this step converts foreign punctuations to fit in Korean.
 //
 // Korean has adapted the European punctuations. Those are the most common in
-// the world. But a few langauges, such as Japanese or Chinese, use different
+// the world. But a few languages, such as Japanese or Chinese, use different
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
 // For example, "「...」" will be "'...'".
@@ -340,5 +404,9 @@ func (p *pipeline) transliterate(word string) string {
 		buf.WriteString(punct)
 	}
 
-	return buf.String()
+	word = buf.String()
+
+	p.tr.TraceWord(Transliterate, word, p.h.spec.Lang.Script, nil)
+
+	return word
 }

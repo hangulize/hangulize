@@ -1,55 +1,122 @@
 package hangulize
 
 import (
+	"bytes"
 	"fmt"
+	"io"
 	"strings"
+
+	runewidth "github.com/mattn/go-runewidth"
 )
 
 // Trace is emitted when a replacement occurs. It is used for tracing of
 // Hangulize pipeline internal.
 type Trace struct {
-	Step string
-	Why  string
+	Step Step
 	Word string
+	Why  string
+	Rule *Rule
 }
 
 func (t *Trace) String() string {
-	return fmt.Sprintf("[%s] %#v %s", t.Step, t.Word, t.Why)
+	var buf bytes.Buffer
+	fmt.Fprintf(&buf, "[%s] %#v", t.Step, t.Word)
+
+	if t.Rule != nil {
+		fmt.Fprintf(&buf, " | %s", t.Rule)
+	} else if t.Why != "" {
+		fmt.Fprintf(&buf, " | (%s)", t.Why)
+	}
+
+	return buf.String()
 }
 
+// -----------------------------------------------------------------------------
+
+// Traces is an array of Trace.
+type Traces []Trace
+
+// Render generates a report text.
+func (ts Traces) Render(w io.Writer) {
+	// Detect the max rune width of the words.
+	var width, maxWidth int
+	widths := make([]int, len(ts))
+
+	for i, t := range ts {
+		width = runewidth.StringWidth(t.Word)
+		widths[i] = width
+
+		if maxWidth < width {
+			maxWidth = width
+		}
+	}
+
+	// Render the report.
+	var step Step
+
+	for i, t := range ts {
+		if step != t.Step {
+			step = t.Step
+			fmt.Fprintf(w, "[%s]\n", step)
+		}
+
+		fmt.Fprintf(w, "  %s", t.Word)
+		fmt.Fprintf(w, strings.Repeat(" ", maxWidth-widths[i]))
+		if t.Why != "" {
+			fmt.Fprintf(w, " | (%s)", t.Why)
+		} else if t.Rule != nil {
+			fmt.Fprintf(w, " | %s", t.Rule)
+		}
+		fmt.Fprintf(w, "\n")
+	}
+}
+
+// -----------------------------------------------------------------------------
+
 type tracer struct {
-	traces   []Trace
+	traces   Traces
 	lastWord string
 }
 
-func (tr *tracer) Traces() []Trace {
+func (tr *tracer) Traces() Traces {
 	return tr.traces
 }
 
-func (tr *tracer) trace(step, why, word string) {
+func (tr *tracer) trace(
+	step Step, word string,
+	why string, rule *Rule,
+) {
 	if word == tr.lastWord {
 		return
 	}
-	tr.traces = append(tr.traces, Trace{step, why, word})
+	tr.traces = append(tr.traces, Trace{step, word, why, rule})
 	tr.lastWord = word
 }
 
-func (tr *tracer) TraceWord(step, why, word string) {
+func (tr *tracer) TraceWord(
+	step Step, word string,
+	why string, rule *Rule,
+) {
 	if tr == nil {
 		return
 	}
-	tr.trace(step, why, word)
+	tr.trace(step, word, why, rule)
 }
 
-func (tr *tracer) TraceSubwords(step, why string, subwords []subword) {
+func (tr *tracer) TraceSubwords(
+	step Step, subwords []subword,
+	why string, rule *Rule,
+) {
 	if tr == nil {
 		return
 	}
 	b := subwordsBuilder{subwords}
 	word := b.String()
 	word = strings.Replace(word, "\x00", ".", -1)
-	tr.trace(step, why, word)
+	tr.trace(step, word, why, rule)
 }
+
+// -----------------------------------------------------------------------------
 
 type ruleTracer struct {
 	tr           *tracer
@@ -88,7 +155,7 @@ func (rtr *ruleTracer) Trace(
 	rtr.maxRuleIndex = ruleIndex
 }
 
-func (rtr *ruleTracer) Commit(step string) {
+func (rtr *ruleTracer) Commit(step Step) {
 	if rtr == nil {
 		return
 	}
@@ -110,7 +177,7 @@ func (rtr *ruleTracer) Commit(step string) {
 		}
 
 		if dirty {
-			rtr.tr.TraceSubwords(step, rule.String(), subwords)
+			rtr.tr.TraceSubwords(step, subwords, "", rule)
 		}
 	}
 }

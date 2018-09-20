@@ -7,6 +7,7 @@
 [![GoDoc](https://godoc.org/github.com/hangulize/hangulize?status.svg)](https://godoc.org/github.com/hangulize/hangulize)
 [![Go Report Card](https://goreportcard.com/badge/github.com/hangulize/hangulize)](https://goreportcard.com/report/github.com/hangulize/hangulize)
 [![Build Status](https://travis-ci.org/hangulize/hangulize.svg?branch=develop)](https://travis-ci.org/hangulize/hangulize)
+[![Coverage Status](https://coveralls.io/repos/github/hangulize/hangulize/badge.svg?branch=develop)](https://coveralls.io/github/hangulize/hangulize)
 
 (WIP: 아직 개발 중, API가 임의로 바뀔 수 있어요!)
 
@@ -33,7 +34,7 @@ hangulize.Hangulize("ita", "Cappuccino")
 // output: "카푸치노"
 ```
 
-## 리부트
+## 재제작
 
 한글라이즈 프로젝트는 2010년에 Python으로 처음 구현되었고, 웹 상에서 누구나 쉽게
 사용할 수 있도록 [hangulize.org](https://hangulize.org/) 서비스를
@@ -41,13 +42,24 @@ hangulize.Hangulize("ita", "Cappuccino")
 [sublee/hangulize](https://github.com/sublee/hangulize)에서 확인할 수 있습니다.
 
 시간이 흘러 2018년, 기존 한글라이즈의 기능은 모두 계승하면서 성능을 높이고
-코드의 유지보수 가능성과 규칙 설계 시 생산성을 높이기 위해 리부트를
-결정했습니다. 리부트한 한글라이즈를 구현하는 데에는 Go를 사용했습니다.
+코드의 유지보수 가능성과 규칙 설계 시 생산성을 높이기 위해 재제작을
+결정했습니다. 한글라이즈를 다시 구현하는 데에는 Go를 사용했습니다.
 
 이 프로젝트는 처음에 "한글라이즈 2"로 명명했으나 기존 한글라이즈를 충분히
 대체할 수 있을 것으로 보여 숫자 2를 뗀 "한글라이즈"로 이름을 바꿨습니다.
 
-## 성능
+자세한 이야기는 [한글라이즈 재제작기][remake-of-hangulize]를 참고해주세요.
+
+### 목표
+
+- [x] 기존 한글라이즈(Python 구현)의 기능을 모두 계승
+- [x] 규칙 설계에 정적 파일(`.hgl`) 사용
+- [ ] 간편한 규칙 설계환경
+- [ ] 규칙 설계법 꼼꼼히 문서화
+- [x] [hangulize.org](https://hangulize.org)에 적용
+- [ ] [hangulize.org](https://hangulize.org) 개편
+
+### 성능
 
 옛 한글라이즈의 시간복잡도는 O(n²)이지만 새 한글라이즈의 시간복잡도는
 O(n)입니다.
@@ -57,15 +69,6 @@ O(n)입니다.
 | 옛 한글라이즈 CPython 3.6.3 | 398 µs | 1.46 ms |
 | 옛 한글라이즈 PyPy 3.5 v5.8.0 | 208 µs | 9.79 ms |
 | **새 한글라이즈 Go 1.10.2** | 85 µs | 1.05 ms |
-
-## 목표
-
-- [x] 기존 한글라이즈(Python 구현)의 기능을 모두 계승
-- [x] 규칙 설계에 정적 파일(`.hgl`) 사용
-- [ ] 간편한 규칙 설계환경
-- [ ] 규칙 설계법 꼼꼼히 문서화
-- [x] [hangulize.org](https://hangulize.org)에 적용
-- [ ] [hangulize.org](https://hangulize.org) 개편
 
 ## 지원하는 언어
 

@@ -26,11 +26,20 @@ func (r *Rule) replacements(word string) []replacement {
 		repl, err := r.To.Interpolate(r.From, word, m)
 
 		if err != nil {
-			repl = word[start:stop]
+			// FIXME(sublee): Shouldn't it throw an error?
+			continue
 		}
 
 		repls = append(repls, replacement{start, stop, repl})
 	}
 
 	return repls
+}
+
+// Replace matches the word with the Pattern and replaces with the RPattern.
+func (r *Rule) Replace(word string) string {
+	rep := newSubwordReplacer(word, 0, 0)
+	repls := r.replacements(word)
+	rep.ReplaceBy(repls...)
+	return rep.String()
 }
