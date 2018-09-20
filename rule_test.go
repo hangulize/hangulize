@@ -10,14 +10,14 @@ import (
 func TestRuleString(t *testing.T) {
 	p, _ := hre.NewPattern("foo", nil, nil)
 	rp := hre.NewRPattern("bar", nil, nil)
-	r := Rule{p, rp}
+	r := Rule{0, p, rp}
 	assert.Equal(t, `"foo" -> "bar"`, r.String())
 }
 
 func TestRuleReplacements(t *testing.T) {
 	p, _ := hre.NewPattern("foo", nil, nil)
 	rp := hre.NewRPattern("bar", nil, nil)
-	r := Rule{p, rp}
+	r := Rule{0, p, rp}
 
 	repls := r.replacements("abcfoodef")
 
@@ -30,7 +30,7 @@ func TestRuleReplacements(t *testing.T) {
 func TestRuleReplace(t *testing.T) {
 	p, _ := hre.NewPattern("foo", nil, nil)
 	rp := hre.NewRPattern("bar", nil, nil)
-	r := Rule{p, rp}
+	r := Rule{0, p, rp}
 	assert.Equal(t, "abcbardef", r.Replace("abcfoodef"))
 }
 
@@ -42,7 +42,7 @@ func TestRuleUnmatchedVar(t *testing.T) {
 	}
 	p, _ := hre.NewPattern("<foo>", nil, vars)
 	rp := hre.NewRPattern("<bar><baz>", nil, vars)
-	r := Rule{p, rp}
+	r := Rule{0, p, rp}
 
 	// Silently, keep the original.
 	assert.Equal(t, "abcfoodef", r.Replace("abcfoodef"))

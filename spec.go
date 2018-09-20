@@ -285,7 +285,7 @@ func newRules(
 		right := pair.Right()
 		to := hre.NewRPattern(right[0], macros, vars)
 
-		rules[i] = &Rule{from, to}
+		rules[i] = &Rule{i, from, to}
 	}
 
 	return rules, nil

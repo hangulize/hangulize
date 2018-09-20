@@ -8,6 +8,7 @@ import (
 
 // Rule is a pair of Pattern and RPattern.
 type Rule struct {
+	ID   int
 	From *hre.Pattern
 	To   *hre.RPattern
 }
