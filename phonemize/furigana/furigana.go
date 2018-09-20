@@ -7,6 +7,7 @@ package furigana
 
 import (
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
+	"golang.org/x/text/unicode/norm"
 )
 
 // P is the Furigana phonemizer.
@@ -32,6 +33,10 @@ func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
 }
 
 func (p *furiganaPhonemizer) Phonemize(word string) string {
+	// Normalize into CJK unified ideographs.
+	word = norm.NFC.String(word)
+
+	// Resolve Kana repeatations.
 	word = repeatKana(word)
 
 	tokens := p.Kagome().Tokenize(word)
