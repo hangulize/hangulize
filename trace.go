@@ -62,11 +62,13 @@ func (ts Traces) Render(w io.Writer) {
 
 		fmt.Fprintf(w, "  %s", t.Word)
 		fmt.Fprintf(w, strings.Repeat(" ", maxWidth-widths[i]))
-		if t.Why != "" {
-			fmt.Fprintf(w, " | (%s)", t.Why)
-		} else if t.Rule != nil {
+
+		if t.Rule != nil {
 			fmt.Fprintf(w, " | %s", t.Rule)
+		} else if t.Why != "" {
+			fmt.Fprintf(w, " | (%s)", t.Why)
 		}
+
 		fmt.Fprintf(w, "\n")
 	}
 }
