@@ -37,17 +37,17 @@ func (h *Hangulizer) Spec() *Spec {
 
 // UsePhonemizer keeps a phonemizer for ready to use.
 func (h *Hangulizer) UsePhonemizer(p Phonemizer) bool {
-	return usePhonemizer(p, &h.phonemizers)
+	return usePhonemizer(p, h.phonemizers)
 }
 
 // UnusePhonemizer discards a phonemizer.
 func (h *Hangulizer) UnusePhonemizer(id string) bool {
-	return unusePhonemizer(id, &h.phonemizers)
+	return unusePhonemizer(id, h.phonemizers)
 }
 
 // GetPhonemizer returns a phonemizer by the ID.
 func (h *Hangulizer) GetPhonemizer(id string) (Phonemizer, bool) {
-	p, ok := getPhonemizer(id, &h.phonemizers)
+	p, ok := getPhonemizer(id, h.phonemizers)
 	return p, ok
 }
 
