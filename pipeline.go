@@ -233,7 +233,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 			rep.ReplaceBy(repls...)
 			word = rep.String()
 
-			rtr.Trace(j, rule, i, word)
+			rtr.Trace(j, &rule, i, word)
 		}
 
 		swBuf.Append(rep.Subwords()...)
@@ -289,7 +289,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 			rep.flush()
 			word = dummy.String()
 
-			rtr.Trace(j, rule, i, rep.word)
+			rtr.Trace(j, &rule, i, rep.word)
 		}
 
 		swBuf.Append(rep.Subwords()...)
