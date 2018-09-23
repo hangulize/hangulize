@@ -83,7 +83,7 @@ type pipeline struct {
 }
 
 // forward runs the Hangulize pipeline for a word.
-func (p *pipeline) forward(word string) string {
+func (p pipeline) forward(word string) string {
 	p.input(word)
 
 	// preparing phase
@@ -106,7 +106,7 @@ func (p *pipeline) forward(word string) string {
 
 // 0. Just recording beginning (Word)
 //
-func (p *pipeline) input(word string) {
+func (p pipeline) input(word string) {
 	p.tr.TraceWord(Input, word, "", nil)
 }
 
@@ -117,7 +117,7 @@ func (p *pipeline) input(word string) {
 // represent the exact pronunciation. But in some languages, such as American
 // English or Chinese, it's not true.
 //
-func (p *pipeline) phonemize(word string) (string, bool) {
+func (p pipeline) phonemize(word string) (string, bool) {
 	id := p.h.spec.Lang.Phonemizer
 	if id == "" {
 		// The language doesn't require a phonemizer. It's okay.
@@ -152,7 +152,7 @@ PhonemizerFound:
 //
 // For example, "Hello" in Latin script will be normalized to "hello".
 //
-func (p *pipeline) normalize(word string) string {
+func (p pipeline) normalize(word string) string {
 	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
 
@@ -188,7 +188,7 @@ func (p *pipeline) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 //
-func (p *pipeline) group(word string) []subword {
+func (p pipeline) group(word string) []subword {
 	rep := newSubwordReplacer(word, 0, 1)
 
 	for i, ch := range word {
@@ -217,7 +217,7 @@ func (p *pipeline) group(word string) []subword {
 //
 // For example, "hello" can be rewritten to "heˈlō".
 //
-func (p *pipeline) rewrite(subwords []subword) []subword {
+func (p pipeline) rewrite(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
 	rtr := p.tr.RuleTracer(subwords)
@@ -256,7 +256,7 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 //
-func (p *pipeline) transcribe(subwords []subword) []subword {
+func (p pipeline) transcribe(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
 	rtr := p.tr.RuleTracer(subwords)
@@ -323,7 +323,7 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) syllabify(subwords []subword) string {
+func (p pipeline) syllabify(subwords []subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
@@ -358,7 +358,7 @@ func (p *pipeline) syllabify(subwords []subword) string {
 //
 // For example, "「...」" will be "'...'".
 //
-func (p *pipeline) transliterate(word string) string {
+func (p pipeline) transliterate(word string) string {
 	script := p.h.spec.script
 
 	chars := []rune(word)
