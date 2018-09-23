@@ -120,7 +120,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// rewrite
 	var rewritePairs []hgl.Pair
 	if sec, ok := h["rewrite"]; ok {
-		rewritePairs = sec.(*hgl.ListSection).Array()
+		rewritePairs = sec.(*hgl.ListSection).Pairs()
 	}
 
 	rewrite, err := newRules(rewritePairs, macros, vars)
@@ -131,7 +131,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// transcribe
 	var transcribePairs []hgl.Pair
 	if sec, ok := h["transcribe"]; ok {
-		transcribePairs = sec.(*hgl.ListSection).Array()
+		transcribePairs = sec.(*hgl.ListSection).Pairs()
 	}
 
 	transcribe, err := newRules(transcribePairs, macros, vars)
@@ -142,7 +142,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// test
 	var test [][2]string
 	if sec, ok := h["test"]; ok {
-		for _, pair := range sec.(*hgl.ListSection).Array() {
+		for _, pair := range sec.(*hgl.ListSection).Pairs() {
 			word := pair.Left()
 			transcribed := pair.Right()[0]
 
