@@ -107,7 +107,7 @@ func (p pipeline) forward(word string) string {
 // 0. Just recording beginning (Word)
 //
 func (p pipeline) input(word string) {
-	p.tr.TraceWord(Input, word, "", nil)
+	p.tr.Trace(Input, word, "")
 }
 
 // 1. Phonemize (Word -> Word)
@@ -141,7 +141,7 @@ func (p pipeline) phonemize(word string) (string, bool) {
 PhonemizerFound:
 	word = pron.Phonemize(word)
 
-	p.tr.TraceWord(Phonemize, word, id, nil)
+	p.tr.Trace(Phonemize, word, id)
 
 	return word, true
 }
@@ -156,7 +156,7 @@ func (p pipeline) normalize(word string) string {
 	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
 
-	p.tr.TraceWord(Normalize, word, "", nil)
+	p.tr.Trace(Normalize, word, "")
 
 	// Per-script normalization.
 	script := p.h.spec.script
@@ -174,7 +174,7 @@ func (p pipeline) normalize(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord(Normalize, word, p.h.spec.Lang.Script, nil)
+	p.tr.Trace(Normalize, word, p.h.spec.Lang.Script)
 
 	return word
 }
@@ -220,7 +220,7 @@ func (p pipeline) group(word string) []subword {
 func (p pipeline) rewrite(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
-	rtr := p.tr.RuleTracer(subwords)
+	swtr := p.tr.SubwordsTracer(Rewrite, subwords)
 
 	for i, sw := range subwords {
 		word := sw.word
@@ -228,12 +228,12 @@ func (p pipeline) rewrite(subwords []subword) []subword {
 
 		rep := newSubwordReplacer(word, level, 1)
 
-		for j, rule := range p.h.spec.Rewrite {
+		for _, rule := range p.h.spec.Rewrite {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
 
-			rtr.Trace(j, &rule, i, word)
+			swtr.Trace(i, word, rule)
 		}
 
 		swBuf.Append(rep.Subwords()...)
@@ -241,7 +241,7 @@ func (p pipeline) rewrite(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit(Rewrite)
+	swtr.Commit()
 
 	return subwords
 }
@@ -259,7 +259,7 @@ func (p pipeline) rewrite(subwords []subword) []subword {
 func (p pipeline) transcribe(subwords []subword) []subword {
 	var swBuf subwordsBuilder
 
-	rtr := p.tr.RuleTracer(subwords)
+	swtr := p.tr.SubwordsTracer(Transcribe, subwords)
 
 	for i, sw := range subwords {
 		if sw.level == 0 {
@@ -277,7 +277,7 @@ func (p pipeline) transcribe(subwords []subword) []subword {
 		// with NULL characters.
 		dummy := newSubwordReplacer(word, 0, 0)
 
-		for j, rule := range p.h.spec.Transcribe {
+		for _, rule := range p.h.spec.Transcribe {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 
@@ -289,7 +289,7 @@ func (p pipeline) transcribe(subwords []subword) []subword {
 			rep.flush()
 			word = dummy.String()
 
-			rtr.Trace(j, &rule, i, rep.word)
+			swtr.Trace(i, rep.word, rule)
 		}
 
 		swBuf.Append(rep.Subwords()...)
@@ -312,7 +312,7 @@ func (p pipeline) transcribe(subwords []subword) []subword {
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit(Transcribe)
+	swtr.Commit()
 
 	return subwords
 }
@@ -343,7 +343,7 @@ func (p pipeline) syllabify(subwords []subword) string {
 
 	word := buf.String()
 
-	p.tr.TraceWord(Syllabify, word, "", nil)
+	p.tr.Trace(Syllabify, word, "")
 
 	return word
 }
@@ -406,7 +406,7 @@ func (p pipeline) transliterate(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord(Transliterate, word, p.h.spec.Lang.Script, nil)
+	p.tr.Trace(Transliterate, word, p.h.spec.Lang.Script)
 
 	return word
 }
