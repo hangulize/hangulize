@@ -13,12 +13,12 @@ type Rule struct {
 	To   *hre.RPattern
 }
 
-func (r *Rule) String() string {
+func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s", r.From, r.To)
 }
 
 // replacements indicates which ranges should be replaced.
-func (r *Rule) replacements(word string) []replacement {
+func (r Rule) replacements(word string) []replacement {
 	var repls []replacement
 
 	for _, m := range r.From.Find(word, -1) {
@@ -38,7 +38,7 @@ func (r *Rule) replacements(word string) []replacement {
 }
 
 // Replace matches the word with the Pattern and replaces with the RPattern.
-func (r *Rule) Replace(word string) string {
+func (r Rule) Replace(word string) string {
 	rep := newSubwordReplacer(word, 0, 0)
 	repls := r.replacements(word)
 	rep.ReplaceBy(repls...)
