@@ -5,6 +5,9 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/hangulize/hangulize/internal/jamo"
+	"github.com/hangulize/hangulize/internal/subword"
 )
 
 var reSpace = regexp.MustCompile(`\s`)
@@ -83,7 +86,7 @@ type pipeline struct {
 }
 
 // forward runs the Hangulize pipeline for a word.
-func (p *pipeline) forward(word string) string {
+func (p pipeline) forward(word string) string {
 	p.input(word)
 
 	// preparing phase
@@ -106,8 +109,8 @@ func (p *pipeline) forward(word string) string {
 
 // 0. Just recording beginning (Word)
 //
-func (p *pipeline) input(word string) {
-	p.tr.TraceWord(Input, word, "", nil)
+func (p pipeline) input(word string) {
+	p.tr.Trace(Input, word, "")
 }
 
 // 1. Phonemize (Word -> Word)
@@ -117,7 +120,7 @@ func (p *pipeline) input(word string) {
 // represent the exact pronunciation. But in some languages, such as American
 // English or Chinese, it's not true.
 //
-func (p *pipeline) phonemize(word string) (string, bool) {
+func (p pipeline) phonemize(word string) (string, bool) {
 	id := p.h.spec.Lang.Phonemizer
 	if id == "" {
 		// The language doesn't require a phonemizer. It's okay.
@@ -141,7 +144,7 @@ func (p *pipeline) phonemize(word string) (string, bool) {
 PhonemizerFound:
 	word = pron.Phonemize(word)
 
-	p.tr.TraceWord(Phonemize, word, id, nil)
+	p.tr.Trace(Phonemize, word, id)
 
 	return word, true
 }
@@ -152,11 +155,11 @@ PhonemizerFound:
 //
 // For example, "Hello" in Latin script will be normalized to "hello".
 //
-func (p *pipeline) normalize(word string) string {
+func (p pipeline) normalize(word string) string {
 	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
 
-	p.tr.TraceWord(Normalize, word, "", nil)
+	p.tr.Trace(Normalize, word, "")
 
 	// Per-script normalization.
 	script := p.h.spec.script
@@ -174,7 +177,7 @@ func (p *pipeline) normalize(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord(Normalize, word, p.h.spec.Lang.Script, nil)
+	p.tr.Trace(Normalize, word, p.h.spec.Lang.Script)
 
 	return word
 }
@@ -188,8 +191,8 @@ func (p *pipeline) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 //
-func (p *pipeline) group(word string) []subword {
-	rep := newSubwordReplacer(word, 0, 1)
+func (p pipeline) group(word string) []subword.Subword {
+	rep := subword.NewReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
@@ -217,31 +220,31 @@ func (p *pipeline) group(word string) []subword {
 //
 // For example, "hello" can be rewritten to "heˈlō".
 //
-func (p *pipeline) rewrite(subwords []subword) []subword {
-	var swBuf subwordsBuilder
+func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
+	var swBuf subword.Builder
 
-	rtr := p.tr.RuleTracer(subwords)
+	swtr := p.tr.SubwordsTracer(Rewrite, subwords)
 
 	for i, sw := range subwords {
-		word := sw.word
-		level := sw.level
+		word := sw.Word
+		level := sw.Level
 
-		rep := newSubwordReplacer(word, level, 1)
+		rep := subword.NewReplacer(word, level, 1)
 
-		for j, rule := range p.h.spec.Rewrite {
+		for _, rule := range p.h.spec.Rewrite {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
 
-			rtr.Trace(j, rule, i, word)
+			swtr.Trace(i, word, rule)
 		}
 
-		swBuf.Append(rep.Subwords()...)
+		swBuf.Write(rep.Subwords()...)
 	}
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit(Rewrite)
+	swtr.Commit()
 
 	return subwords
 }
@@ -256,43 +259,41 @@ func (p *pipeline) rewrite(subwords []subword) []subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 //
-func (p *pipeline) transcribe(subwords []subword) []subword {
-	var swBuf subwordsBuilder
+func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
+	var swBuf subword.Builder
 
-	rtr := p.tr.RuleTracer(subwords)
+	swtr := p.tr.SubwordsTracer(Transcribe, subwords)
 
 	for i, sw := range subwords {
-		if sw.level == 0 {
-			swBuf.Append(sw)
+		if sw.Level == 0 {
+			swBuf.Write(sw)
 			continue
 		}
 
-		word := sw.word
-		level := sw.level
+		word := sw.Word
+		level := sw.Level
 
-		rep := newSubwordReplacer(word, level, 2)
+		rep := subword.NewReplacer(word, level, 2)
 
 		// transcribe is not rewrite. A result of a replacement is not the
 		// input of the next replacement. dummy marks the replaced subwords
 		// with NULL characters.
-		dummy := newSubwordReplacer(word, 0, 0)
+		dummy := subword.NewReplacer(word, 0, 0)
 
-		for j, rule := range p.h.spec.Transcribe {
+		for _, rule := range p.h.spec.Transcribe {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 
 			for _, repl := range repls {
-				nulls := strings.Repeat("\x00", len(repl.word))
-				dummy.Replace(repl.start, repl.stop, nulls)
+				nulls := strings.Repeat("\x00", len(repl.Word))
+				dummy.Replace(repl.Start, repl.Stop, nulls)
 			}
 
-			rep.flush()
 			word = dummy.String()
-
-			rtr.Trace(j, rule, i, rep.word)
+			swtr.Trace(i, rep.String(), rule)
 		}
 
-		swBuf.Append(rep.Subwords()...)
+		swBuf.Write(rep.Subwords()...)
 	}
 
 	// Discard level=1 subwords. They have been generated by "3. Rewrite" but
@@ -301,18 +302,18 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 	swBuf.Reset()
 
 	for _, sw := range subwords {
-		if sw.level == 1 {
-			if hasSpace(sw.word) {
-				swBuf.Append(subword{" ", 1})
+		if sw.Level == 1 {
+			if hasSpace(sw.Word) {
+				swBuf.Write(subword.New(" ", 1))
 			}
 			continue
 		}
-		swBuf.Append(sw)
+		swBuf.Write(sw)
 	}
 
 	subwords = swBuf.Subwords()
 
-	rtr.Commit(Transcribe)
+	swtr.Commit()
 
 	return subwords
 }
@@ -323,27 +324,27 @@ func (p *pipeline) transcribe(subwords []subword) []subword {
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p *pipeline) syllabify(subwords []subword) string {
+func (p pipeline) syllabify(subwords []subword.Subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
 	for _, sw := range subwords {
 		// Don't touch level=0 subwords. They just have passed through the
 		// pipeline, because they are meaningless.
-		if sw.level == 0 {
-			buf.WriteString(ComposeHangul(jamoBuf.String()))
+		if sw.Level == 0 {
+			buf.WriteString(jamo.ComposeHangul(jamoBuf.String()))
 			jamoBuf.Reset()
 
-			buf.WriteString(sw.word)
+			buf.WriteString(sw.Word)
 			continue
 		}
-		jamoBuf.WriteString(sw.word)
+		jamoBuf.WriteString(sw.Word)
 	}
-	buf.WriteString(ComposeHangul(jamoBuf.String()))
+	buf.WriteString(jamo.ComposeHangul(jamoBuf.String()))
 
 	word := buf.String()
 
-	p.tr.TraceWord(Syllabify, word, "", nil)
+	p.tr.Trace(Syllabify, word, "")
 
 	return word
 }
@@ -358,7 +359,7 @@ func (p *pipeline) syllabify(subwords []subword) string {
 //
 // For example, "「...」" will be "'...'".
 //
-func (p *pipeline) transliterate(word string) string {
+func (p pipeline) transliterate(word string) string {
 	script := p.h.spec.script
 
 	chars := []rune(word)
@@ -406,7 +407,7 @@ func (p *pipeline) transliterate(word string) string {
 
 	word = buf.String()
 
-	p.tr.TraceWord(Transliterate, word, p.h.spec.Lang.Script, nil)
+	p.tr.Trace(Transliterate, word, p.h.spec.Lang.Script)
 
 	return word
 }

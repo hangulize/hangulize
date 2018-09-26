@@ -27,8 +27,8 @@ type Spec struct {
 	Normalize map[string][]string
 
 	// Rewrite/Transcribe
-	Rewrite    []*Rule
-	Transcribe []*Rule
+	Rewrite    []Rule
+	Transcribe []Rule
 
 	// Test examples
 	Test [][2]string
@@ -45,8 +45,13 @@ type Spec struct {
 	normLetters  stringset.StringSet
 }
 
-func (s *Spec) String() string {
-	return fmt.Sprintf("<Spec lang=%s>", s.Lang.ID)
+func (s Spec) String() string {
+	return s.Lang.ID
+}
+
+// GoString implements GoStringer for Spec.
+func (s Spec) GoString() string {
+	return fmt.Sprintf("hangulize.Spec{Lang.ID: %#v}", s.Lang.ID)
 }
 
 // ParseSpec parses a Spec from an HGL source.
@@ -120,7 +125,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// rewrite
 	var rewritePairs []hgl.Pair
 	if sec, ok := h["rewrite"]; ok {
-		rewritePairs = sec.(*hgl.ListSection).Array()
+		rewritePairs = sec.(*hgl.ListSection).Pairs()
 	}
 
 	rewrite, err := newRules(rewritePairs, macros, vars)
@@ -131,7 +136,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// transcribe
 	var transcribePairs []hgl.Pair
 	if sec, ok := h["transcribe"]; ok {
-		transcribePairs = sec.(*hgl.ListSection).Array()
+		transcribePairs = sec.(*hgl.ListSection).Pairs()
 	}
 
 	transcribe, err := newRules(transcribePairs, macros, vars)
@@ -142,7 +147,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// test
 	var test [][2]string
 	if sec, ok := h["test"]; ok {
-		for _, pair := range sec.(*hgl.ListSection).Array() {
+		for _, pair := range sec.(*hgl.ListSection).Pairs() {
 			word := pair.Left()
 			transcribed := pair.Right()[0]
 
@@ -214,7 +219,7 @@ type Language struct {
 	Phonemizer string
 }
 
-func (l *Language) String() string {
+func (l Language) String() string {
 	return fmt.Sprintf("%s(%s)", l.ID, l.English)
 }
 
@@ -266,9 +271,9 @@ func newRules(
 	macros map[string]string,
 	vars map[string][]string,
 
-) ([]*Rule, error) {
+) ([]Rule, error) {
 
-	rules := make([]*Rule, len(pairs))
+	rules := make([]Rule, len(pairs))
 
 	for i, pair := range pairs {
 		from, err := hre.NewPattern(pair.Left(), macros, vars)
@@ -285,7 +290,7 @@ func newRules(
 		right := pair.Right()
 		to := hre.NewRPattern(right[0], macros, vars)
 
-		rules[i] = &Rule{from, to}
+		rules[i] = Rule{i, from, to}
 	}
 
 	return rules, nil
@@ -295,11 +300,11 @@ func newRules(
 
 // collectPuncts collects punctuation characters from rewrite/transcribe rules.
 // It discards the punctuations that is used only for rewriting hints.
-func collectPuncts(rewrite []*Rule, transcribe []*Rule) stringset.StringSet {
+func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
 	var puncts []string
 	rletters := make(map[string]bool)
 
-	collectFrom := func(rule *Rule) {
+	collectFrom := func(rule Rule) {
 		for _, let := range rule.From.Letters() {
 			ch, _ := utf8.DecodeRuneInString(let)
 

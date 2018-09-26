@@ -1,4 +1,4 @@
-package hangulize
+package jamo
 
 import (
 	"fmt"

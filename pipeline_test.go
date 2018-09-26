@@ -4,6 +4,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/hangulize/hangulize/internal/scripts"
 )
 
 func TestTransliterate(t *testing.T) {
@@ -11,7 +13,7 @@ func TestTransliterate(t *testing.T) {
 	h := NewHangulizer(&s)
 	p := pipeline{h, nil}
 
-	s.script = _Kana{}
+	s.script = scripts.Kana{}
 
 	assert.Equal(t, "foo.", p.transliterate("foo。"))
 	assert.Equal(t, ", foo, bar", p.transliterate("、foo、bar"))
