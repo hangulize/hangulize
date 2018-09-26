@@ -6,14 +6,14 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestSubwordsBuilderEmpty(t *testing.T) {
+func TestBuilderEmpty(t *testing.T) {
 	var swBuf Builder
 
 	assert.Equal(t, "", swBuf.String())
 	assert.Len(t, swBuf.Subwords(), 0)
 }
 
-func TestSubwordsBuilder1Subword(t *testing.T) {
+func TestBuilder1Subword(t *testing.T) {
 	var swBuf Builder
 
 	swBuf.Append(Subword{"hello", 1})
@@ -22,7 +22,7 @@ func TestSubwordsBuilder1Subword(t *testing.T) {
 	assert.Len(t, swBuf.Subwords(), 1)
 }
 
-func TestSubwordsBuilderMergeSameLevel(t *testing.T) {
+func TestBuilderMergeSameLevel(t *testing.T) {
 	var swBuf Builder
 
 	swBuf.Append(Subword{"hello", 1})
@@ -32,7 +32,7 @@ func TestSubwordsBuilderMergeSameLevel(t *testing.T) {
 	assert.Len(t, swBuf.Subwords(), 1)
 }
 
-func TestSubwordsBuilderDifferentLevel(t *testing.T) {
+func TestBuilderDifferentLevel(t *testing.T) {
 	var swBuf Builder
 
 	swBuf.Append(Subword{"hello", 1})
