@@ -1,4 +1,12 @@
-package hangulize
+/*
+Package jamo implements a Hangul composer. It converts decomposed Jamo phonemes
+to composed Hangul syllables.
+
+	fmt.Println(jamo.ComposeHangul("ㅈㅏㅁㅗ"))
+	// Output: 자모
+
+*/
+package jamo
 
 import (
 	"bufio"

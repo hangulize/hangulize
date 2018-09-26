@@ -6,7 +6,8 @@ import (
 	"strings"
 	"unicode"
 
-	"github.com/hangulize/hangulize/subword"
+	"github.com/hangulize/hangulize/internal/jamo"
+	"github.com/hangulize/hangulize/internal/subword"
 )
 
 var reSpace = regexp.MustCompile(`\s`)
@@ -331,7 +332,7 @@ func (p pipeline) syllabify(subwords []subword.Subword) string {
 		// Don't touch level=0 subwords. They just have passed through the
 		// pipeline, because they are meaningless.
 		if sw.Level == 0 {
-			buf.WriteString(ComposeHangul(jamoBuf.String()))
+			buf.WriteString(jamo.ComposeHangul(jamoBuf.String()))
 			jamoBuf.Reset()
 
 			buf.WriteString(sw.Word)
@@ -339,7 +340,7 @@ func (p pipeline) syllabify(subwords []subword.Subword) string {
 		}
 		jamoBuf.WriteString(sw.Word)
 	}
-	buf.WriteString(ComposeHangul(jamoBuf.String()))
+	buf.WriteString(jamo.ComposeHangul(jamoBuf.String()))
 
 	word := buf.String()
 

@@ -3,8 +3,9 @@ package hangulize
 import (
 	"fmt"
 
-	"github.com/hangulize/hangulize/subword"
 	"github.com/hangulize/hre"
+
+	"github.com/hangulize/hangulize/internal/subword"
 )
 
 // Rule is a pair of Pattern and RPattern.

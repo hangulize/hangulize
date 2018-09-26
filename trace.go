@@ -6,8 +6,9 @@ import (
 	"io"
 	"strings"
 
-	"github.com/hangulize/hangulize/subword"
 	runewidth "github.com/mattn/go-runewidth"
+
+	"github.com/hangulize/hangulize/internal/subword"
 )
 
 // Trace is emitted when a replacement occurs. It is used for tracing of
