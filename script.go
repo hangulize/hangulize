@@ -192,6 +192,9 @@ func (_Kana) TransliteratePunct(punct rune) string {
 // -----------------------------------------------------------------------------
 
 // _Pinyin represents the Latin script for Chinese Pinyin.
+//
+//   漢語拼音
+//
 type _Pinyin struct {
 	_Latin
 }
