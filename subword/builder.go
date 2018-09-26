@@ -1,19 +1,15 @@
-package hangulize
+package subword
 
-import (
-	"bytes"
-)
-
-// Subword is a chunk of a word with a level number. The level indicates which
-// pipeline step generated this sw.
-type Subword struct {
-	Word  string
-	Level int
-}
+import "bytes"
 
 // Builder is a buffer to build a []Subword array.
 type Builder struct {
 	subwords []Subword
+}
+
+// NewBuilder creates a Builder.
+func NewBuilder(subwords []Subword) *Builder {
+	return &Builder{subwords}
 }
 
 // String() concatenates buffered subwords to assemble the full word.

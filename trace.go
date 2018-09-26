@@ -6,6 +6,7 @@ import (
 	"io"
 	"strings"
 
+	"github.com/hangulize/hangulize/subword"
 	runewidth "github.com/mattn/go-runewidth"
 )
 
@@ -135,7 +136,7 @@ func (tr *tracer) Trace(step Step, word, why string) {
 type subwordsTracer struct {
 	tr        *tracer
 	step      Step
-	subwords  []Subword
+	subwords  []subword.Subword
 	trap      map[int][]*string
 	rules     map[int]Rule
 	maxRuleID int
@@ -144,7 +145,7 @@ type subwordsTracer struct {
 // SubwordsTracer creates a subwordsTracer under the tracer.
 func (tr *tracer) SubwordsTracer(
 	step Step,
-	subwords []Subword,
+	subwords []subword.Subword,
 ) *subwordsTracer {
 	if tr == nil {
 		return nil
@@ -183,7 +184,7 @@ func (swtr *subwordsTracer) Commit() {
 		return
 	}
 
-	subwords := make([]Subword, len(swtr.subwords))
+	subwords := make([]subword.Subword, len(swtr.subwords))
 	copy(subwords, swtr.subwords)
 
 	var (
@@ -201,12 +202,12 @@ func (swtr *subwordsTracer) Commit() {
 			if word == nil {
 				continue
 			}
-			subwords[swIndex] = Subword{*word, 0}
+			subwords[swIndex] = subword.New(*word, 0)
 			dirty = true
 		}
 
 		if dirty {
-			b := Builder{subwords}
+			b := subword.NewBuilder(subwords)
 			word := b.String()
 			word = strings.Replace(word, "\x00", ".", -1)
 

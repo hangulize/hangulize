@@ -5,6 +5,8 @@ import (
 	"regexp"
 	"strings"
 	"unicode"
+
+	"github.com/hangulize/hangulize/subword"
 )
 
 var reSpace = regexp.MustCompile(`\s`)
@@ -188,8 +190,8 @@ func (p pipeline) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 //
-func (p pipeline) group(word string) []Subword {
-	rep := NewReplacer(word, 0, 1)
+func (p pipeline) group(word string) []subword.Subword {
+	rep := subword.NewReplacer(word, 0, 1)
 
 	for i, ch := range word {
 		let := string(ch)
@@ -217,8 +219,8 @@ func (p pipeline) group(word string) []Subword {
 //
 // For example, "hello" can be rewritten to "heˈlō".
 //
-func (p pipeline) rewrite(subwords []Subword) []Subword {
-	var swBuf Builder
+func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
+	var swBuf subword.Builder
 
 	swtr := p.tr.SubwordsTracer(Rewrite, subwords)
 
@@ -226,7 +228,7 @@ func (p pipeline) rewrite(subwords []Subword) []Subword {
 		word := sw.Word
 		level := sw.Level
 
-		rep := NewReplacer(word, level, 1)
+		rep := subword.NewReplacer(word, level, 1)
 
 		for _, rule := range p.h.spec.Rewrite {
 			repls := rule.replacements(word)
@@ -256,8 +258,8 @@ func (p pipeline) rewrite(subwords []Subword) []Subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 //
-func (p pipeline) transcribe(subwords []Subword) []Subword {
-	var swBuf Builder
+func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
+	var swBuf subword.Builder
 
 	swtr := p.tr.SubwordsTracer(Transcribe, subwords)
 
@@ -270,12 +272,12 @@ func (p pipeline) transcribe(subwords []Subword) []Subword {
 		word := sw.Word
 		level := sw.Level
 
-		rep := NewReplacer(word, level, 2)
+		rep := subword.NewReplacer(word, level, 2)
 
 		// transcribe is not rewrite. A result of a replacement is not the
 		// input of the next replacement. dummy marks the replaced subwords
 		// with NULL characters.
-		dummy := NewReplacer(word, 0, 0)
+		dummy := subword.NewReplacer(word, 0, 0)
 
 		for _, rule := range p.h.spec.Transcribe {
 			repls := rule.replacements(word)
@@ -301,7 +303,7 @@ func (p pipeline) transcribe(subwords []Subword) []Subword {
 	for _, sw := range subwords {
 		if sw.Level == 1 {
 			if hasSpace(sw.Word) {
-				swBuf.Append(Subword{" ", 1})
+				swBuf.Append(subword.New(" ", 1))
 			}
 			continue
 		}
@@ -321,7 +323,7 @@ func (p pipeline) transcribe(subwords []Subword) []Subword {
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
 //
-func (p pipeline) syllabify(subwords []Subword) string {
+func (p pipeline) syllabify(subwords []subword.Subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 

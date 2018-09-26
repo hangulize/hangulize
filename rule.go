@@ -3,6 +3,7 @@ package hangulize
 import (
 	"fmt"
 
+	"github.com/hangulize/hangulize/subword"
 	"github.com/hangulize/hre"
 )
 
@@ -18,8 +19,8 @@ func (r Rule) String() string {
 }
 
 // replacements indicates which ranges should be replaced.
-func (r Rule) replacements(word string) []Replacement {
-	var repls []Replacement
+func (r Rule) replacements(word string) []subword.Replacement {
+	var repls []subword.Replacement
 
 	for _, m := range r.From.Find(word, -1) {
 		start, stop := m[0], m[1]
@@ -31,7 +32,7 @@ func (r Rule) replacements(word string) []Replacement {
 			continue
 		}
 
-		repls = append(repls, Replacement{start, stop, repl})
+		repls = append(repls, subword.NewReplacement(start, stop, repl))
 	}
 
 	return repls
@@ -39,7 +40,7 @@ func (r Rule) replacements(word string) []Replacement {
 
 // Replace matches the word with the Pattern and replaces with the RPattern.
 func (r Rule) Replace(word string) string {
-	rep := NewReplacer(word, 0, 0)
+	rep := subword.NewReplacer(word, 0, 0)
 	repls := r.replacements(word)
 	rep.ReplaceBy(repls...)
 	return rep.String()

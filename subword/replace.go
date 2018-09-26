@@ -1,4 +1,4 @@
-package hangulize
+package subword
 
 import (
 	"bytes"
@@ -14,6 +14,11 @@ type Replacement struct {
 
 func (r Replacement) String() string {
 	return fmt.Sprintf(`[%d-%d] %#v`, r.Start, r.Stop, r.Word)
+}
+
+// NewReplacement creates a Replacement.
+func NewReplacement(start, stop int, word string) Replacement {
+	return Replacement{start, stop, word}
 }
 
 // Replacer remembers replacements in a buffer. Finally, it applies the
