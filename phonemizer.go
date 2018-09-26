@@ -50,20 +50,20 @@ func getPhonemizer(
 	return p, ok
 }
 
-// globalPhonemizers is the registry holding the imported globalPhonemizers.
-var globalPhonemizers = make(map[string]Phonemizer)
+// phonemizerRegistry is the registry holding the imported phonemizerRegistry.
+var phonemizerRegistry = make(map[string]Phonemizer)
 
 // UsePhonemizer keeps a phonemizer for ready to use globally.
 func UsePhonemizer(p Phonemizer) bool {
-	return usePhonemizer(p, globalPhonemizers)
+	return usePhonemizer(p, phonemizerRegistry)
 }
 
 // UnusePhonemizer discards a global phonemizer.
 func UnusePhonemizer(id string) bool {
-	return unusePhonemizer(id, globalPhonemizers)
+	return unusePhonemizer(id, phonemizerRegistry)
 }
 
 // GetPhonemizer returns a global phonemizer by the ID.
 func GetPhonemizer(id string) (Phonemizer, bool) {
-	return getPhonemizer(id, globalPhonemizers)
+	return getPhonemizer(id, phonemizerRegistry)
 }
