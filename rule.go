@@ -19,6 +19,14 @@ func (r Rule) String() string {
 	return fmt.Sprintf("%s -> %s", r.From, r.To)
 }
 
+// Replace matches the word with the Pattern and replaces with the RPattern.
+func (r Rule) Replace(word string) string {
+	rep := subword.NewReplacer(word, 0, 0)
+	repls := r.replacements(word)
+	rep.ReplaceBy(repls...)
+	return rep.String()
+}
+
 // replacements indicates which ranges should be replaced.
 func (r Rule) replacements(word string) []subword.Replacement {
 	var repls []subword.Replacement
@@ -37,12 +45,4 @@ func (r Rule) replacements(word string) []subword.Replacement {
 	}
 
 	return repls
-}
-
-// Replace matches the word with the Pattern and replaces with the RPattern.
-func (r Rule) Replace(word string) string {
-	rep := subword.NewReplacer(word, 0, 0)
-	repls := r.replacements(word)
-	rep.ReplaceBy(repls...)
-	return rep.String()
 }
