@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	runewidth "github.com/mattn/go-runewidth"
+
+	"github.com/hangulize/hangulize/internal/subword"
 )
 
 // Trace is emitted when a replacement occurs. It is used for tracing of
@@ -135,7 +137,7 @@ func (tr *tracer) Trace(step Step, word, why string) {
 type subwordsTracer struct {
 	tr        *tracer
 	step      Step
-	subwords  []subword
+	subwords  []subword.Subword
 	trap      map[int][]*string
 	rules     map[int]Rule
 	maxRuleID int
@@ -144,7 +146,7 @@ type subwordsTracer struct {
 // SubwordsTracer creates a subwordsTracer under the tracer.
 func (tr *tracer) SubwordsTracer(
 	step Step,
-	subwords []subword,
+	subwords []subword.Subword,
 ) *subwordsTracer {
 	if tr == nil {
 		return nil
@@ -183,7 +185,7 @@ func (swtr *subwordsTracer) Commit() {
 		return
 	}
 
-	subwords := make([]subword, len(swtr.subwords))
+	subwords := make([]subword.Subword, len(swtr.subwords))
 	copy(subwords, swtr.subwords)
 
 	var (
@@ -201,12 +203,12 @@ func (swtr *subwordsTracer) Commit() {
 			if word == nil {
 				continue
 			}
-			subwords[swIndex] = subword{*word, 0}
+			subwords[swIndex] = subword.New(*word, 0)
 			dirty = true
 		}
 
 		if dirty {
-			b := subwordsBuilder{subwords}
+			b := subword.NewBuilder(subwords)
 			word := b.String()
 			word = strings.Replace(word, "\x00", ".", -1)
 
