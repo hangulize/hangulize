@@ -22,9 +22,9 @@ func TestRuleReplacements(t *testing.T) {
 	repls := r.replacements("abcfoodef")
 
 	assert.Len(t, repls, 1)
-	assert.Equal(t, 3, repls[0].start)
-	assert.Equal(t, 6, repls[0].stop)
-	assert.Equal(t, "bar", repls[0].word)
+	assert.Equal(t, 3, repls[0].Start)
+	assert.Equal(t, 6, repls[0].Stop)
+	assert.Equal(t, "bar", repls[0].Word)
 }
 
 func TestRuleReplace(t *testing.T) {

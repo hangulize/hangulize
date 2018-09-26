@@ -135,7 +135,7 @@ func (tr *tracer) Trace(step Step, word, why string) {
 type subwordsTracer struct {
 	tr        *tracer
 	step      Step
-	subwords  []subword
+	subwords  []Subword
 	trap      map[int][]*string
 	rules     map[int]Rule
 	maxRuleID int
@@ -144,7 +144,7 @@ type subwordsTracer struct {
 // SubwordsTracer creates a subwordsTracer under the tracer.
 func (tr *tracer) SubwordsTracer(
 	step Step,
-	subwords []subword,
+	subwords []Subword,
 ) *subwordsTracer {
 	if tr == nil {
 		return nil
@@ -183,7 +183,7 @@ func (swtr *subwordsTracer) Commit() {
 		return
 	}
 
-	subwords := make([]subword, len(swtr.subwords))
+	subwords := make([]Subword, len(swtr.subwords))
 	copy(subwords, swtr.subwords)
 
 	var (
@@ -201,12 +201,12 @@ func (swtr *subwordsTracer) Commit() {
 			if word == nil {
 				continue
 			}
-			subwords[swIndex] = subword{*word, 0}
+			subwords[swIndex] = Subword{*word, 0}
 			dirty = true
 		}
 
 		if dirty {
-			b := subwordsBuilder{subwords}
+			b := Builder{subwords}
 			word := b.String()
 			word = strings.Replace(word, "\x00", ".", -1)
 

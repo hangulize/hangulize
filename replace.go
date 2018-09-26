@@ -5,24 +5,24 @@ import (
 	"fmt"
 )
 
-// replacement is a deferred sw replacement.
-type replacement struct {
-	start int
-	stop  int
-	word  string
+// Replacement is a deferred sw Replacement.
+type Replacement struct {
+	Start int
+	Stop  int
+	Word  string
 }
 
-func (r replacement) String() string {
-	return fmt.Sprintf(`[%d-%d] %#v`, r.start, r.stop, r.word)
+func (r Replacement) String() string {
+	return fmt.Sprintf(`[%d-%d] %#v`, r.Start, r.Stop, r.Word)
 }
 
-// subwordReplacer remembers replacements in a buffer. Finally, it applies the
+// Replacer remembers replacements in a buffer. Finally, it applies the
 // replacements and splits the result in several subwords.
-type subwordReplacer struct {
+type Replacer struct {
 	word string
 
 	// Buffered replacements.
-	repls []replacement
+	repls []Replacement
 
 	levels []int
 
@@ -30,38 +30,38 @@ type subwordReplacer struct {
 	nextLevel int
 }
 
-// newSubwordReplacer creates a SubwordReplacer for a word.
-func newSubwordReplacer(word string, prevLevel, nextLevel int) *subwordReplacer {
-	var repls []replacement
+// NewReplacer creates a SubwordReplacer for a word.
+func NewReplacer(word string, prevLevel, nextLevel int) *Replacer {
+	var repls []Replacement
 
 	levels := make([]int, len(word))
 	for i := 0; i < len(levels); i++ {
 		levels[i] = prevLevel
 	}
 
-	return &subwordReplacer{word, repls, levels, nextLevel}
+	return &Replacer{word, repls, levels, nextLevel}
 }
 
 // Replace buffers a replacement.
-func (r *subwordReplacer) Replace(start, stop int, word string) {
-	r.ReplaceBy(replacement{start, stop, word})
+func (r *Replacer) Replace(start, stop int, word string) {
+	r.ReplaceBy(Replacement{start, stop, word})
 }
 
 // ReplaceBy buffers multiple replacements.
-func (r *subwordReplacer) ReplaceBy(repls ...replacement) {
+func (r *Replacer) ReplaceBy(repls ...Replacement) {
 	r.repls = append(r.repls, repls...)
 }
 
 // flush applies the buffered replacements to the SubwordReplacer internal.
-func (r *subwordReplacer) flush() {
+func (r *Replacer) flush() {
 	var buf bytes.Buffer
 	var levels []int
 
 	offset := 0
 	for _, repl := range r.repls {
-		start := repl.start
-		stop := repl.stop
-		word := repl.word
+		start := repl.Start
+		stop := repl.Stop
+		word := repl.Word
 
 		// before replacement
 		buf.WriteString(r.word[offset:start])
@@ -85,17 +85,17 @@ func (r *subwordReplacer) flush() {
 }
 
 // String applies the buffered replacements and returns the replaced full word.
-func (r *subwordReplacer) String() string {
+func (r *Replacer) String() string {
 	r.flush()
 	return r.word
 }
 
 // Subwords applies the buffered replacements and returns the replaced word as
 // a []Subword array.
-func (r *subwordReplacer) Subwords() []subword {
+func (r *Replacer) Subwords() []Subword {
 	r.flush()
 
-	var subwords []subword
+	var subwords []Subword
 
 	if len(r.levels) == 0 {
 		return subwords
@@ -107,13 +107,13 @@ func (r *subwordReplacer) Subwords() []subword {
 
 	for i, ch := range r.word {
 		if r.levels[i] != level {
-			subwords = append(subwords, subword{buf.String(), level})
+			subwords = append(subwords, Subword{buf.String(), level})
 			level = r.levels[i]
 			buf.Reset()
 		}
 		buf.WriteRune(ch)
 	}
-	subwords = append(subwords, subword{buf.String(), level})
+	subwords = append(subwords, Subword{buf.String(), level})
 
 	return subwords
 }

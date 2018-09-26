@@ -18,8 +18,8 @@ func (r Rule) String() string {
 }
 
 // replacements indicates which ranges should be replaced.
-func (r Rule) replacements(word string) []replacement {
-	var repls []replacement
+func (r Rule) replacements(word string) []Replacement {
+	var repls []Replacement
 
 	for _, m := range r.From.Find(word, -1) {
 		start, stop := m[0], m[1]
@@ -31,7 +31,7 @@ func (r Rule) replacements(word string) []replacement {
 			continue
 		}
 
-		repls = append(repls, replacement{start, stop, repl})
+		repls = append(repls, Replacement{start, stop, repl})
 	}
 
 	return repls
@@ -39,7 +39,7 @@ func (r Rule) replacements(word string) []replacement {
 
 // Replace matches the word with the Pattern and replaces with the RPattern.
 func (r Rule) Replace(word string) string {
-	rep := newSubwordReplacer(word, 0, 0)
+	rep := NewReplacer(word, 0, 0)
 	repls := r.replacements(word)
 	rep.ReplaceBy(repls...)
 	return rep.String()

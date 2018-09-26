@@ -4,41 +4,41 @@ import (
 	"bytes"
 )
 
-// subword is a chunk of a word with a level number. The level indicates which
+// Subword is a chunk of a word with a level number. The level indicates which
 // pipeline step generated this sw.
-type subword struct {
-	word  string
-	level int
+type Subword struct {
+	Word  string
+	Level int
 }
 
-// subwordsBuilder is a buffer to build a []Subword array.
-type subwordsBuilder struct {
-	subwords []subword
+// Builder is a buffer to build a []Subword array.
+type Builder struct {
+	subwords []Subword
 }
 
 // String() concatenates buffered subwords to assemble the full word.
-func (b *subwordsBuilder) String() string {
+func (b *Builder) String() string {
 	var buf bytes.Buffer
 	for _, sw := range b.subwords {
-		buf.WriteString(sw.word)
+		buf.WriteString(sw.Word)
 	}
 	return buf.String()
 }
 
 // Append extends the underlying subwords by the given ones.
-func (b *subwordsBuilder) Append(subwords ...subword) {
+func (b *Builder) Append(subwords ...Subword) {
 	b.subwords = append(b.subwords, subwords...)
 }
 
 // Reset discards the underlying subwords.
-func (b *subwordsBuilder) Reset() {
+func (b *Builder) Reset() {
 	b.subwords = b.subwords[:0]
 }
 
 // Subwords builds the buffered subwords into a []Subword array. It merges
 // adjoin subwords if they share the same level.
-func (b *subwordsBuilder) Subwords() []subword {
-	var subwords []subword
+func (b *Builder) Subwords() []Subword {
+	var subwords []Subword
 
 	if len(b.subwords) == 0 {
 		// No subwords buffered.
@@ -50,20 +50,20 @@ func (b *subwordsBuilder) Subwords() []subword {
 	mergingLevel := -1
 
 	for _, sw := range b.subwords {
-		if sw.level != mergingLevel && mergingLevel != -1 {
+		if sw.Level != mergingLevel && mergingLevel != -1 {
 			// Keep the merged sw.
-			merged := &subword{buf.String(), mergingLevel}
+			merged := &Subword{buf.String(), mergingLevel}
 			subwords = append(subwords, *merged)
 
 			// Open a new one.
 			buf.Reset()
 		}
 
-		buf.WriteString(sw.word)
-		mergingLevel = sw.level
+		buf.WriteString(sw.Word)
+		mergingLevel = sw.Level
 	}
 
-	merged := &subword{buf.String(), mergingLevel}
+	merged := &Subword{buf.String(), mergingLevel}
 	subwords = append(subwords, *merged)
 
 	return subwords
