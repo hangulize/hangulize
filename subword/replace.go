@@ -57,8 +57,8 @@ func (r *Replacer) ReplaceBy(repls ...Replacement) {
 	r.repls = append(r.repls, repls...)
 }
 
-// flush applies the buffered replacements to the SubwordReplacer internal.
-func (r *Replacer) flush() {
+// commit applies the buffered replacements to the SubwordReplacer internal.
+func (r *Replacer) commit() {
 	var buf bytes.Buffer
 	var levels []int
 
@@ -86,19 +86,19 @@ func (r *Replacer) flush() {
 
 	r.word = buf.String()
 	r.levels = levels
-	r.repls = r.repls[:0]
+	r.repls = make([]Replacement, 0)
 }
 
 // String applies the buffered replacements and returns the replaced full word.
 func (r *Replacer) String() string {
-	r.flush()
+	r.commit()
 	return r.word
 }
 
 // Subwords applies the buffered replacements and returns the replaced word as
 // a []Subword array.
 func (r *Replacer) Subwords() []Subword {
-	r.flush()
+	r.commit()
 
 	var subwords []Subword
 
@@ -112,13 +112,13 @@ func (r *Replacer) Subwords() []Subword {
 
 	for i, ch := range r.word {
 		if r.levels[i] != level {
-			subwords = append(subwords, Subword{buf.String(), level})
+			subwords = append(subwords, New(buf.String(), level))
 			level = r.levels[i]
 			buf.Reset()
 		}
 		buf.WriteRune(ch)
 	}
-	subwords = append(subwords, Subword{buf.String(), level})
+	subwords = append(subwords, New(buf.String(), level))
 
 	return subwords
 }

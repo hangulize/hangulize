@@ -7,7 +7,7 @@ type Builder struct {
 	subwords []Subword
 }
 
-// NewBuilder creates a Builder.
+// NewBuilder creates a Builder from subwords.
 func NewBuilder(subwords []Subword) *Builder {
 	return &Builder{subwords}
 }
@@ -21,8 +21,8 @@ func (b *Builder) String() string {
 	return buf.String()
 }
 
-// Append extends the underlying subwords by the given ones.
-func (b *Builder) Append(subwords ...Subword) {
+// Write extends the underlying subwords by the given ones.
+func (b *Builder) Write(subwords ...Subword) {
 	b.subwords = append(b.subwords, subwords...)
 }
 
@@ -48,8 +48,8 @@ func (b *Builder) Subwords() []Subword {
 	for _, sw := range b.subwords {
 		if sw.Level != mergingLevel && mergingLevel != -1 {
 			// Keep the merged sw.
-			merged := &Subword{buf.String(), mergingLevel}
-			subwords = append(subwords, *merged)
+			merged := New(buf.String(), mergingLevel)
+			subwords = append(subwords, merged)
 
 			// Open a new one.
 			buf.Reset()
@@ -59,8 +59,8 @@ func (b *Builder) Subwords() []Subword {
 		mergingLevel = sw.Level
 	}
 
-	merged := &Subword{buf.String(), mergingLevel}
-	subwords = append(subwords, *merged)
+	merged := New(buf.String(), mergingLevel)
+	subwords = append(subwords, merged)
 
 	return subwords
 }
