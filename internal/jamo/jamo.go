@@ -16,8 +16,6 @@ import (
 	"github.com/suapapa/go_hangul"
 )
 
-const none = rune(0)
-
 // ComposeHangul converts decomposed Jamo phonemes to composed Hangul
 // syllables.
 //
@@ -26,46 +24,34 @@ const none = rune(0)
 //
 func ComposeHangul(word string) string {
 	r := bufio.NewReader(strings.NewReader(word))
-	var buf bytes.Buffer
+	c := composer{r: bufio.NewReader(r)}
+	return c.Compose()
+}
 
-	var lmt [3]rune // [lead, medial, tail]
-	const (
-		lead   = 0
-		medial = 1
-		tail   = 2
-	)
+const (
+	lead   = 0
+	medial = 1
+	tail   = 2
+)
 
-	prevScore := -1
-	score := -1
+// composer is a state machine which converts decomposed Jamo phonemes to
+// composed Hangul syllables.
+type composer struct {
+	r   *bufio.Reader
+	buf bytes.Buffer // The output buffer.
+	lmt [3]rune      // Buffered Jamos. [lead, medial. tail]
+}
 
+// read consumes 1 character. If the character is a tail Jamo, the second bool
+// return value will be set as true.
+func (c *composer) read() (rune, bool, error) {
 	isTail := false
 
-	writeLetter := func() {
-		if lmt[0] == none && lmt[1] == none && lmt[2] == none {
-			return
-		}
-
-		// Fill missing Jamo.
-		if lmt[0] == none {
-			lmt[0] = 'ㅇ'
-		}
-		if lmt[1] == none {
-			lmt[1] = 'ㅡ'
-		}
-
-		// Complete a letter.
-		letter := hangul.Join(lmt[0], lmt[1], lmt[2])
-		buf.WriteRune(letter)
-
-		// Clear.
-		lmt[0], lmt[1], lmt[2] = none, none, none
-	}
-
 	for {
-		ch, _, err := r.ReadRune()
+		ch, _, err := c.r.ReadRune()
 
 		if err != nil {
-			break
+			return 0, false, err
 		}
 
 		// Hyphen is the prefix of a tail Jaeum.
@@ -75,64 +61,123 @@ func ComposeHangul(word string) string {
 			continue
 		}
 
-		if !hangul.IsHangul(ch) {
+		return ch, isTail, nil
+	}
+}
+
+// write writes a composed Hangul from the buffered Jamos into the output
+// buffer.
+func (c *composer) write() {
+	if c.lmt == [3]rune{} {
+		return
+	}
+
+	// Fill missing Jamo.
+	if c.lmt[lead] == 0 {
+		c.lmt[lead] = 'ㅇ'
+	}
+	if c.lmt[medial] == 0 {
+		c.lmt[medial] = 'ㅡ'
+	}
+
+	// Complete a letter.
+	letter := hangul.Join(c.lmt[lead], c.lmt[medial], c.lmt[tail])
+	c.buf.WriteRune(letter)
+
+	// Clear.
+	c.lmt = [3]rune{}
+}
+
+// Compose converts decomposed Jamo phonemes to composed Hangul syllables.
+func (c *composer) Compose() string {
+	var (
+		ch     rune
+		isTail bool
+		err    error
+	)
+
+	var isHangul, isMoeum, isComposed bool
+
+	// Score values can be -1 for non-Hangul,
+	// 0 for leads, 1 for medials, and 2 for tails.
+	var score, prevScore int
+
+	for {
+		prevScore = score
+
+		ch, isTail, err = c.read()
+
+		if err != nil {
+			break
+		}
+
+		isHangul, _, isMoeum, isComposed = analyzeHangul(ch)
+
+		// Non-Hangul
+		if !isHangul {
 			if prevScore != -1 {
-				writeLetter()
+				c.write()
 			}
 
-			buf.WriteRune(ch)
+			c.buf.WriteRune(ch)
 			prevScore = -1
+
 			continue
 		}
 
-		isJaeum := hangul.IsJaeum(ch)
-		isMoeum := hangul.IsMoeum(ch)
+		// Composed Hangul
+		if isComposed {
+			c.write()
 
-		if !isJaeum && !isMoeum {
-			// Composed Hangul.
-			writeLetter()
+			// Decompose it to merge with a tail later.
+			c.lmt[lead], c.lmt[medial], c.lmt[tail] = hangul.Split(ch)
 
-			lmt[0], lmt[1], lmt[2] = hangul.Split(ch)
-
-			if lmt[2] == none {
+			if c.lmt[tail] == 0 {
 				score = medial
 			} else {
 				score = tail
 			}
-		} else {
-			// Decomposed Jamo.
-			switch true {
 
-			case isJaeum:
-				if isTail {
-					score = tail
-				} else {
-					score = lead
-				}
-
-			case isMoeum:
-				score = medial
-
-			}
-
-			// Write a letter.
-			if score <= prevScore {
-				writeLetter()
-			}
-
-			if score != -1 {
-				lmt[score] = ch
-			}
+			continue
 		}
 
-		prevScore = score
-		isTail = false
+		// Decomposed Jamo
+		if isMoeum {
+			score = medial
+		} else if isTail {
+			score = tail
+		} else {
+			score = lead
+		}
+
+		// If cursor should be moved forward, flush the buffered letter.
+		if score <= prevScore {
+			c.write()
+		}
+
+		// Buffer the Jamo.
+		if score != -1 {
+			c.lmt[score] = ch
+		}
 	}
 
 	// Write the final letter.
 	if prevScore != -1 {
-		writeLetter()
+		c.write()
 	}
 
-	return buf.String()
+	return c.buf.String()
+}
+
+// analyzeHangul analyzes a Hangul character to check if it is a Jaeum, a
+// Moeum, or a composed Hangul.
+func analyzeHangul(ch rune) (isHangul, isJaeum, isMoeum, isComposed bool) {
+	isHangul = hangul.IsHangul(ch)
+	if !isHangul {
+		return
+	}
+	isJaeum = hangul.IsJaeum(ch)
+	isMoeum = hangul.IsMoeum(ch)
+	isComposed = !isJaeum && !isMoeum
+	return
 }
