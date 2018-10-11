@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	goJyutping "github.com/sublee/go-jyutping"
+	"golang.org/x/text/unicode/norm"
 )
 
 // P is the Jyutping phonemizer.
@@ -23,6 +24,10 @@ func (jyutpingPhonemizer) ID() string {
 }
 
 func (p *jyutpingPhonemizer) Phonemize(word string) string {
+	// Normalize into CJK unified ideographs.
+	word = norm.NFC.String(word)
+
+	// Pick Jyutping.
 	var chunks []string
 	var buf bytes.Buffer
 
