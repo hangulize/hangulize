@@ -10,11 +10,6 @@ config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
     stage  = "draft"
 
-vars:
-    jqx   = "j", "q", "x"
-    nojqx = "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "r", "z", "c", "s"
-    J     = "j", "q", "zh", "ch", "c"
-
 rewrite:
     # Collapse vowel differences that are ignored in Hangul transcription.
     "aa" -> "a"
@@ -50,12 +45,12 @@ transcribe:
     "u"  -> "ㅜ"
 
     # 종성
-    "m,"  -> "-ㅁ"
-    "ng," -> "-ㅇ"
-    "n,"  -> "-ㄴ"
-    "p,"  -> "-ㅂ"
-    "t,"  -> "-ㅅ"
-    "k,"  -> "-ㄱ"
+    "m$"  -> "-ㅁ"
+    "ng$" -> "-ㅇ"
+    "n$"  -> "-ㄴ"
+    "p$"  -> "-ㅂ"
+    "t$"  -> "-ㅅ"
+    "k$"  -> "-ㄱ"
 
     # 성모
     "ng" -> "ㅇ"
