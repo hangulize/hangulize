@@ -282,3 +282,5 @@ test:
     "Находка"      -> "나홋카"
     "Бенедиктов"   -> "베네딕토프"
 
+    # Combining Acute Accent (U+0301) should be removed.
+    "Алекса́ндр"    -> "알렉사느드르"

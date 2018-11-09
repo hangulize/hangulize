@@ -17,6 +17,11 @@ func TestComposeHangulOnComposed(t *testing.T) {
 	assert.Equal(t, "한글라이즈", ComposeHangul("하-ㄴ글ㄹㅏ이ㅈ"))
 }
 
+func TestComposeHangulNonHangul(t *testing.T) {
+	assert.Equal(t, "Hello, world", ComposeHangul("Hello, world"))
+	assert.Equal(t, "안녕, world", ComposeHangul("ㅇㅏ-ㄴㄴㅕ-ㅇ, world"))
+}
+
 // -----------------------------------------------------------------------------
 // Benchmarks
 
