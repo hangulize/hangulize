@@ -366,11 +366,15 @@ func (p pipeline) transliterate(word string) string {
 	last := len(chars) - 1
 
 	// Pre-evaluate punct or space classification.
-	isPunct := make(map[int]bool)
-	isSpace := make(map[int]bool)
+	var (
+		isPunct = make(map[int]bool)
+		isSpace = make(map[int]bool)
+		isMark  = make(map[int]bool)
+	)
 	for i, ch := range chars {
 		isPunct[i] = unicode.IsPunct(ch)
 		isSpace[i] = unicode.IsSpace(ch)
+		isMark[i] = unicode.IsMark(ch)
 	}
 	isSpace[-1] = true
 	isSpace[last+1] = true
@@ -380,6 +384,11 @@ func (p pipeline) transliterate(word string) string {
 	for i, ch := range chars {
 		// Skip ZWSP.
 		if ch == '\u200B' {
+			continue
+		}
+
+		// Skip marks.
+		if isMark[i] {
 			continue
 		}
 
