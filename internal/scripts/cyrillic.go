@@ -10,7 +10,7 @@ type Cyrillic struct{}
 
 // Is checks whether the character is Cyrillic or not.
 func (Cyrillic) Is(ch rune) bool {
-	return unicode.Is(unicode.Cyrillic, ch)
+	return unicode.Is(unicode.Cyrillic, ch) || unicode.IsMark(ch)
 }
 
 // Normalize converts character into lower case.
