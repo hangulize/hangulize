@@ -25,7 +25,8 @@ rewrite:
     "{<jqx>}uan"  -> "yuan"
     "{<jqx>}un"   -> "yun"
     "{<jqx>}u"    -> "yu"
-    "{<jqx>}iong" -> "yong"
+
+    "{<jqx>|<nojqx>}iong" -> "yong"
 
     "{<jqx>|<nojqx>}iao"   -> "yao"
     "{<jqx>|<nojqx>}iang"  -> "yang"
@@ -52,11 +53,10 @@ rewrite:
     "r$" -> "r,"
 
 transcribe:
-    # 촬구류
+    # 촬구류(yong/-iong 제외)
     "yue"   -> "ㅞ"
     "yuan"  -> "ㅟ안"
     "yun,?" -> "ㅟ-ㄴ"
-    "yong"  -> "ㅠ-ㅇ"
 
     # 단운
     "yu" -> "ㅟ"
@@ -76,7 +76,8 @@ transcribe:
     "wei" -> "ㅞ이"
     "ui"  -> "ㅜ이"
 
-    # 제치류
+    # 제치류(yong/-iong 추가)
+    "{<J>}yong" -> "ㅜ-ㅇ"
     "{<J>}yang" -> "ㅏ-ㅇ"
     "{<J>}yan"  -> "ㅔ-ㄴ"
     "{<J>}you"  -> "ㅜ"
@@ -86,6 +87,7 @@ transcribe:
     "{<J>}yo"   -> "ㅗ"
     "{<J>}ye"   -> "ㅔ"
 
+    "yong"  -> "ㅠ-ㅇ"
     "yang"  -> "ㅑ-ㅇ"
     "yan,?" -> "ㅖ-ㄴ"
     "ying"  -> "ㅣ-ㅇ"
@@ -179,6 +181,7 @@ test:
     "周星馳" -> "저우싱츠"
     "周润发" -> "저우룬파"
     "王祖賢" -> "왕쭈셴"
+    "蒋琼耳" -> "장충얼"
 
     # Place names
     "靑島"     -> "칭다오"
