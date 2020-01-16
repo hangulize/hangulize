@@ -10,6 +10,8 @@ install:
 
 script:
 - go test ./...
+- go generate
+- git diff --exit-code
 
 after_success:
 - |
