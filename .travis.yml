@@ -1,9 +1,11 @@
 language: go
 
 go:
-- '1.9.x' # for Google App Engine Standard Environment and Heroku
+- '1.9.x'
 - '1.10.x'
 - '1.11.x'
+- '1.12.x' # for Google App Engine Standard Environment and Heroku
+- '1.13.x'
 
 install:
 - go get -v -t ./...
