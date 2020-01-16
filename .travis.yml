@@ -36,18 +36,18 @@ deploy:
   skip_cleanup: true
   on:
     tags: true
-    go: '1.11.x'
+    go: '1.12.x'
 
 - provider: script
   script: .ci/propagate -r api.hangulize.org -t "$TRAVIS_TAG"
   skip_cleanup: true
   on:
     tags: true
-    go: '1.9.x'
+    go: '1.12.x'
 
 - provider: script
   script: .ci/propagate -r phonemize.herokuapp.com -d -b 'master'
   skip_cleanup: true
   on:
     tags: true
-    go: '1.9.x'
+    go: '1.12.x'
