@@ -13,7 +13,7 @@ import (
 	"bytes"
 	"strings"
 
-	"github.com/suapapa/go_hangul"
+	hangul "github.com/suapapa/go_hangul"
 )
 
 // ComposeHangul converts decomposed Jamo phonemes to composed Hangul
@@ -23,8 +23,9 @@ import (
 // after a hyphen ("-ㄴ") means that it is a Jongseong (tail).
 //
 func ComposeHangul(word string) string {
-	r := bufio.NewReader(strings.NewReader(word))
-	c := composer{r: bufio.NewReader(r)}
+	c := composer{
+		r: bufio.NewReader(strings.NewReader(word)),
+	}
 	return c.Compose()
 }
 
