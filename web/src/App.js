@@ -1,5 +1,5 @@
 import React from 'react'
-import logo from './logo.svg'
+import Select from 'react-select'
 import './App.css'
 
 class App extends React.Component {
@@ -66,7 +66,12 @@ class App extends React.Component {
     return (
       <div className="App">
         <p>Version: {this.state.version}</p>
-        <Hangulize lang="ita" word="cappuccino" hangulize={this.hangulize.bind(this)} />
+        <Hangulize
+          lang="ita"
+          word="cappuccino"
+          hangulize={this.hangulize.bind(this)}
+          specs={this.state.specs}
+        />
       </div>
     )
   }
@@ -75,6 +80,7 @@ class App extends React.Component {
 class Hangulize extends React.Component {
   static defaultProps = {
     hangulize: (lang, word) => { return word },
+    specs: [],
     lang: 'ita',
     word: '',
     result: '',
@@ -84,10 +90,26 @@ class Hangulize extends React.Component {
     lang: '',
     word: '',
     result: '',
+    specs: [
+      {lang: {code3: 'aze', english: 'Azerbaijani', korean: '아제르바이잔어'}},
+    ],
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      specs: nextProps.specs,
+      lang: nextProps.lang,
+      word: nextProps.word,
+    })
   }
 
   async componentDidMount() {
-    this.setState({lang: this.props.lang, word: this.props.word})
+    this.setState({
+      specs: this.props.specs,
+      lang: this.props.lang,
+      word: this.props.word,
+    })
+
     if (this.props.result === '') {
       await this.hangulizeSoon()
     } else {
@@ -95,8 +117,8 @@ class Hangulize extends React.Component {
     }
   }
 
-  async handleChangeLang(e) {
-    this.setState({lang: e.target.value})
+  async handleChangeLang(opt) {
+    this.setState({lang: opt.value})
     await this.hangulizeSoon()
   }
 
@@ -114,7 +136,13 @@ class Hangulize extends React.Component {
   render() {
     return (
       <div>
-        <input type="text" defaultValue={this.props.lang} onChange={this.handleChangeLang.bind(this)} />
+        <Select
+          defaultValue={this.props.lang}
+          options={this.state.specs.map((s) => {
+            return {value: s.lang.code3, label: s.lang.korean}
+          })}
+          onChange={this.handleChangeLang.bind(this)}
+        />
         <input type="text" defaultValue={this.props.word} onChange={this.handleChangeWord.bind(this)} />
         <p>{this.state.result}</p>
       </div>
