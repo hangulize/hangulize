@@ -7,29 +7,6 @@ function specOption(spec) {
   return {key: spec.lang.id, value: spec.lang.id, flag: Flags[spec.lang.code3], text: spec.lang.korean}
 }
 
-function formatOptionLabel(opt, meta) {
-  switch (meta.context) {
-    case 'value':
-      return (
-        <div>
-          <span class="flag">{Flags[opt.code]}</span>
-          &nbsp;
-          <code>{opt.code.toUpperCase()}</code>
-        </div>
-      )
-    case 'menu':
-      return (
-        <div>
-          <span class="flag">{Flags[opt.code]}</span>
-          &nbsp;
-          <code>{opt.code.toUpperCase()}</code>
-          &nbsp;
-          {opt.label}
-        </div>
-      )
-  }
-}
-
 class Prompt extends React.Component {
   hangulizing = false
 
@@ -42,6 +19,7 @@ class Prompt extends React.Component {
     readOnly: false,
     onChangeLang: (lang, prevLang) => {},
     onChangeWord: (word, prevWord) => {},
+    onHangulize: (result) => {},
   }
 
   state = {
@@ -146,6 +124,7 @@ class Prompt extends React.Component {
 
     let result = await this.props.hangulize(this.state.lang, word)
     this.setState({result: result, loading: false})
+    this.props.onHangulize(result)
 
     clearTimeout(deferredLoading)
   }
@@ -163,29 +142,20 @@ class Prompt extends React.Component {
       />
     )
 
-    let result = ''
-    if (this.state.result !== '') {
-      result = (
-        <Label pointing="left" size="big">{this.state.result}</Label>
-      )
-    }
-
     return (
-      <Container fluid className="prompt">
-        <Input
-          className="word"
-          readOnly={this.state.readOnly}
-          transparent={this.state.readOnly}
-          loading={this.state.loading}
-          actionPosition="left"
-          action={dropdown}
-          placeholder="외래어 단어"
-          value={this.props.word}
-          onChange={this.handleChangeWord.bind(this)}
-          size="large"
-        />
-        {result}
-      </Container>
+      <Input
+        className="word"
+        fluid
+        readOnly={this.state.readOnly}
+        transparent={this.state.readOnly}
+        loading={this.state.loading}
+        actionPosition="left"
+        action={dropdown}
+        placeholder="외래어 단어"
+        value={this.props.word}
+        onChange={this.handleChangeWord.bind(this)}
+        size="large"
+      />
     )
   }
 }

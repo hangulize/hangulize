@@ -1,13 +1,26 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { Link, useSearchParams } from 'react-router-dom'
+import {
+  Form,
+  Message,
+  Image,
+  Placeholder,
+  Container,
+  Dimmer,
+  Divider,
+  Grid,
+  Header,
+  Loader,
+  Segment,
+} from 'semantic-ui-react'
 import _ from 'underscore'
-import { useSearchParams, Link } from 'react-router-dom'
-import DefaultSpecs from './hangulize-specs'
-import './Hangulize.css'
-import { Container, Dimmer, Divider, Grid, Header, Loader, Segment } from 'semantic-ui-react'
-import Prompt from './Prompt'
+import Copyright from './Copyright'
 import Examples from './Examples'
-import Hangulizer from './hangulize'
+import Hangulizer from './Hangulizer'
+import Prompt from './Prompt'
+import DefaultSpecs from './hangulize-specs'
 import { getSpec } from './util'
+import Logo from './logo.svg'
 
 function App() {
   const [version, setVersion] = useState('')
@@ -22,7 +35,7 @@ function App() {
   const hangulizer = useRef(null)
   if (hangulizer.current === null) {
     hangulizer.current = new Hangulizer((hangulizer, version, specs) => {
-      setVersion(version)
+      setVersion('v' + version)
       setSpecs(specs)
       setHangulize(() => hangulizer.hangulize.bind(hangulizer))
     })
@@ -50,29 +63,50 @@ function App() {
     setWord(word)
   }
 
+  const [result, setResult] = useState('')
+
+  useEffect(() => {
+    if (word) {
+      document.title = `한글라이즈: ${word}`
+    } else {
+      document.title = '한글라이즈'
+    }
+  })
+
   return (
-    <Container fluid className="Hangulize">
-      <Header>한글라이즈</Header>
-      <p>{version}</p>
-      <Prompt
-        hangulize={hangulize}
-        specs={specs}
-        lang={lang}
-        word={word}
-        onChangeLang={setLang}
-        onChangeWord={setWord}
-      />
-      <Examples
-        specs={specs}
-        lang={lang}
-      />
+    <Container text className="Hangulize">
+      <Header>
+        <Image src={Logo} />
+        <Header.Content>
+          한글라이즈
+          <Header.Subheader>
+            {version ? version : '불러오는 중...'}
+          </Header.Subheader>
+        </Header.Content>
+      </Header>
+
+      <Form>
+        <Form.Field>
+          <Prompt
+            hangulize={hangulize}
+            specs={specs}
+            lang={lang}
+            word={word}
+            onChangeLang={setLang}
+            onChangeWord={setWord}
+            onHangulize={setResult}
+          />
+        </Form.Field>
+        <Form.Field>
+          <Examples specs={specs} lang={lang} />
+        </Form.Field>
+        <Form.Field>
+          {result ? <Message size="massive">{result}</Message> : ''}
+        </Form.Field>
+      </Form>
+
       <Divider />
-      <p>
-        &copy; 2010–2018{' '}
-        <a href="https://www.facebook.com/kkeutsori">Brian</a> &amp;{' '}
-        <a href="https://subl.ee/">Heungsub</a>.{' '}
-        All rights reserved.
-      </p>
+      <Copyright />
     </Container>
   )
 }
