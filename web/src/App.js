@@ -15,7 +15,6 @@ import Hangulizer from './Hangulizer'
 import Prompt from './Prompt'
 import DefaultSpecs from './hangulize-specs'
 import { getSpec } from './util'
-import Logo from './logo.svg'
 
 function useHangulize({
   onInitialize = (version, specs) => null,
@@ -142,7 +141,7 @@ function App() {
   return (
     <Container text className="Hangulize">
       <Header>
-        <Image src={Logo} />
+        <Image src={process.env.PUBLIC_URL + '/logo.svg'} />
         <Header.Content>
           한글라이즈
           <Header.Subheader>

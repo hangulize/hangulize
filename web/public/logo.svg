@@ -10,7 +10,7 @@
   <rect fill="#000" width="32" height="76" x="120" y="0" rx="4" />
   <mask id="mask">
     <rect fill="#fff" width="160" height="160" />
-    <circle fill="#000" r="16" cx="116" cy="122" />
+    <circle fill="#000" r="12" cx="116" cy="122" />
   </mask>
   <rect fill="#000" width="72" height="76" x="80" y="84" rx="4" mask="url(#mask)" />
 </svg>
