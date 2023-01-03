@@ -25,6 +25,10 @@ class Hangulizer {
 
         this.resolvers[nonce](msg.data.result)
         delete this.resolvers[nonce]
+        break
+
+      default:
+        throw new Error(`unexpected method from worker: ${msg.data.method}`)
     }
   }
 

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Button, Dropdown, Input } from 'semantic-ui-react'
+import { Dropdown, Input } from 'semantic-ui-react'
 import _ from 'underscore'
 import Flags from './flags'
 
