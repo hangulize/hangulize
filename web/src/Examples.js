@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Container, Button, Form, Icon, Label } from 'semantic-ui-react'
+import { Container, Form, Icon, Label } from 'semantic-ui-react'
 import _ from 'underscore'
 import { getSpec } from './util'
 
@@ -17,8 +17,7 @@ function Examples({ specs, lang, onClick }) {
 
   return (
     <Container className="examples">
-      <label>예시</label>
-      <Button basic compact size="mini" icon="shuffle" onClick={shuffle} />
+      <label>예시</label> <Icon name="shuffle" link onClick={shuffle} />
       {examples.map((x, i) => {
         return (
           <Label as={Link} to={`?lang=${lang}&word=${x.word}`} key={i}>

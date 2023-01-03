@@ -1,5 +1,5 @@
 class Hangulizer {
-  constructor(onInitialize = (h, v, s) => {}) {
+  constructor(onInitialize = (v, s) => {}) {
     this.worker = new Worker('hangulize.worker.js')
     this.worker.addEventListener('message', this.handleMessage.bind(this))
     this.resolvers = {}
@@ -12,8 +12,8 @@ class Hangulizer {
 
     switch (msg.data.method) {
       case 'initialized':
-        this.onInitialize(this, msg.data.version, msg.data.specs)
         this.initialized = true
+        this.onInitialize(msg.data.version, msg.data.specs)
         break
 
       case 'hangulized':
