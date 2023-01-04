@@ -81,15 +81,18 @@ function App() {
   const word = searchParams.get('word')
 
   useEffect(() => {
+    let redirect = false
     if (!searchParams.has('lang')) {
       searchParams.set('lang', lang)
-      setSearchParams(searchParams)
+      redirect = true
     }
-
     if (!searchParams.has('word')) {
       const randomWord = _.sample(getSpec(specs, lang).test, 1)[0].word
       searchParams.set('word', randomWord)
-      setSearchParams(searchParams)
+      redirect = true
+    }
+    if (redirect) {
+      setSearchParams(searchParams, {replace: true})
     }
 
     if (word) {
@@ -102,7 +105,7 @@ function App() {
   const handleChange = async (lang, word) => {
     searchParams.set('lang', lang)
     searchParams.set('word', word)
-    setSearchParams(searchParams)
+    setSearchParams(searchParams, {replace: true})
   }
 
   const hangulize = useHangulize({
