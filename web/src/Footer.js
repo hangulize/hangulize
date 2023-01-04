@@ -1,6 +1,6 @@
 import { Grid, Icon } from 'semantic-ui-react'
 
-function Copyright({ year }) {
+function Footer({ year }) {
   if (year === undefined) {
     year = new Date().getFullYear()
   }
@@ -10,12 +10,11 @@ function Copyright({ year }) {
   const github = 'https://github.com/hangulize/hangulize'
 
   return (
-    <Grid className="copyright">
+    <Grid className="footer">
       <Grid.Column floated="left" width={14}>
         &copy; 2010–{year}{' '}
         <a href={brian} target="_blank" rel="noreferrer">Brian</a> &amp;{' '}
-        <a href={heungsub} target="_blank" rel="noreferrer">Heungsub</a>.{' '}
-        All rights reserved.
+        <a href={heungsub} target="_blank" rel="noreferrer">Heungsub</a>
       </Grid.Column>
       <Grid.Column floated="right" width={2} align="right">
         <a href={github} target="_blank" rel="noreferrer">
@@ -26,4 +25,4 @@ function Copyright({ year }) {
   )
 }
 
-export default Copyright
+export default Footer

@@ -3,14 +3,14 @@ import { useSearchParams } from 'react-router-dom'
 import {
   Container,
   Divider,
-  Form,
   Header,
   Image,
   Message,
 } from 'semantic-ui-react'
 import _ from 'underscore'
-import Copyright from './Copyright'
+import Description from './Description'
 import Examples from './Examples'
+import Footer from './Footer'
 import Hangulizer from './Hangulizer'
 import Prompt from './Prompt'
 import DefaultSpecs from './hangulize-specs'
@@ -147,32 +147,27 @@ function App() {
         <Image src={process.env.PUBLIC_URL + '/logo.svg'} />
         <Header.Content>
           한글라이즈
-          <Header.Subheader>
-            {version ? version : '불러오는 중...'}
+          <Header.Subheader className="version">
+            {version ? <span>{version}</span> : '불러오는 중...'}
           </Header.Subheader>
         </Header.Content>
       </Header>
 
-      <Form>
-        <Form.Field>
-          <Prompt
-            specs={specs}
-            lang={lang}
-            word={word}
-            loading={loading}
-            onChange={handleChange}
-          />
-        </Form.Field>
-        <Form.Field>
-          <Examples specs={specs} lang={lang} />
-        </Form.Field>
-        <Form.Field>
-          {result ? <Message size="massive">{result}</Message> : ''}
-        </Form.Field>
-      </Form>
+      <Prompt
+        specs={specs}
+        lang={lang}
+        word={word}
+        loading={loading}
+        onChange={handleChange}
+      />
+      <Examples specs={specs} lang={lang} />
+      {result ?
+        <Message size="massive" className="result">{result}</Message>
+      : ''}
 
+      <Description />
       <Divider />
-      <Copyright />
+      <Footer />
     </Container>
   )
 }
