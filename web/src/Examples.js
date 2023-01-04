@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
 import _ from 'underscore'
@@ -13,7 +13,14 @@ function Examples({ specs, lang, onClick }) {
       setExamples(_.sample(spec.test, 5))
     }
   }
-  useEffect(shuffle, [specs, lang])
+
+  const prevLang = useRef(null)
+  useEffect(() => {
+    if (prevLang.current !== lang) {
+      shuffle()
+    }
+    prevLang.current = lang
+  })
 
   return (
     <Container className="examples">
