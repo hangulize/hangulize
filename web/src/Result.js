@@ -1,6 +1,5 @@
 import _ from 'lodash'
-import Hangul from 'hangul-js'
-import { useState, useEffect, useLayoutEffect, useRef } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 import './Result.css'
 
 function Result({

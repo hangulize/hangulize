@@ -1,13 +1,7 @@
 import _ from 'lodash'
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import {
-  Container,
-  Divider,
-  Header,
-  Image,
-  Message,
-} from 'semantic-ui-react'
+import { Container, Divider, Header, Image } from 'semantic-ui-react'
 import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
