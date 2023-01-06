@@ -8,6 +8,7 @@
     "@testing-library/user-event": "^13.5.0",
     "fuse.js": "^6.6.2",
     "hangul-js": "^0.2.6",
+    "lodash": "^4.17.21",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.5.0",
@@ -15,7 +16,6 @@
     "react-select": "^5.7.0",
     "semantic-ui-less": "^2.5.0",
     "semantic-ui-react": "^2.1.4",
-    "underscore": "^1.13.6",
     "web-vitals": "^2.1.4"
   },
   "scripts": {

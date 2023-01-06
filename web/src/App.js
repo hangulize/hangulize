@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import {
@@ -7,7 +8,6 @@ import {
   Image,
   Message,
 } from 'semantic-ui-react'
-import _ from 'underscore'
 import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
@@ -78,7 +78,7 @@ function App() {
 
   // Sync lang and word with search parameters.
   const [searchParams, setSearchParams] = useSearchParams()
-  const lang = searchParams.get('lang') || _.sample(specs, 1)[0].lang.id
+  const lang = searchParams.get('lang') || _.sampleSize(specs, 1)[0].lang.id
   const word = searchParams.get('word')
 
   useEffect(() => {

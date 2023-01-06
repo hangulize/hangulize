@@ -1,7 +1,7 @@
+import _ from 'lodash'
 import React, { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
-import _ from 'underscore'
 import { getSpec } from './util'
 
 function Examples({ specs, lang, onClick }) {
@@ -10,7 +10,7 @@ function Examples({ specs, lang, onClick }) {
   const shuffle = () => {
     const spec = getSpec(specs, lang)
     if (spec !== null) {
-      setExamples(_.sample(spec.test, 5))
+      setExamples(_.sampleSize(spec.test, 5))
     }
   }
 

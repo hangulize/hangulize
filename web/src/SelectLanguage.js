@@ -1,8 +1,8 @@
+import _ from 'lodash'
 import Fuse from 'fuse.js'
 import Hangul from 'hangul-js'
 import React, { useEffect, useRef, useState } from 'react'
 import { Dropdown } from 'semantic-ui-react'
-import _ from 'underscore'
 import Flags from './flags'
 
 function SelectLanguage({
