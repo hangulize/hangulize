@@ -56,7 +56,7 @@ function Result({
 
   return (
     <div className="result">
-      <p ref={p} style={{fontSize: `${zoom}em`}}>{children}</p>
+      <p ref={p} style={{fontSize: `${zoom}em`}}>{children.trim()}</p>
     </div>
   )
 }
