@@ -1,59 +1,58 @@
+import _ from 'lodash'
 import Hangul from 'hangul-js'
-import { useState, useLayoutEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import './Result.css'
 
 function Result({
   children = '',
 }) {
-  const [ zoom, setZoom ] = useState(1)
-  const maxZoom = 1
   const minZoom = 0.5
+  const maxZoom = 1
+  const lo = useRef(minZoom)
+  const hi = useRef(maxZoom)
+  const [ zoom, setZoom ] = useState(maxZoom)
 
+  // Start a binary search to find the best zoom.
+  const reset = () => {
+    lo.current = minZoom
+    hi.current = maxZoom
+  }
+
+  // Do a binary search before rendering to a user.
   const p = useRef()
-  const prevLength = useRef(0)
-  const prevWidth = useRef(0)
+  const update = () => {
+    if (!p.current || !p.current.firstChild) {
+      return
+    }
 
-  const updateSize = () => {
-    if (p.current) {
-      if (p.current.childNodes.length === 0) {
-        return
-      }
+    // Detect the number of rendered lines.
+    const textNode = p.current.firstChild
+    const range = document.createRange()
+    range.setStart(textNode, 0)
+    range.setEnd(textNode, textNode.length)
+    const lines = range.getClientRects().length
 
-      // Make range to detect the number of rendered lines.
-      const range = document.createRange()
-      const textNode = p.current.firstChild
-      range.setStart(textNode, 0)
-      range.setEnd(textNode, textNode.length)
-
-      const lines = range.getClientRects().length
-      const length = textNode.length
-      const width = document.body.offsetWidth
-
+    if (lines > 1) {
       // Try to size down on two or more lines.
-      if (lines > 1) {
-        console.log('down')
-        setZoom(Math.max(minZoom, zoom * 0.99))
-        prevLength.current = length
-        return
-      }
-
-      // Try to size up on the text has been shrunken.
-      if (length < prevLength.current || width > prevWidth.current) {
-        console.log('up')
-        setZoom(Math.min(maxZoom, zoom / 0.99))
-        prevWidth.current = width
-        return
-      }
-
-      prevLength.current = length
-      prevWidth.current = width
+      hi.current = zoom
+      setZoom(_.floor((zoom - lo.current) / 2 + lo.current, 2))
+    } else if (hi.current - lo.current > 0.011) {
+      // Try to size up if there's still a room.
+      lo.current = zoom
+      setZoom(_.ceil((hi.current - zoom) / 2 + zoom, 2))
     }
   }
 
+  useLayoutEffect(reset, [children])
   useLayoutEffect(() => {
-    updateSize()
-    window.addEventListener('resize', updateSize)
-    return () => window.removeEventListener('resize', updateSize)
+    update()
+
+    const resetAndUpdate = () => {
+      reset()
+      update()
+    }
+    window.addEventListener('resize', resetAndUpdate)
+    return () => window.removeEventListener('resize', resetAndUpdate)
   })
 
   return (
