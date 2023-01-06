@@ -8,13 +8,12 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.examples .label {
-  margin-bottom: 0.25rem;
+.examples {
+  font-size: 1rem;
 }
 
-.result {
-  margin-top: 0.75rem !important;
-  margin-bottom: 1rem !important;
+.examples .label {
+  margin-bottom: 0.25rem;
 }
 
 .description {

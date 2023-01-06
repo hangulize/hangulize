@@ -1,0 +1,37 @@
+.result {
+  position: relative;
+  margin: 0.75rem 0 1rem;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 8rem;
+}
+
+.result p {
+  display: inline-block;
+  text-align: left;
+  margin: 1rem 3rem;
+  line-height: 1.2;
+  font-size: 5rem;
+}
+
+.result p::before,
+.result p::after {
+  position: absolute;
+  margin-top: -0.5rem;
+  color: #49e;
+  font-size: 1.2em;
+  width: 1em;
+  margin-left: -0.5em;
+}
+
+.result p::before {
+  content: '“';
+  text-align: left;
+}
+
+.result p::after {
+  content: '”';
+  text-align: right;
+}

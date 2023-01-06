@@ -13,6 +13,7 @@ import Examples from './Examples'
 import Footer from './Footer'
 import Hangulizer from './Hangulizer'
 import Prompt from './Prompt'
+import Result from './Result'
 import DefaultSpecs from './hangulize-specs'
 import { getSpec } from './util'
 
@@ -143,7 +144,7 @@ function App() {
 
   return (
     <Container text className="Hangulize">
-      <Header>
+      <Header as='h1'>
         <Image src={process.env.PUBLIC_URL + '/logo.svg'} />
         <Header.Content>
           한글라이즈
@@ -161,9 +162,8 @@ function App() {
         onChange={handleChange}
       />
       <Examples specs={specs} lang={lang} />
-      {result ?
-        <Message size="massive" className="result">{result}</Message>
-      : ''}
+
+      {result ? <Result>{result}</Result> : <></>}
 
       <Description />
       <Divider />
