@@ -72,7 +72,7 @@ function App() {
 
   // Sync lang and word with search parameters.
   const [searchParams, setSearchParams] = useSearchParams()
-  const lang = searchParams.get('lang') || _.sampleSize(specs, 1)[0].lang.id
+  const lang = searchParams.get('lang') || _.sample(specs).lang.id
   const word = searchParams.get('word')
 
   useEffect(() => {
@@ -82,7 +82,7 @@ function App() {
       redirect = true
     }
     if (!searchParams.has('word')) {
-      const randomWord = _.sample(getSpec(specs, lang).test, 1)[0].word
+      const randomWord = _.sample(getSpec(specs, lang).test).word
       searchParams.set('word', randomWord)
       redirect = true
     }
