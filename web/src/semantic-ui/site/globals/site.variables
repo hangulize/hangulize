@@ -28,7 +28,7 @@
 @loaderLineColor : @hangulizeBlue;
 
 /* GitHub icon color */
-@grey : @hangulizeGrayDarker;
+@grey : @hangulizeBrownQuieter;
 
 @headerFont     : 'Noto Sans KR', sans-serif;
 @pageFont       : 'Noto Sans KR', sans-serif;
