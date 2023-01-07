@@ -1,11 +1,11 @@
 import _ from 'lodash'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
 import { getSpec } from './util'
 
 function Examples({ specs, lang, onClick }) {
-  const [examples, setExamples] = useState([])
+  const [ examples, setExamples ] = useState([])
 
   const shuffle = () => {
     const spec = getSpec(specs, lang)
@@ -14,12 +14,13 @@ function Examples({ specs, lang, onClick }) {
     }
   }
 
-  const prevLang = useRef(null)
+  const prevLang = useRef()
   useEffect(() => {
+    // Check lang dependency manually to hide the dependency with specs.
     if (prevLang.current !== lang) {
       shuffle()
+      prevLang.current = lang
     }
-    prevLang.current = lang
   })
 
   return (
