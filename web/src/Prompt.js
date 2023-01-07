@@ -25,7 +25,7 @@ function Prompt({
       placeholder="외래어 단어..."
       value={word}
       onChange={(e) => { onChange(lang, e.target.value) }}
-      size="large"
+      size="medium"
     />
   )
 }
