@@ -4,6 +4,14 @@ body {
   padding: 3rem 1rem;
 }
 
+.version {
+  height: 1.25rem;
+}
+
+.version span {
+  font-family: Roboto, sans-serif;
+}
+
 .word {
   margin-bottom: 0.5rem;
 }
@@ -25,17 +33,7 @@ body {
   font-size: 1rem;
 }
 
-.version {
-  height: 1.25rem;
-}
-
-.version span {
-  font-family: Roboto, sans-serif;
-}
-
-p a:hover, .copyright a:hover {
+.description a:hover,
+.copyright a:hover {
   text-decoration: underline;
-}
-
-.ui.form .fields .field .ui.input input, .ui.form .field .ui.input input {
 }

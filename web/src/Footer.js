@@ -11,7 +11,7 @@ function Footer({ year }) {
 
   return (
     <Grid className="footer">
-      <Grid.Column floated="left" width={14}>
+      <Grid.Column floated="left" width={14} className="copyright">
         &copy; 2010–{year}{' '}
         <a href={brian} target="_blank" rel="noreferrer">Brian</a> &amp;{' '}
         <a href={heungsub} target="_blank" rel="noreferrer">Heungsub</a>
