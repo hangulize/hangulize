@@ -63,7 +63,7 @@ Korean word. The Transliterate step replaces them.
 
 Spec
 
-A spec is written by the HGL format which is a configuration DSL for Hangulize
+A spec is written by the HSL format which is a configuration DSL for Hangulize
 2. One spec is for one language transcription system. So we need to describe
 about the language at the first:
 

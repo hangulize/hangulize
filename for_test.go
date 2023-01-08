@@ -17,8 +17,8 @@ func loadSpec(lang string) *Spec {
 	return spec
 }
 
-func mustParseSpec(hgl string) *Spec {
-	spec, err := ParseSpec(strings.NewReader(hgl))
+func mustParseSpec(hsl string) *Spec {
+	spec, err := ParseSpec(strings.NewReader(hsl))
 	if err != nil {
 		panic(err)
 	}
