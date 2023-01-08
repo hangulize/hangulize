@@ -8,7 +8,7 @@ import Footer from './Footer'
 import Hangulizer from './Hangulizer'
 import Prompt from './Prompt'
 import Result from './Result'
-import DefaultSpecs from './hangulize-specs'
+import staticSpecs from './specs'
 import { getSpec } from './util'
 
 function useHangulize({
@@ -62,7 +62,7 @@ function useHangulize({
 
 function App() {
   const [version, setVersion] = useState('')
-  const [specs, setSpecs] = useState(DefaultSpecs.specs)
+  const [specs, setSpecs] = useState(staticSpecs.specs)
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(true)
 
