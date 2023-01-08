@@ -12,7 +12,7 @@ import (
 
 	"github.com/hangulize/hgl"
 	"github.com/hangulize/hre"
-	"github.com/hangulize/stringset"
+	"github.com/hangulize/hangulize/pkg/stringset"
 )
 
 // Spec represents a transactiption specification for a language.
