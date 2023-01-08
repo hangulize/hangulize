@@ -1,11 +1,8 @@
 {
-  "name": "web",
+  "name": "hangulize.org",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@testing-library/jest-dom": "^5.16.5",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "fuse.js": "^6.6.2",
     "hangul-js": "^0.2.6",
     "lodash": "^4.17.21",
@@ -44,6 +41,9 @@
   },
   "devDependencies": {
     "@craco/craco": "^7.0.0",
-    "@semantic-ui-react/craco-less": "^3.0.0"
+    "@semantic-ui-react/craco-less": "^3.0.0",
+    "@testing-library/jest-dom": "^5.16.5",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0"
   }
 }
