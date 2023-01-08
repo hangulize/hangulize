@@ -1,16 +1,17 @@
-package hangulize
+package hangulize_test
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/hangulize/hangulize"
 	"github.com/stretchr/testify/assert"
 )
 
 // TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
-	for _, lang := range ListLangs() {
-		spec, ok := LoadSpec(lang)
+	for _, lang := range hangulize.ListLangs() {
+		spec, ok := hangulize.LoadSpec(lang)
 
 		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
 
@@ -29,24 +30,24 @@ func TestLang(t *testing.T) {
 // Basic cases
 
 func TestHangulizerSpec(t *testing.T) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 	assert.Equal(t, spec, h.Spec())
 }
 
 // -----------------------------------------------------------------------------
 // Edge cases
 
-func hangulize(spec *Spec, word string) string {
-	h := NewHangulizer(spec)
+func hangulizeSpec(spec *hangulize.Spec, word string) string {
+	h := hangulize.NewHangulizer(spec)
 	return h.Hangulize(word)
 }
 
 // TestSlash tests "/" in input word. The original Hangulize removes the "/" so
 // the result was "글로르이아" instead of "글로르/이아".
 func TestSlash(t *testing.T) {
-	assert.Equal(t, "글로르/이아", Hangulize("ita", "glor/ia"))
-	assert.Equal(t, "글로르{}이아", Hangulize("ita", "glor{}ia"))
+	assert.Equal(t, "글로르/이아", hangulize.Hangulize("ita", "glor/ia"))
+	assert.Equal(t, "글로르{}이아", hangulize.Hangulize("ita", "glor{}ia"))
 }
 
 func TestComma(t *testing.T) {
@@ -61,12 +62,12 @@ func TestPunctInVar(t *testing.T) {
 }
 
 func TestQuote(t *testing.T) {
-	assert.Equal(t, "글로리아", Hangulize("ita", "glor'ia"))
-	assert.Equal(t, "코모", Hangulize("ita", "com'o"))
+	assert.Equal(t, "글로리아", hangulize.Hangulize("ita", "glor'ia"))
+	assert.Equal(t, "코모", hangulize.Hangulize("ita", "com'o"))
 }
 
 func TestSpecials(t *testing.T) {
-	assert.Equal(t, "<글로리아>", Hangulize("ita", "<gloria>"))
+	assert.Equal(t, "<글로리아>", hangulize.Hangulize("ita", "<gloria>"))
 }
 
 func TestHyphen(t *testing.T) {
@@ -76,7 +77,7 @@ func TestHyphen(t *testing.T) {
 		"e-" -> "ㅣ"
 		"e" -> "ㅔ"
 	`)
-	assert.Equal(t, "엑스야!", hangulize(spec, "ex야!"))
+	assert.Equal(t, "엑스야!", hangulizeSpec(spec, "ex야!"))
 }
 
 func TestDifferentAges(t *testing.T) {
@@ -88,7 +89,7 @@ func TestDifferentAges(t *testing.T) {
 		"xx" -> "-ㄱㅅ"
 		"e" -> "ㅔ"
 	`)
-	assert.Equal(t, "엑스야!", hangulize(spec, "ex야!"))
+	assert.Equal(t, "엑스야!", hangulizeSpec(spec, "ex야!"))
 }
 
 func TestKeepAndCleanup(t *testing.T) {
@@ -119,7 +120,7 @@ func TestKeepAndCleanup(t *testing.T) {
 	// --├─┘┌┘┌┘------------------ jamo
 	//   │ ┌┘┌┘
 	// ㅋ윽그스!
-	assert.Equal(t, "ㅋ윽그스!", hangulize(spec, "ㅋ𐌄𐌗!"))
+	assert.Equal(t, "ㅋ윽그스!", hangulizeSpec(spec, "ㅋ𐌄𐌗!"))
 }
 
 func TestSpace(t *testing.T) {
@@ -131,7 +132,7 @@ func TestSpace(t *testing.T) {
 		"van"  -> "반"
 		"gogh" -> "고흐"
 	`)
-	assert.Equal(t, "반고흐", hangulize(spec, "van gogh"))
+	assert.Equal(t, "반고흐", hangulizeSpec(spec, "van gogh"))
 }
 
 func TestZeroWidthSpace(t *testing.T) {
@@ -146,7 +147,7 @@ func TestZeroWidthSpace(t *testing.T) {
 		"v" -> "ㅍ"
 		"c" -> "ㅊ"
 	`)
-	assert.Equal(t, "으프 츠", hangulize(spec, "a b c"))
+	assert.Equal(t, "으프 츠", hangulizeSpec(spec, "a b c"))
 }
 
 func TestVarToVar(t *testing.T) {
@@ -170,12 +171,12 @@ func TestVarToVar(t *testing.T) {
 		"h" -> "h"
 		"i" -> "i"
 	`)
-	assert.Equal(t, "dg", hangulize(spec, "aa"))
-	assert.Equal(t, "ei", hangulize(spec, "bc"))
+	assert.Equal(t, "dg", hangulizeSpec(spec, "aa"))
+	assert.Equal(t, "ei", hangulizeSpec(spec, "bc"))
 }
 
 func TestUnknownLang(t *testing.T) {
-	assert.Equal(t, "hello", Hangulize("unknown", "hello"))
+	assert.Equal(t, "hello", hangulize.Hangulize("unknown", "hello"))
 }
 
 type stubFurigana struct{}
@@ -189,8 +190,8 @@ func (p *stubFurigana) Phonemize(word string) string {
 }
 
 func TestInstancePhonemizers(t *testing.T) {
-	spec, _ := LoadSpec("jpn")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("jpn")
+	h := hangulize.NewHangulizer(spec)
 
 	h.UsePhonemizer(&stubFurigana{})
 	assert.Equal(t, "스타부", h.Hangulize("1234"))
@@ -204,9 +205,9 @@ func TestInstancePhonemizers(t *testing.T) {
 
 func Example() {
 	// Person names from http://iceager.egloos.com/2610028
-	fmt.Println(Hangulize("ron", "Cătălin Moroşanu"))
-	fmt.Println(Hangulize("nld", "Jerrel Venetiaan"))
-	fmt.Println(Hangulize("por", "Vítor Constâncio"))
+	fmt.Println(hangulize.Hangulize("ron", "Cătălin Moroşanu"))
+	fmt.Println(hangulize.Hangulize("nld", "Jerrel Venetiaan"))
+	fmt.Println(hangulize.Hangulize("por", "Vítor Constâncio"))
 	// Output:
 	// 커털린 모로샤누
 	// 예럴 페네티안
@@ -214,12 +215,12 @@ func Example() {
 }
 
 func ExampleHangulize_cappuccino() {
-	fmt.Println(Hangulize("ita", "Cappuccino"))
+	fmt.Println(hangulize.Hangulize("ita", "Cappuccino"))
 	// Output: 카푸치노
 }
 
 func ExampleHangulize_nietzsche() {
-	fmt.Println(Hangulize("deu", "Friedrich Wilhelm Nietzsche"))
+	fmt.Println(hangulize.Hangulize("deu", "Friedrich Wilhelm Nietzsche"))
 	// Output: 프리드리히 빌헬름 니체
 }
 
@@ -227,13 +228,13 @@ func ExampleHangulize_shinkaiMakoto() {
 	// import "github.com/hangulize/hangulize/phonemize/furigana"
 	// UsePhonemizer(&furigana.P)
 
-	fmt.Println(Hangulize("jpn", "新海誠"))
+	fmt.Println(hangulize.Hangulize("jpn", "新海誠"))
 	// Output: 신카이 마코토
 }
 
 func ExampleNewHangulizer() {
-	spec, _ := LoadSpec("nld")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("nld")
+	h := hangulize.NewHangulizer(spec)
 
 	fmt.Println(h.Hangulize("Vincent van Gogh"))
 	// Output: 빈센트 반고흐

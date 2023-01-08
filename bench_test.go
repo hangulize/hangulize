@@ -1,13 +1,15 @@
-package hangulize
+package hangulize_test
 
 import (
 	"strings"
 	"testing"
+
+	"github.com/hangulize/hangulize"
 )
 
 func BenchmarkCappuccino(b *testing.B) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 
 	b.ResetTimer()
 
@@ -17,8 +19,8 @@ func BenchmarkCappuccino(b *testing.B) {
 }
 
 func BenchmarkCappuccinoTrace(b *testing.B) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 
 	b.ResetTimer()
 
@@ -28,8 +30,8 @@ func BenchmarkCappuccinoTrace(b *testing.B) {
 }
 
 func BenchmarkJulianaLouiseEmmaMarieWilhelmina(b *testing.B) {
-	spec, _ := LoadSpec("nld")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("nld")
+	h := hangulize.NewHangulizer(spec)
 
 	b.ResetTimer()
 
@@ -39,8 +41,8 @@ func BenchmarkJulianaLouiseEmmaMarieWilhelmina(b *testing.B) {
 }
 
 func BenchmarkVeryLongWord(b *testing.B) {
-	spec, _ := LoadSpec("deu")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("deu")
+	h := hangulize.NewHangulizer(spec)
 
 	hunk := "Donaudampfschifffahrtselektrizitätenhauptbetriebswerkbauunterbeamtengesellschaft"
 
@@ -62,8 +64,8 @@ func BenchmarkVeryLongWord(b *testing.B) {
 }
 
 func BenchmarkVeryLongNegativeLookbehind(b *testing.B) {
-	spec, _ := LoadSpec("nld")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("nld")
+	h := hangulize.NewHangulizer(spec)
 
 	// This hunk triggers the "{~@}rj" pattern.
 	hunk := "rj"
