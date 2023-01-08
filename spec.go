@@ -10,8 +10,8 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/hangulize/hangulize/pkg/hsl"
 	"github.com/hangulize/hangulize/pkg/hre"
+	"github.com/hangulize/hangulize/pkg/hsl"
 	"github.com/hangulize/hangulize/pkg/stringset"
 )
 

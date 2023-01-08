@@ -4,8 +4,7 @@ import "unicode"
 
 // Georgian represents the Georgian script.
 //
-//   ასომთავრული
-//
+//	ასომთავრული
 type Georgian struct{}
 
 // Is checks whether the character is Georgian or not.

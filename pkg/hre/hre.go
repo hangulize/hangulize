@@ -9,7 +9,7 @@ string.
 Lookaround is not supported in RE2 because there's no known efficient algorithm
 without backtracking to implement it. Anyways, HRE provides a simplified
 lookaround. The syntax {...} is for the positive lookaround and {~...} is for
-the negative lookaround. The lookaround is restircted to place at the leftmost
+the negative lookaround. The lookaround is restricted to place at the leftmost
 or rightmost.
 
 	"foo{bar}"
@@ -32,6 +32,5 @@ HRE also provides macros and variables.
 
 	p, err := NewPattern("<abc>@", macros, vars)
 	// The p matches with "ai", "be" or "ci".
-
 */
 package hre

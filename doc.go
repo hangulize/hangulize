@@ -11,7 +11,7 @@ on https://hangulize.org/, it has been of great help for Korean translators.
 
 This Go re-implementation is a reboot of Hangulize with feature improvements.
 
-Pipeline
+# Pipeline
 
 Basically, Hangulize transcribes with 5 steps. These steps include "Normalize",
 "Group", "Rewrite", "Transcribe", and "Syllabify". To clarify these concepts,
@@ -41,7 +41,7 @@ groups.
 
 	"ㅎㅔ-ㄹㄹㅗ", "!" -> "헬로!"
 
-Extended Pipeline
+# Extended Pipeline
 
 Some languages, such as Japanese, may require 2 more steps: "Phonemize" and
 "Transliterate". The prior is before the Normalize step, and the latter is
@@ -61,7 +61,7 @@ Korean word. The Transliterate step replaces them.
 
 	"이마、아이니유키마스" -> "이마, 아이니유키마스"
 
-Spec
+# Spec
 
 A spec is written by the HSL format which is a configuration DSL for Hangulize
 2. One spec is for one language transcription system. So we need to describe
@@ -129,6 +129,5 @@ unit testing. Verify your spec yourself:
 	    "gita"       -> "지타"
 	    "bisnonno"   -> "비스논노"
 	    "Pinocchio"  -> "피노키오"
-
 */
 package hangulize

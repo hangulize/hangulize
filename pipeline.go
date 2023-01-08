@@ -108,7 +108,6 @@ func (p pipeline) forward(word string) string {
 // -----------------------------------------------------------------------------
 
 // 0. Just recording beginning (Word)
-//
 func (p pipeline) input(word string) {
 	p.tr.Trace(Input, word, "")
 }
@@ -119,7 +118,6 @@ func (p pipeline) input(word string) {
 // analysis. Most languages already use phonograms which are sufficient to
 // represent the exact pronunciation. But in some languages, such as American
 // English or Chinese, it's not true.
-//
 func (p pipeline) phonemize(word string) (string, bool) {
 	id := p.h.spec.Lang.Phonemizer
 	if id == "" {
@@ -154,7 +152,6 @@ PhonemizerFound:
 // This step eliminates letter case to make the next steps work easier.
 //
 // For example, "Hello" in Latin script will be normalized to "hello".
-//
 func (p pipeline) normalize(word string) string {
 	// Per-spec normalization.
 	word = p.h.spec.normReplacer.Replace(word)
@@ -190,7 +187,6 @@ func (p pipeline) normalize(word string) string {
 //
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
-//
 func (p pipeline) group(word string) []subword.Subword {
 	rep := subword.NewReplacer(word, 0, 1)
 
@@ -219,7 +215,6 @@ func (p pipeline) group(word string) []subword.Subword {
 // called "rewrite".
 //
 // For example, "hello" can be rewritten to "heˈlō".
-//
 func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
 	var swBuf subword.Builder
 
@@ -258,7 +253,6 @@ func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
 // ("-ㄴ") means that it is a Jongseong (tail).
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
-//
 func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
 	var swBuf subword.Builder
 
@@ -323,7 +317,6 @@ func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
-//
 func (p pipeline) syllabify(subwords []subword.Subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
@@ -358,7 +351,6 @@ func (p pipeline) syllabify(subwords []subword.Subword) string {
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
 // For example, "「...」" will be "'...'".
-//
 func (p pipeline) transliterate(word string) string {
 	script := p.h.spec.script
 

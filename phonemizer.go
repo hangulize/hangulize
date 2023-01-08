@@ -9,12 +9,11 @@ package hangulize
 // For example, there is a phonemizer for Furigana of Japanese in a separate
 // package.
 //
-//   import "github.com/hangulize/hangulize"
-//   import "github.com/hangulize/hangulize/phonemize/furigana"
+//	import "github.com/hangulize/hangulize"
+//	import "github.com/hangulize/hangulize/phonemize/furigana"
 //
-//   hangulize.UsePhonemizer(&furigana.P)
-//   fmt.Println(hangulize.Hangulize("jpn", "日本語"))
-//
+//	hangulize.UsePhonemizer(&furigana.P)
+//	fmt.Println(hangulize.Hangulize("jpn", "日本語"))
 type Phonemizer interface {
 	ID() string
 	Phonemize(string) string

@@ -4,8 +4,7 @@ import "unicode"
 
 // Cyrillic represents the Cyrillic script.
 //
-//   вулкан
-//
+//	вулкан
 type Cyrillic struct{}
 
 // Is checks whether the character is Cyrillic or not.

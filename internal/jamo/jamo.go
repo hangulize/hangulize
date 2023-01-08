@@ -4,7 +4,6 @@ to composed Hangul syllables.
 
 	fmt.Println(jamo.ComposeHangul("ㅈㅏㅁㅗ"))
 	// Output: 자모
-
 */
 package jamo
 
@@ -21,7 +20,6 @@ import (
 //
 // Decomposed Jamo phonemes look like "ㅎㅏ-ㄴㄱㅡ-ㄹㄹㅏㅇㅣㅈㅡ". A Jaeum
 // after a hyphen ("-ㄴ") means that it is a Jongseong (tail).
-//
 func ComposeHangul(word string) string {
 	c := composer{
 		r: bufio.NewReader(strings.NewReader(word)),

@@ -1,6 +1,6 @@
 /*
 Package stringset implements a set of strings. StringSet has very simple
-implementation. But it should be commonly unsed in both Hangulize and HRE. So
+implementation. But it should be commonly used in both Hangulize and HRE. So
 packed as a separate package.
 */
 package stringset

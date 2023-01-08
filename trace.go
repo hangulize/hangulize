@@ -96,7 +96,6 @@ func (ts Traces) Render(w io.Writer) {
 // tracer collects tracing logs.
 //
 // HangulizeTrace uses it.
-//
 type tracer struct {
 	traces   Traces
 	lastWord string
@@ -110,7 +109,6 @@ func (tr *tracer) Traces() Traces {
 // trace records a tracing log.
 //
 // Public tracing methods are implemented by this method.
-//
 func (tr *tracer) trace(step Step, word string, why string, rule *Rule) {
 	if tr == nil {
 		return
@@ -164,7 +162,6 @@ func (tr *tracer) SubwordsTracer(
 // Trace records a tracing log for a subword.
 //
 // It buffers the tracing logs. Call Commit to flush them.
-//
 func (swtr *subwordsTracer) Trace(swIndex int, word string, rule Rule) {
 	if swtr == nil {
 		return
