@@ -1,0 +1,37 @@
+/*******************************
+     User Global Variables
+*******************************/
+
+/* Hangulize colors */
+@hangulizeBrown        : #432;
+@hangulizeBrownQuiet   : #777066;
+@hangulizeBrownQuieter : #aaa399;
+@hangulizeBrownDark    : #321;
+@hangulizeBlue         : #49e;
+@hangulizeBlueDark     : #17e;
+@hangulizeGray         : #f2f1f0;
+@hangulizeGrayDark     : #e2e1e0;
+@hangulizeGrayDarker   : #d2d1d0;
+
+/* Text colors */
+@textColor                  : @hangulizeBrown;
+@linkColor                  : @hangulizeBlue;
+@linkHoverColor             : @hangulizeBlueDark;
+@mutedTextColor             : @hangulizeBrownQuiet;
+@hoveredTextColor           : @hangulizeBrownDark;
+@selectedTextColor          : @hangulizeBrown;
+@inputPlaceholderColor      : @hangulizeBrownQuieter;
+@inputPlaceholderFocusColor : @hangulizeBrownQuiet;
+
+/* Loader collors */
+@loaderFillColor : @hangulizeGrayDarker;
+@loaderLineColor : @hangulizeBlue;
+
+/* GitHub icon color */
+@grey : @hangulizeBrownQuieter;
+
+@headerFont     : 'Noto Sans KR', sans-serif;
+@pageFont       : 'Noto Sans KR', sans-serif;
+@googleFontName : 'Noto+Sans+KR';
+
+@h1 : 3rem;

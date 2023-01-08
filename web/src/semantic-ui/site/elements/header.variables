@@ -1,0 +1,6 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@imageWidth: auto;
+@imageHeight: 1.6em;

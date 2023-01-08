@@ -1,0 +1,10 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@basicBorderSize      : 0;
+@basicBorder          : 0;
+@basicBackground      : @hangulizeGray;
+@basicHoverBackground : @hangulizeGrayDark;
+@basicDownBackground  : @hangulizeGrayDarker;
+@basicDownBoxShadow   : none;

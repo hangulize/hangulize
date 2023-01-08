@@ -1,0 +1,8 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@hoveredItemBackground : @hangulizeGray;
+@selectedBackground    : @hangulizeBlue;
+@selectedColor         : #fff;
+@activeItemFontWeight  : @normal;

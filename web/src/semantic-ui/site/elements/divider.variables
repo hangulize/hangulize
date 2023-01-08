@@ -1,0 +1,6 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@highlightWidth : 0;
+@shadowColor    : @hangulizeGrayDark;

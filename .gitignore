@@ -1,6 +1,10 @@
-# Created by https://www.gitignore.io/api/go,vim,visualstudiocode
+# Created by https://www.toptal.com/developers/gitignore/api/go,react
+# Edit at https://www.toptal.com/developers/gitignore?templates=go,react
 
 ### Go ###
+# If you prefer the allow list template instead of the deny list, see community template:
+# https://github.com/github/gitignore/blob/main/community/Golang/Go.AllowList.gitignore
+#
 # Binaries for programs and plugins
 *.exe
 *.exe~
@@ -8,31 +12,37 @@
 *.so
 *.dylib
 
-# Test binary, build with `go test -c`
+# Test binary, built with `go test -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE
 *.out
 
-### Vim ###
-# swap
-.sw[a-p]
-.*.sw[a-p]
-# session
-Session.vim
-# temporary
-.netrwhist
-*~
-# auto-generated tag files
-tags
+# Dependency directories (remove the comment below to include it)
+# vendor/
 
-### VisualStudioCode ###
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-.history
+# Go workspace file
+go.work
 
+### react ###
+.DS_*
+*.log
+logs
+**/*.backup.*
+**/*.back.*
 
-# End of https://www.gitignore.io/api/go,vim,visualstudiocode
+node_modules
+bower_components
+
+*.sublime*
+
+psd
+thumb
+sketch
+
+# End of https://www.toptal.com/developers/gitignore/api/go,react
+
+# Generated files for Web
+web/build
+web/public/hangulize.wasm
+web/src/specs.json

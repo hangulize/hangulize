@@ -1,0 +1,6 @@
+/*******************************
+    User Variable Overrides
+*******************************/
+
+@backgroundColor           : @hangulizeGray;
+@labelHoverBackgroundColor : @hangulizeGrayDark;
