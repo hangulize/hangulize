@@ -1,0 +1,44 @@
+name: hangulize.org
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  gh-pages:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # fetch tags
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: '1.19.4'
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.12.1'
+
+    - name: Install NPM dependencies
+      uses: bahmutov/npm-install@v1
+      with:
+        working-directory: web
+
+    - name: Build
+      working-directory: web
+      run: |
+        make
+        echo hangulize.org > build/CNAME
+        echo "$GITHUB_SHA" > build/version.txt
+
+    - name: GitHub Pages
+      if: success()
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: web/build
