@@ -3,7 +3,7 @@ package hangulize
 import (
 	"testing"
 
-	"github.com/hangulize/hre"
+	"github.com/hangulize/hangulize/pkg/hre"
 	"github.com/stretchr/testify/assert"
 )
 
