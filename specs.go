@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"embed"
+	"fmt"
 	"io/fs"
 	"sort"
 	"strings"
@@ -59,7 +60,7 @@ func LoadSpec(lang string) (*Spec, bool) {
 
 	// Bundled spec must not have any error.
 	if err != nil {
-		panic(errors.Wrapf(err, `bundled spec "%s" has error`, lang))
+		panic(fmt.Errorf("bundled spec '%s': %w", lang, err))
 	}
 
 	// Cache it.
