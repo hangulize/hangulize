@@ -1,35 +1,48 @@
-name: hangulize.org
+name: Deployment
 
-on:
-  workflow_run:
-    workflows: [Test]
-    types: [completed]
-    branches:
-    - main
+on: push
 
 jobs:
-  gh-pages:
+  test:
     runs-on: ubuntu-22.04
+
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-      with:
-        fetch-depth: 0 # fetch tags
 
     - name: Setup Go
       uses: actions/setup-go@v3
-      with:
-        go-version: '1.19.4'
+      with: {go-version: 1.19.4}
+
+    - name: Lint
+      uses: golangci/golangci-lint-action@v3
+      with: {version: v1.50.1}
+
+    - name: Test
+      run: go test ./...
+
+  deploy:
+    needs: [test]
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+      with: {fetch-depth: 0} # fetch tags
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with: {go-version: 1.19.4}
 
     - name: Setup Node
       uses: actions/setup-node@v3
-      with:
-        node-version: '18.12.1'
+      with: {node-version: 18.12.1}
 
     - name: Install NPM dependencies
       uses: bahmutov/npm-install@v1
-      with:
-        working-directory: web
+      with: {working-directory: web}
 
     - name: Build
       working-directory: web
