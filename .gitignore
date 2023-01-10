@@ -41,8 +41,3 @@ thumb
 sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/go,react
-
-# Generated files for Web
-web/build
-web/public/hangulize.wasm
-web/src/specs.json

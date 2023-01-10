@@ -1,0 +1,5 @@
+build
+src/specs.json
+public/hangulize.wasm
+public/favicon.ico
+public/icons
