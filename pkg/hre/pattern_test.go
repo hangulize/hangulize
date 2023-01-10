@@ -67,9 +67,7 @@ func TestSimple(t *testing.T) {
 }
 
 func TestLookbehind(t *testing.T) {
-	var p *Pattern
-
-	p = fixturePattern(`{han}gul`)
+	p := fixturePattern(`{han}gul`)
 	assertFirstMatch(t, p, []string{
 		o, "hangul",
 		"      ^^^",
@@ -84,11 +82,8 @@ func TestLookbehind(t *testing.T) {
 }
 
 func TestLookahead(t *testing.T) {
-	var p *Pattern
-
-	p = fixturePattern(`han{gul}`)
+	p := fixturePattern(`han{gul}`)
 	assertFirstMatch(t, p, []string{
-		o, "hangul",
 		"   ^^^   ",
 		o, "hangulize",
 		"   ^^^      ",
@@ -99,9 +94,7 @@ func TestLookahead(t *testing.T) {
 }
 
 func TestNegativeLookbehind(t *testing.T) {
-	var p *Pattern
-
-	p = fixturePattern(`{~han}gul`)
+	p := fixturePattern(`{~han}gul`)
 	assertFirstMatch(t, p, []string{
 		x, "hangul",
 		x, "hangulize",
@@ -121,9 +114,7 @@ func TestNegativeLookbehind(t *testing.T) {
 }
 
 func TestNegativeLookahead(t *testing.T) {
-	var p *Pattern
-
-	p = fixturePattern(`han{~gul}`)
+	p := fixturePattern(`han{~gul}`)
 	assertFirstMatch(t, p, []string{
 		x, "hangul",
 		x, "hangulize",
@@ -305,13 +296,13 @@ func TestComplexLookaround(t *testing.T) {
 func TestMultipleNegativeLookahead(t *testing.T) {
 	p := fixturePattern("foo{~foo}")
 	w := "foobarbarfoofoo"
-	assert.Equal(t, [][]int{[]int{0, 3}, []int{12, 15}}, p.Find(w, -1))
+	assert.Equal(t, [][]int{{0, 3}, {12, 15}}, p.Find(w, -1))
 }
 
 func TestMultipleNegativeLookbehind(t *testing.T) {
 	p := fixturePattern("{~foo}foo")
 	w := "barfoofoobarfoo"
-	assert.Equal(t, [][]int{[]int{3, 6}, []int{12, 15}}, p.Find(w, -1))
+	assert.Equal(t, [][]int{{3, 6}, {12, 15}}, p.Find(w, -1))
 }
 
 func TestNegativeLookaroundWidth(t *testing.T) {
@@ -375,8 +366,8 @@ func TestReplace(t *testing.T) {
 
 func TestReplaceWithVars(t *testing.T) {
 	vars := map[string][]string{
-		"abc": []string{"a", "b", "c"},
-		"xyz": []string{"x", "y", "z"},
+		"abc": {"a", "b", "c"},
+		"xyz": {"x", "y", "z"},
 	}
 
 	p, _ := NewPattern("<abc>", nil, vars)
@@ -387,8 +378,8 @@ func TestReplaceWithVars(t *testing.T) {
 
 func TestShiftedSubmatchIndex(t *testing.T) {
 	p, _ := NewPattern("-|'", nil, nil)
-	assert.Equal(t, [][]int{[]int{0, 1}}, p.Find("-", -1))
-	assert.Equal(t, [][]int{[]int{0, 1}, []int{1, 2}}, p.Find("--", -1))
+	assert.Equal(t, [][]int{{0, 1}}, p.Find("-", -1))
+	assert.Equal(t, [][]int{{0, 1}, {1, 2}}, p.Find("--", -1))
 }
 
 // -----------------------------------------------------------------------------

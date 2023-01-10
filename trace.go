@@ -79,7 +79,7 @@ func (ts Traces) Render(w io.Writer) {
 		}
 
 		fmt.Fprintf(w, "  %s", t.Word)
-		fmt.Fprintf(w, strings.Repeat(" ", maxWidth-widths[i]))
+		fmt.Fprint(w, strings.Repeat(" ", maxWidth-widths[i]))
 
 		if t.HasRule {
 			fmt.Fprintf(w, " | %s", t.Rule)

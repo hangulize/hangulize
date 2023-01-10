@@ -18,8 +18,7 @@ func (Latin) Is(ch rune) bool {
 // Normalize converts a Latin character into
 // ISO basic Latin lower alphabet [a-z]:
 //
-//   Pokémon -> pokemon
-//
+//	Pokémon -> pokemon
 func (Latin) Normalize(ch rune) rune {
 	props := norm.NFD.PropertiesString(string(ch))
 	bin := props.Decomposition()

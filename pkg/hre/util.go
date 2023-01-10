@@ -65,25 +65,25 @@ var (
 // lines and whitespace except escaped "\ " will be removed before compiling.
 //
 // Example:
-//  var reEmail = re(`
-//  --- start of string
-//      ^
-//  --- user
-//      (
-//          [^@]+
-//      )
-//  --- at
-//      @
-//  --- host
-//      (
-//          [a-zA-Z0-9-_]+
-//          \.
-//          [a-zA-Z0-9-_.]+
-//      )
-//  --- end of string
-//      $
-//  `)
 //
+//	var reEmail = re(`
+//	--- start of string
+//	    ^
+//	--- user
+//	    (
+//	        [^@]+
+//	    )
+//	--- at
+//	    @
+//	--- host
+//	    (
+//	        [a-zA-Z0-9-_]+
+//	        \.
+//	        [a-zA-Z0-9-_.]+
+//	    )
+//	--- end of string
+//	    $
+//	`)
 func re(verboseExpr string) *regexp.Regexp {
 	expr := reComment.ReplaceAllString(verboseExpr, ``)
 

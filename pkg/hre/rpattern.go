@@ -12,11 +12,10 @@ import (
 //
 // Some expressions in RPattern have special meaning:
 //
-//  "{}"    // zero-width space
-//  "<var>" // ...
+//	"{}"    // zero-width space
+//	"<var>" // ...
 //
 // "R" in the name means "replacement" or "right-side".
-//
 type RPattern struct {
 	expr string
 

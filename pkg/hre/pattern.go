@@ -16,26 +16,25 @@ import (
 // Pattern and an RPattern. A sub-word which is matched with the Pattern, will
 // be rewritten by the RPattern.
 //
-//  rewrite:
-//      "'"        -> ""
-//      "^gli$"    -> "li"
-//      "^glia$"   -> "g.lia"
-//      "^glioma$" -> "g.lioma"
-//      "^gli{@}"  -> "li"
-//      "{@}gli"   -> "li"
-//      "gn{@}"    -> "nJ"
-//      "gn"       -> "n"
+//	rewrite:
+//	    "'"        -> ""
+//	    "^gli$"    -> "li"
+//	    "^glia$"   -> "g.lia"
+//	    "^glioma$" -> "g.lioma"
+//	    "^gli{@}"  -> "li"
+//	    "{@}gli"   -> "li"
+//	    "gn{@}"    -> "nJ"
+//	    "gn"       -> "n"
 //
 // Some expressions in Pattern have special meaning:
 //
-//  "^"      // start of chunk
-//  "^^"     // start of string
-//  "$"      // end of chunk
-//  "$$"     // end of string
-//  "{...}"  // zero-width match
-//  "{~...}" // zero-width negative match
-//  "<var>"  // one of var values (defined in spec)
-//
+//	"^"      // start of chunk
+//	"^^"     // start of string
+//	"$"      // end of chunk
+//	"$$"     // end of string
+//	"{...}"  // zero-width match
+//	"{~...}" // zero-width negative match
+//	"<var>"  // one of var values (defined in spec)
 type Pattern struct {
 	expr string
 

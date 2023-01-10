@@ -32,7 +32,7 @@ func mergeLongVowels(word string, offset int) string {
 		if offset <= i {
 			prior, ok := longVowelRels[ch]
 			if ok {
-				if strings.IndexRune(prior, prevCh) != -1 {
+				if strings.ContainsRune(prior, prevCh) {
 					isLongVowel = true
 				}
 			}

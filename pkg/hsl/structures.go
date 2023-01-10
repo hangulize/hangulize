@@ -10,7 +10,6 @@ type HSL map[string]Section
 // Liner holds the line number belonging to the node.
 //
 // All HSL nodes should implement this interface.
-//
 type Liner interface {
 	Line() int
 }
@@ -37,9 +36,8 @@ func (l liner) Line() int {
 
 // Pair is a left-right tuple:
 //
-//  aa -> "ㅏ", "ㅐ"
-//  ^^^^^^^^^^^^^^^^
-//
+//	aa -> "ㅏ", "ㅐ"
+//	^^^^^^^^^^^^^^^^
 type Pair struct {
 	l string
 	r []string
@@ -52,28 +50,26 @@ func (p Pair) String() string {
 
 // Left is a string. It is used for as keys in dict:
 //
-//  english = "Italian"
-//  ^^^^^^^
+//	english = "Italian"
+//	^^^^^^^
 //
 // Or as left of pair:
 //
-//  aa -> "ㅏ", "ㅐ"
-//  ^^
-//
+//	aa -> "ㅏ", "ㅐ"
+//	^^
 func (p Pair) Left() string {
 	return p.l
 }
 
 // Right is a string array. It is used for as values in dict:
 //
-//  english = "Italian"
-//	          ^^^^^^^^^
+//	 english = "Italian"
+//		          ^^^^^^^^^
 //
 // Or as right of pair:
 //
-//  aa -> "ㅏ", "ㅐ"
-//        ^^^^^^^^^^
-//
+//	aa -> "ㅏ", "ㅐ"
+//	      ^^^^^^^^^^
 func (p Pair) Right() []string {
 	return p.r
 }

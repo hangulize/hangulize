@@ -42,15 +42,14 @@ const x = ""
 
 // assertFirstMatch is a helper to test a pattern with multiple examples:
 //
-//  p := fixturePattern(`foo`)
-//  assertFirstMatch(t, p, []string{
-//    o, "foo",
-//    "   ^^^",
-//    o, "foobar",
-//    "   ^^^   ",
-//    x, "bar",
-//  })
-//
+//	p := fixturePattern(`foo`)
+//	assertFirstMatch(t, p, []string{
+//	  o, "foo",
+//	  "   ^^^",
+//	  o, "foobar",
+//	  "   ^^^   ",
+//	  x, "bar",
+//	})
 func assertFirstMatch(t *testing.T, p *Pattern, scenario []string) {
 	drawUnderline := func(start int, stop int) string {
 		return strings.Repeat(" ", start) + strings.Repeat("^", stop-start)

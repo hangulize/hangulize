@@ -2,19 +2,13 @@ package hsl
 
 import (
 	"errors"
+	"fmt"
 	"io"
 )
 
 // parser ...
 type parser struct {
 	lexer *lexer
-
-	buf struct {
-		tok   token
-		lit   string
-		line  int
-		reuse bool
-	}
 }
 
 // newParser ...
@@ -23,29 +17,10 @@ func newParser(r io.Reader) *parser {
 }
 
 func (p *parser) scan() (token, string, int) {
-	// If unscan() performed, reuses the latest token and literal.
-	if p.buf.reuse {
-		p.buf.reuse = false
-		return p.buf.tok, p.buf.lit, p.buf.line
-	}
-
 	// Scan the next one.
 	tok, lit := p.lexer.Scan()
 	line := p.lexer.Line()
-
-	// Keep the latest token and literal to reuse.
-	p.buf.tok, p.buf.lit, p.buf.line = tok, lit, line
-
 	return tok, lit, line
-}
-
-func (p *parser) unscan() error {
-	if p.buf.reuse {
-		return errors.New("already unscanned once")
-	}
-
-	p.buf.reuse = true
-	return nil
 }
 
 // parse ...
@@ -69,7 +44,7 @@ func (p *parser) parse() (HSL, error) {
 
 		// The common behavior for useless tokens.
 		if tok == Illegal {
-			return nil, illegalError(lit)
+			return nil, fmt.Errorf("parse: %w: %s", errIllegalToken, lit)
 		} else if tok == EOF {
 			break
 		} else if tok == Comment {
@@ -124,7 +99,10 @@ func (p *parser) parse() (HSL, error) {
 				}
 			}
 
-			section.addPair(lastString, values, line)
+			if err := section.addPair(lastString, values, line); err != nil {
+				panic(fmt.Errorf("failed to add pair: %w", err))
+			}
+
 			continue
 		}
 	}
@@ -140,7 +118,7 @@ func (p *parser) parseValues() ([]string, error) {
 
 		// The common behavior for useless tokens.
 		if tok == Illegal {
-			return nil, illegalError(lit)
+			return nil, fmt.Errorf("parse values: %w: %s", errIllegalToken, lit)
 		} else if tok == EOF {
 			break
 		} else if tok == Comment {

@@ -5,8 +5,10 @@ import (
 	"strings"
 )
 
-// <...>
-//  └─┴─ (1)
+// reVar is a regular expression for variable placeholders.
+//
+//	<...>
+//	 └─┴─ (1)
 var reVar = re(`<(.+?)>`)
 
 // expandVars replaces <var> to corresponding content Regexp such as (a|b|c).
