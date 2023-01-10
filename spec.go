@@ -10,9 +10,9 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/hangulize/hangulize/internal/runeset"
 	"github.com/hangulize/hangulize/pkg/hre"
 	"github.com/hangulize/hangulize/pkg/hsl"
-	"github.com/hangulize/hangulize/pkg/stringset"
 )
 
 // Spec represents a transactiption specification for a language.
@@ -38,11 +38,11 @@ type Spec struct {
 
 	// Prepared stuffs
 	script script
-	puncts stringset.StringSet
+	puncts runeset.Set
 
 	// Custom normalization
 	normReplacer *strings.Replacer
-	normLetters  stringset.StringSet
+	normLetters  runeset.Set
 }
 
 func (s Spec) String() string {
@@ -175,9 +175,14 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	normLetters := make(stringset.StringSet)
+	normLetters := runeset.New(len(normalize))
 	for to := range normalize {
-		normLetters[to] = true
+		more := len(to)
+		for more > 0 {
+			ch, size := utf8.DecodeRuneInString(to)
+			normLetters.Put(ch)
+			more -= size
+		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -300,14 +305,12 @@ func newRules(
 
 // collectPuncts collects punctuation characters from rewrite/transcribe rules.
 // It discards the punctuations that is used only for rewriting hints.
-func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
-	var puncts []string
-	rletters := make(map[string]bool)
+func collectPuncts(rewrite []Rule, transcribe []Rule) runeset.Set {
+	var puncts []rune
+	rletters := runeset.New(1)
 
 	collectFrom := func(rule Rule) {
-		for _, let := range rule.From.Letters() {
-			ch, _ := utf8.DecodeRuneInString(let)
-
+		for _, ch := range rule.From.Letters() {
 			// Collect only punctuation characters. (category P)
 			if !unicode.IsPunct(ch) {
 				continue
@@ -315,18 +318,18 @@ func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
 
 			// Punctuations appearing in the above RPatterns should be
 			// discarded. Bacause they are just hints for rewriting.
-			if rletters[let] {
+			if rletters.Has(ch) {
 				continue
 			}
 
-			puncts = append(puncts, let)
+			puncts = append(puncts, ch)
 		}
 	}
 
 	for _, rule := range rewrite {
 		// Mark letters in RPatterns.
 		for _, let := range rule.To.Letters() {
-			rletters[let] = true
+			rletters.Put(let)
 		}
 
 		collectFrom(rule)
@@ -336,5 +339,5 @@ func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
 		collectFrom(rule)
 	}
 
-	return stringset.NewStringSet(puncts...)
+	return runeset.Of(puncts...)
 }

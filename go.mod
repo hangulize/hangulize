@@ -9,6 +9,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.1
 	github.com/suapapa/go_hangul v1.2.1
+	github.com/zyedidia/generic v1.2.0
 	golang.org/x/text v0.5.0
 )
 
@@ -16,5 +17,7 @@ require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
+	github.com/segmentio/fasthash v1.0.3 // indirect
+	golang.org/x/exp v0.0.0-20220218215828-6cf2b201936e // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

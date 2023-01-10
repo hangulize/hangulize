@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"fmt"
 
-	"github.com/hangulize/hangulize/pkg/stringset"
+	"github.com/hangulize/hangulize/internal/runeset"
 	"github.com/pkg/errors"
 )
 
@@ -22,7 +22,7 @@ type RPattern struct {
 	parts []rPart
 
 	// Letters used in the regexp.
-	letters stringset.StringSet
+	letters runeset.Set
 }
 
 func (rp *RPattern) String() string {
@@ -86,7 +86,7 @@ func NewRPattern(
 	}
 
 	// Collect letters in the regexp.
-	letters := stringset.NewStringSet(splitLetters(regexpLetters(expr))...)
+	letters := runeset.Of(splitLetters(regexpLetters(expr))...)
 
 	return &RPattern{expr, parts, letters}
 }
@@ -133,6 +133,6 @@ func (rp *RPattern) Interpolate(
 
 // Letters returns the set of natural letters used in the expression in
 // ascending order.
-func (rp *RPattern) Letters() []string {
-	return rp.letters.Array()
+func (rp *RPattern) Letters() []rune {
+	return rp.letters.Slice()
 }

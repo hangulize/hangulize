@@ -127,10 +127,10 @@ func regexpLetters(reExpr string) string {
 	return letters
 }
 
-func splitLetters(word string) []string {
-	var letters []string
+func splitLetters(word string) []rune {
+	var letters []rune
 	for _, ch := range word {
-		letters = append(letters, string(ch))
+		letters = append(letters, rune(ch))
 	}
 	return letters
 }
