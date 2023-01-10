@@ -16,7 +16,8 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.word input, .lang input {
+.word input,
+.lang input {
   line-height: 1 !important;
 }
 

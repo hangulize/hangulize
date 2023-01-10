@@ -40,3 +40,19 @@
   content: '”';
   text-align: right;
 }
+
+.result.loading {
+  animation: result-loading 1.5s ease infinite alternate;
+}
+
+@keyframes result-loading {
+  0% {
+    opacity: 1;
+  }
+  95% {
+    opacity: 0.25;
+  }
+  100% {
+    opacity: 0.25;
+  }
+}
