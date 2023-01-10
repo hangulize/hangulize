@@ -10,7 +10,7 @@ import (
 
 func TestTransliterate(t *testing.T) {
 	s := Spec{}
-	h := NewHangulizer(&s)
+	h := New(&s)
 	p := pipeline{h, nil}
 
 	s.script = scripts.Kana{}
@@ -25,7 +25,7 @@ func TestTransliterate(t *testing.T) {
 
 func TestTransliterateZWSP(t *testing.T) {
 	s := Spec{}
-	h := NewHangulizer(&s)
+	h := New(&s)
 	p := pipeline{h, nil}
 
 	assert.Equal(t, "foo", p.transliterate("f\u200Bo\u200Bo"))

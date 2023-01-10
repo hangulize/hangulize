@@ -27,7 +27,7 @@ func mustParseSpec(hsl string) *hangulize.Spec {
 }
 
 func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word string) {
-	h := hangulize.NewHangulizer(spec)
+	h := hangulize.New(spec)
 
 	if h.Hangulize(word) == expected {
 		return

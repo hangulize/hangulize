@@ -14,7 +14,7 @@ func Hangulize(lang string, word string) string {
 		return word
 	}
 
-	h := NewHangulizer(spec)
+	h := New(spec)
 	return h.Hangulize(word)
 }
 
@@ -24,10 +24,13 @@ type Hangulizer struct {
 	phonemizers map[string]Phonemizer
 }
 
-// NewHangulizer creates a Hangulizer for a spec.
-func NewHangulizer(spec *Spec) *Hangulizer {
+// New creates a Hangulizer for a spec.
+func New(spec *Spec) *Hangulizer {
 	return &Hangulizer{spec, make(map[string]Phonemizer)}
 }
+
+// NewHangulizer has been deprecated. Use New instead.
+var NewHangulizer = New
 
 // Spec returns the underlying spec.
 func (h *Hangulizer) Spec() *Spec {

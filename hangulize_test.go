@@ -31,7 +31,7 @@ func TestLang(t *testing.T) {
 
 func TestHangulizerSpec(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("ita")
-	h := hangulize.NewHangulizer(spec)
+	h := hangulize.New(spec)
 	assert.Equal(t, spec, h.Spec())
 }
 
@@ -39,7 +39,7 @@ func TestHangulizerSpec(t *testing.T) {
 // Edge cases
 
 func hangulizeSpec(spec *hangulize.Spec, word string) string {
-	h := hangulize.NewHangulizer(spec)
+	h := hangulize.New(spec)
 	return h.Hangulize(word)
 }
 
@@ -191,7 +191,7 @@ func (p *stubFurigana) Phonemize(word string) string {
 
 func TestInstancePhonemizers(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("jpn")
-	h := hangulize.NewHangulizer(spec)
+	h := hangulize.New(spec)
 
 	h.UsePhonemizer(&stubFurigana{})
 	assert.Equal(t, "스타부", h.Hangulize("1234"))
@@ -232,9 +232,9 @@ func ExampleHangulize_shinkaiMakoto() {
 	// Output: 신카이 마코토
 }
 
-func ExampleNewHangulizer() {
+func ExampleNew() {
 	spec, _ := hangulize.LoadSpec("nld")
-	h := hangulize.NewHangulizer(spec)
+	h := hangulize.New(spec)
 
 	fmt.Println(h.Hangulize("Vincent van Gogh"))
 	// Output: 빈센트 반고흐
