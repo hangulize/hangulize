@@ -34,8 +34,7 @@ jobs:
     - name: Build
       working-directory: web
       run: |
-        make
-        echo hangulize.org > build/CNAME
+        make build
         echo "$GITHUB_SHA" > build/version.txt
 
     - name: GitHub Pages

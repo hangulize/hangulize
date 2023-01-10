@@ -11,6 +11,7 @@ ICON_FILES = \
 
 build: $(SOURCE_FILES) $(CONFIG_FILES) $(ICON_FILES) public/hangulize.wasm src/specs.json CNAME
 	npm run build
+	cp CNAME build/CNAME
 
 PORT ?= 8080
 start: $(SOURCE_FILES) $(CONFIG_FILES) $(ICON_FILES) public/hangulize.wasm src/specs.json
