@@ -1,0 +1,36 @@
+env:
+  browser: true
+  es6: true
+
+parser: '@typescript-eslint/parser'
+
+parserOptions:
+  ecmaVersion: latest
+  ecmaFeatures: {jsx: true}
+  sourceType: module
+
+extends:
+  - eslint:recommended
+  - plugin:@typescript-eslint/eslint-recommended
+  - plugin:@typescript-eslint/recommended
+  - plugin:import/recommended
+  - plugin:import/errors
+  - plugin:prettier/recommended
+  - plugin:react/recommended
+  - prettier
+
+plugins:
+  - react
+  - '@typescript-eslint'
+  - simple-import-sort
+
+settings:
+  react:
+    version: detect
+  import/resolver:
+    typescript: true
+
+rules:
+  react/react-in-jsx-scope: off
+  simple-import-sort/imports: error
+  simple-import-sort/exports: error
