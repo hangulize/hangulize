@@ -3,7 +3,7 @@
   <!-- H -->
   <rect fill="#432" width="34" height="160" x="0" y="0" rx="4" />
   <rect fill="#432" width="34" height="160" x="42" y="0" rx="4" />
-  <rect fill="#432" width="76" height="28" x="0" y="66" />
+  <rect fill="#432" width="70" height="34" x="3" y="63" />
 
   <!-- ㅎ -->
   <rect fill="#432" width="34" height="76" x="84" y="0" rx="4" />
