@@ -1,8 +1,9 @@
-package hangulize
+package hangulize_test
 
 import (
 	"testing"
 
+	"github.com/hangulize/hangulize"
 	"github.com/hangulize/hangulize/phonemize/furigana"
 	"github.com/hangulize/hangulize/phonemize/pinyin"
 	"github.com/stretchr/testify/assert"
@@ -12,8 +13,8 @@ import (
 // Use all phonemizers automatically for test.
 
 func init() {
-	UsePhonemizer(&furigana.P)
-	UsePhonemizer(&pinyin.P)
+	hangulize.UsePhonemizer(&furigana.P)
+	hangulize.UsePhonemizer(&pinyin.P)
 }
 
 // -----------------------------------------------------------------------------
@@ -32,27 +33,27 @@ func TestPhonemizerRegistry(t *testing.T) {
 	var ok bool
 
 	// Not exists.
-	_, ok = GetPhonemizer("my")
+	_, ok = hangulize.GetPhonemizer("my")
 	assert.False(t, ok)
 
 	// Successfully registered.
-	ok = UsePhonemizer(&myPhonemizer{})
+	ok = hangulize.UsePhonemizer(&myPhonemizer{})
 	assert.True(t, ok)
 
 	// Already exists.
-	ok = UsePhonemizer(&myPhonemizer{})
+	ok = hangulize.UsePhonemizer(&myPhonemizer{})
 	assert.False(t, ok)
 
 	// Found.
-	p, ok := GetPhonemizer("my")
+	p, ok := hangulize.GetPhonemizer("my")
 	assert.True(t, ok)
 	assert.IsType(t, &myPhonemizer{}, p)
 
 	// Successfully deregistered.
-	ok = UnusePhonemizer("my")
+	ok = hangulize.UnusePhonemizer("my")
 	assert.True(t, ok)
 
 	// Not exists.
-	ok = UnusePhonemizer("my")
+	ok = hangulize.UnusePhonemizer("my")
 	assert.False(t, ok)
 }

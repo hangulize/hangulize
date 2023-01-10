@@ -1,13 +1,15 @@
-package hangulize
+package hangulize_test
 
 import (
 	"fmt"
 	"testing"
+
+	"github.com/hangulize/hangulize"
 )
 
 // Here're all supported languages.
 func ExampleListLangs() {
-	for _, lang := range ListLangs() {
+	for _, lang := range hangulize.ListLangs() {
 		fmt.Println(lang)
 	}
 	// Output:

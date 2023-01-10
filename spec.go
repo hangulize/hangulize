@@ -10,9 +10,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/hangulize/hgl"
-	"github.com/hangulize/hre"
-	"github.com/hangulize/stringset"
+	"github.com/hangulize/hangulize/internal/runeset"
+	"github.com/hangulize/hangulize/pkg/hre"
+	"github.com/hangulize/hangulize/pkg/hsl"
 )
 
 // Spec represents a transactiption specification for a language.
@@ -38,11 +38,11 @@ type Spec struct {
 
 	// Prepared stuffs
 	script script
-	puncts stringset.StringSet
+	puncts runeset.Set
 
 	// Custom normalization
 	normReplacer *strings.Replacer
-	normLetters  stringset.StringSet
+	normLetters  runeset.Set
 }
 
 func (s Spec) String() string {
@@ -54,7 +54,7 @@ func (s Spec) GoString() string {
 	return fmt.Sprintf("hangulize.Spec{Lang.ID: %#v}", s.Lang.ID)
 }
 
-// ParseSpec parses a Spec from an HGL source.
+// ParseSpec parses a Spec from an HSL source.
 func ParseSpec(r io.Reader) (*Spec, error) {
 	var err error
 	var sourceBuf bytes.Buffer
@@ -62,22 +62,22 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// Use TeeReader to copy the source while parsing.
 	tee := io.TeeReader(r, &sourceBuf)
 
-	h, err := hgl.Parse(tee)
+	h, err := hsl.Parse(tee)
 
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse HGL source")
+		return nil, errors.Wrap(err, "failed to parse HSL source")
 	}
 
 	source := sourceBuf.String()
 
 	// -------------------------------------------------------------------------
-	// Every sections are optional. An empty HGL source is also valid spec.
+	// Every sections are optional. An empty HSL source is also valid spec.
 
 	// lang
 	var lang Language
 
 	if sec, ok := h["lang"]; ok {
-		_lang, err := newLanguage(sec.(*hgl.DictSection))
+		_lang, err := newLanguage(sec.(*hsl.DictSection))
 
 		if err != nil {
 			return nil, err
@@ -90,7 +90,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	var config Config
 
 	if sec, ok := h["config"]; ok {
-		_config, err := newConfig(sec.(*hgl.DictSection))
+		_config, err := newConfig(sec.(*hsl.DictSection))
 
 		if err != nil {
 			return nil, err
@@ -103,7 +103,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	var macros map[string]string
 
 	if sec, ok := h["macros"]; ok {
-		macros, err = sec.(*hgl.DictSection).Injective()
+		macros, err = sec.(*hsl.DictSection).Injective()
 
 		if err != nil {
 			return nil, err
@@ -113,19 +113,19 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// vars
 	var vars map[string][]string
 	if sec, ok := h["vars"]; ok {
-		vars = sec.(*hgl.DictSection).Map()
+		vars = sec.(*hsl.DictSection).Map()
 	}
 
 	// normalize
 	var normalize map[string][]string
 	if sec, ok := h["normalize"]; ok {
-		normalize = sec.(*hgl.DictSection).Map()
+		normalize = sec.(*hsl.DictSection).Map()
 	}
 
 	// rewrite
-	var rewritePairs []hgl.Pair
+	var rewritePairs []hsl.Pair
 	if sec, ok := h["rewrite"]; ok {
-		rewritePairs = sec.(*hgl.ListSection).Pairs()
+		rewritePairs = sec.(*hsl.ListSection).Pairs()
 	}
 
 	rewrite, err := newRules(rewritePairs, macros, vars)
@@ -134,9 +134,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	}
 
 	// transcribe
-	var transcribePairs []hgl.Pair
+	var transcribePairs []hsl.Pair
 	if sec, ok := h["transcribe"]; ok {
-		transcribePairs = sec.(*hgl.ListSection).Pairs()
+		transcribePairs = sec.(*hsl.ListSection).Pairs()
 	}
 
 	transcribe, err := newRules(transcribePairs, macros, vars)
@@ -147,7 +147,7 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	// test
 	var test [][2]string
 	if sec, ok := h["test"]; ok {
-		for _, pair := range sec.(*hgl.ListSection).Pairs() {
+		for _, pair := range sec.(*hsl.ListSection).Pairs() {
 			word := pair.Left()
 			transcribed := pair.Right()[0]
 
@@ -175,9 +175,14 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	normReplacer := strings.NewReplacer(args...)
 
 	// letters in normalize
-	normLetters := make(stringset.StringSet)
+	normLetters := runeset.New(len(normalize))
 	for to := range normalize {
-		normLetters[to] = true
+		more := len(to)
+		for more > 0 {
+			ch, size := utf8.DecodeRuneInString(to)
+			normLetters.Put(ch)
+			more -= size
+		}
 	}
 
 	// -------------------------------------------------------------------------
@@ -223,7 +228,7 @@ func (l Language) String() string {
 	return fmt.Sprintf("%s(%s)", l.ID, l.English)
 }
 
-func newLanguage(dict *hgl.DictSection) (*Language, error) {
+func newLanguage(dict *hsl.DictSection) (*Language, error) {
 	_codes := dict.All("codes")
 
 	if len(_codes) != 2 {
@@ -254,7 +259,7 @@ type Config struct {
 	Stage   string
 }
 
-func newConfig(dict *hgl.DictSection) (*Config, error) {
+func newConfig(dict *hsl.DictSection) (*Config, error) {
 	config := Config{
 		Authors: dict.All("authors"),
 		Stage:   dict.One("stage"),
@@ -266,7 +271,7 @@ func newConfig(dict *hgl.DictSection) (*Config, error) {
 // "rewrite"/"transcribe" section
 
 func newRules(
-	pairs []hgl.Pair,
+	pairs []hsl.Pair,
 
 	macros map[string]string,
 	vars map[string][]string,
@@ -300,14 +305,12 @@ func newRules(
 
 // collectPuncts collects punctuation characters from rewrite/transcribe rules.
 // It discards the punctuations that is used only for rewriting hints.
-func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
-	var puncts []string
-	rletters := make(map[string]bool)
+func collectPuncts(rewrite []Rule, transcribe []Rule) runeset.Set {
+	var puncts []rune
+	rletters := runeset.New(1)
 
 	collectFrom := func(rule Rule) {
-		for _, let := range rule.From.Letters() {
-			ch, _ := utf8.DecodeRuneInString(let)
-
+		for _, ch := range rule.From.Letters() {
 			// Collect only punctuation characters. (category P)
 			if !unicode.IsPunct(ch) {
 				continue
@@ -315,18 +318,18 @@ func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
 
 			// Punctuations appearing in the above RPatterns should be
 			// discarded. Bacause they are just hints for rewriting.
-			if rletters[let] {
+			if rletters.Has(ch) {
 				continue
 			}
 
-			puncts = append(puncts, let)
+			puncts = append(puncts, ch)
 		}
 	}
 
 	for _, rule := range rewrite {
 		// Mark letters in RPatterns.
 		for _, let := range rule.To.Letters() {
-			rletters[let] = true
+			rletters.Put(let)
 		}
 
 		collectFrom(rule)
@@ -336,5 +339,5 @@ func collectPuncts(rewrite []Rule, transcribe []Rule) stringset.StringSet {
 		collectFrom(rule)
 	}
 
-	return stringset.NewStringSet(puncts...)
+	return runeset.Of(puncts...)
 }

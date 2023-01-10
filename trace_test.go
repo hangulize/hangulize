@@ -1,16 +1,17 @@
-package hangulize
+package hangulize_test
 
 import (
 	"bytes"
 	"strings"
 	"testing"
 
+	"github.com/hangulize/hangulize"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestHangulizeTrace(t *testing.T) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 	transcribed, traces := h.HangulizeTrace("Cappuccino")
 
 	assert.Equal(t, "카푸치노", transcribed)
@@ -18,8 +19,8 @@ func TestHangulizeTrace(t *testing.T) {
 }
 
 func TestTraceString(t *testing.T) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 	_, traces := h.HangulizeTrace("Cappuccino")
 
 	assert.Equal(t, `[Input] "Cappuccino"`, traces[0].String())
@@ -27,8 +28,8 @@ func TestTraceString(t *testing.T) {
 }
 
 func TestTracesRender(t *testing.T) {
-	spec, _ := LoadSpec("ita")
-	h := NewHangulizer(spec)
+	spec, _ := hangulize.LoadSpec("ita")
+	h := hangulize.NewHangulizer(spec)
 	_, traces := h.HangulizeTrace("Cappuccino")
 
 	var b bytes.Buffer

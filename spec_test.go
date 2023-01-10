@@ -1,9 +1,10 @@
-package hangulize
+package hangulize_test
 
 import (
 	"bytes"
 	"testing"
 
+	"github.com/hangulize/hangulize"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -24,7 +25,7 @@ func TestSpecSource(t *testing.T) {
 }
 
 func TestUnlimitedNegativeLookaround(t *testing.T) {
-	_, err := ParseSpec(bytes.NewBufferString(`
+	_, err := hangulize.ParseSpec(bytes.NewBufferString(`
 		rewrite:
 			"{~.*}@_@" -> "o<-<"
 	`))

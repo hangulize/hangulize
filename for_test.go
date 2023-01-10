@@ -1,4 +1,4 @@
-package hangulize
+package hangulize_test
 
 import (
 	"bytes"
@@ -6,27 +6,28 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/hangulize/hangulize"
 	"github.com/stretchr/testify/assert"
 )
 
-func loadSpec(lang string) *Spec {
-	spec, ok := LoadSpec(lang)
+func loadSpec(lang string) *hangulize.Spec {
+	spec, ok := hangulize.LoadSpec(lang)
 	if !ok {
 		panic("failed to laod spec")
 	}
 	return spec
 }
 
-func mustParseSpec(hgl string) *Spec {
-	spec, err := ParseSpec(strings.NewReader(hgl))
+func mustParseSpec(hsl string) *hangulize.Spec {
+	spec, err := hangulize.ParseSpec(strings.NewReader(hsl))
 	if err != nil {
 		panic(err)
 	}
 	return spec
 }
 
-func assertHangulize(t *testing.T, spec *Spec, expected string, word string) {
-	h := NewHangulizer(spec)
+func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word string) {
+	h := hangulize.NewHangulizer(spec)
 
 	if h.Hangulize(word) == expected {
 		return

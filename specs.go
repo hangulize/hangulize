@@ -1,29 +1,32 @@
-//go:generate go get -v github.com/gobuffalo/packr/...
-//go:generate packr -v
-
 package hangulize
 
 import (
+	"embed"
+	"fmt"
+	"io/fs"
 	"sort"
 	"strings"
 
-	"github.com/gobuffalo/packr"
 	"github.com/pkg/errors"
 )
 
-// The box for HGL files.
-var hgls = packr.NewBox("./hgls")
+const ext = `.hsl`
 
-const ext = `.hgl`
+//go:embed specs/*.hsl
+var f embed.FS
 
 // ListLangs returns the language name list of bundled specs.
 // The bundled spec can be loaded by LoadSpec.
 func ListLangs() []string {
-	var langs []string
+	dir, err := f.ReadDir("specs")
+	if err != nil {
+		return nil
+	}
 
-	for _, filename := range hgls.List() {
-		if strings.HasSuffix(filename, ext) {
-			langs = append(langs, strings.TrimSuffix(filename, ext))
+	var langs []string
+	for _, ent := range dir {
+		if strings.HasSuffix(ent.Name(), ext) {
+			langs = append(langs, strings.TrimSuffix(ent.Name(), ext))
 		}
 	}
 
@@ -45,19 +48,19 @@ func LoadSpec(lang string) (*Spec, bool) {
 		return spec, true
 	}
 
-	filename := lang + ext
+	filename := "specs/" + lang + ext
+	hsl, err := f.ReadFile(filename)
 
-	if !hgls.Has(filename) {
+	if errors.Is(err, fs.ErrNotExist) {
 		// not found
 		return nil, false
 	}
 
-	hgl := hgls.String(filename)
-	spec, err := ParseSpec(strings.NewReader(hgl))
+	spec, err = ParseSpec(strings.NewReader(string(hsl)))
 
 	// Bundled spec must not have any error.
 	if err != nil {
-		panic(errors.Wrapf(err, `bundled spec "%s" has error`, lang))
+		panic(fmt.Errorf("bundled spec '%s': %w", lang, err))
 	}
 
 	// Cache it.

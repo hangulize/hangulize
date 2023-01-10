@@ -53,7 +53,7 @@ hangulize.Hangulize("ita", "Cappuccino")
 ### 목표
 
 - [x] 기존 한글라이즈(Python 구현)의 기능을 모두 계승
-- [x] 규칙 설계에 정적 파일(`.hgl`) 사용
+- [x] 규칙 설계에 정적 파일(`.hsl`) 사용
 - [ ] 간편한 규칙 설계환경
 - [ ] 규칙 설계법 꼼꼼히 문서화
 - [x] [hangulize.org](https://hangulize.org)에 적용

@@ -4,8 +4,7 @@ import "unicode"
 
 // Greek represents the Greek script.
 //
-//   ελληνικά
-//
+//	ελληνικά
 type Greek struct{}
 
 // Is checks whether the character is Greek or not.

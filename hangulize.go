@@ -7,7 +7,6 @@ package hangulize
 // "블라디보스토크".
 //
 // It is the most simple and useful API of thie package.
-//
 func Hangulize(lang string, word string) string {
 	spec, ok := LoadSpec(lang)
 	if !ok {

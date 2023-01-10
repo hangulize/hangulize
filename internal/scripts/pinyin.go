@@ -2,8 +2,7 @@ package scripts
 
 // Pinyin represents the Latin script for Chinese Pinyin.
 //
-//   漢語拼音
-//
+//	漢語拼音
 type Pinyin struct {
 	Latin
 }
@@ -11,8 +10,7 @@ type Pinyin struct {
 // Normalize converts a Latin character for Pinyin into ISO basic Latin lower
 // alphabet [a-z]. Especially, it converts "ü" to "v":
 //
-//   lüè -> lve
-//
+//	lüè -> lve
 func (s Pinyin) Normalize(ch rune) rune {
 	switch ch {
 	case 'ü', 'Ü':

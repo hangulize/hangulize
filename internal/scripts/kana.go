@@ -4,8 +4,7 @@ import "unicode"
 
 // Kana represents the Kana script including Hiragana and Katakana.
 //
-//   ひらがな カタカナ
-//
+//	ひらがな カタカナ
 type Kana struct{}
 
 // Is checks whether the character is either Hiragana or Katakana.
