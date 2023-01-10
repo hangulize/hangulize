@@ -40,15 +40,12 @@ jobs:
       uses: actions/setup-node@v3
       with: {node-version: 18.12.1}
 
-    - name: Install NPM dependencies
-      uses: bahmutov/npm-install@v1
-      with: {working-directory: web}
+    - name: Setup Yarn
+      run: npm i -g yarn@1.22.19
 
     - name: Build
       working-directory: web
-      run: |
-        make build
-        echo "$GITHUB_SHA" > build/version.txt
+      run: make build
 
     - name: GitHub Pages
       if: success()

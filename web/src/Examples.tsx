@@ -1,20 +1,26 @@
 import _ from 'lodash'
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
-import { getSpec } from './util'
 
-function Examples({ specs, lang, onClick }) {
-  const [ examples, setExamples ] = useState([])
+import { Example, findSpec, Spec } from './hangulize'
+
+interface ExamplesProps {
+  specs: Spec[]
+  lang: string
+}
+
+function Examples({ specs, lang }: ExamplesProps) {
+  const [examples, setExamples] = useState<Example[]>([])
 
   const shuffle = () => {
-    const spec = getSpec(specs, lang)
+    const spec = findSpec(specs, lang)
     if (spec !== null) {
       setExamples(_.sampleSize(spec.test, 5))
     }
   }
 
-  const prevLang = useRef()
+  const prevLang = useRef('')
   useEffect(() => {
     // Check lang dependency manually to hide the dependency with specs.
     if (prevLang.current !== lang) {

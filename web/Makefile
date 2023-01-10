@@ -1,33 +1,55 @@
 CONFIG_FILES = $(shell ls *.js *.json)
 SOURCE_FILES = $(shell find src public -type f)
+SPEC_FILES = $(shell find ../specs -name '*.hsl')
+
+.PHONY: help
+help:
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "%-10s %s\n", $$1, $$2}'
+
 ICON_FILES = \
 	public/favicon.ico \
 	public/icons/favicon-16x16.png \
 	public/icons/favicon-32x32.png \
 	public/icons/apple-touch-icon.png \
 	public/icons/safari-pinned-tab.svg
+$(ICON_FILES): public/logo.svg real-favicon.json
+	yarn icon
+	mv public/icons/favicon.ico public/favicon.ico
 
-.PHONY: start clean
-
-build: $(SOURCE_FILES) $(CONFIG_FILES) $(ICON_FILES) public/hangulize.wasm src/specs.json CNAME
-	npm run build
-	cp CNAME build/CNAME
-
-PORT ?= 8080
-start: $(SOURCE_FILES) $(CONFIG_FILES) $(ICON_FILES) public/hangulize.wasm src/specs.json
-	PORT=$(PORT) npm start
-
-src/specs.json: FORCE
+src/specs.json: $(SPEC_FILES)
 	go run ../cmd/hangulize-specs > $@
 
 public/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
 
-$(ICON_FILES): public/logo.svg real-favicon.json
-	npx -y cli-real-favicon generate real-favicon.json /dev/null public/icons
-	mv public/icons/favicon.ico public/favicon.ico
+GEN_FILES = $(ICON_FILES) src/specs.json public/hangulize.wasm
 
-clean: FORCE
-	rm -rf build public/hangulize.wasm src/specs.json
+node_modules: package.json
+	yarn install
+
+.PHONY: lint
+lint: node_modules ## Lint by ESLint
+	yarn lint
+
+.PHONY: fmt
+fmt: node_modules ## Format code by ESLint and Prettier
+	yarn lint:fix
+	yarn prettier
+
+build: node_modules $(GEN_FILES) ## Build a web app in ./build/
+	yarn build
+	cp CNAME build/CNAME
+
+.PHONY: start
+start: node_modules $(GEN_FILES) ## Start a web app for development
+	yarn start
+
+.PHONY: clean
+clean: ## Clean generated files and directories
+	rm -f ./public/hangulize.wasm
+	rm -f ./src/specs.json
+	rm -f $(ICON_FILES)
+	rm -rf ./node_modules
+	rm -rf ./build
 
 FORCE:

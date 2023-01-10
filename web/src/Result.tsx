@@ -1,15 +1,24 @@
-import _ from 'lodash'
-import { useLayoutEffect, useRef, useState } from 'react'
 import './Result.css'
 
-function Result({
-  children = '',
-}) {
+import _ from 'lodash'
+import { useLayoutEffect, useRef, useState } from 'react'
+
+interface ResultProps {
+  children: string
+  loading: boolean
+}
+
+function Result({ children, loading }: ResultProps) {
+  let result = (children || '').trim()
+  if (loading && result === '') {
+    result = '…'
+  }
+
   const minZoom = 0.5
   const maxZoom = 1
   const lo = useRef(minZoom)
   const hi = useRef(maxZoom)
-  const [ zoom, setZoom ] = useState(maxZoom)
+  const [zoom, setZoom] = useState(maxZoom)
 
   // Start a binary search to find the best zoom.
   const reset = () => {
@@ -18,7 +27,7 @@ function Result({
   }
 
   // Do a binary search before rendering to a user.
-  const p = useRef()
+  const p = useRef<HTMLParagraphElement>(null)
   const update = () => {
     if (!p.current || !p.current.firstChild) {
       return
@@ -28,7 +37,7 @@ function Result({
     const textNode = p.current.firstChild
     const range = document.createRange()
     range.setStart(textNode, 0)
-    range.setEnd(textNode, textNode.length)
+    range.setEnd(textNode, (textNode.textContent as string).length)
     const lines = range.getClientRects().length
 
     if (lines > 1) {
@@ -55,8 +64,10 @@ function Result({
   })
 
   return (
-    <div className="result">
-      <p ref={p} style={{fontSize: `${zoom}em`}}>{children.trim()}</p>
+    <div className={`result ${loading ? 'loading' : ''}`}>
+      <p ref={p} style={{ fontSize: `${zoom}em` }}>
+        {result}
+      </p>
     </div>
   )
 }
