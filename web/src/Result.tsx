@@ -65,9 +65,13 @@ function Result({ children, loading }: ResultProps) {
 
   return (
     <div className={`result ${loading ? 'loading' : ''}`}>
-      <p ref={p} style={{ fontSize: `${zoom}em` }}>
-        {result}
-      </p>
+      {result ? (
+        <p ref={p} style={{ fontSize: `${size}rem` }}>
+          {result}
+        </p>
+      ) : (
+        <></>
+      )}
     </div>
   )
 }

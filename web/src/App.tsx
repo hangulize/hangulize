@@ -24,11 +24,18 @@ function App() {
   // Sync lang and word with search parameters.
   const [searchParams, setSearchParams] = useSearchParams()
   const lang = searchParams.get('lang') || (_.sample(specs) as Spec).lang.id
-  const word = (searchParams.get('word') || '').trim()
+  const word = searchParams.get('word') || ''
 
   const spec = findSpec(specs, lang)
   if (spec === null) {
     throw new Error(`unknown lang: ${lang}`)
+  }
+
+  const shouldHangulize = word.trim() !== ''
+  if (shouldHangulize && loading && result === '') {
+    setResult('…')
+  } else if (!shouldHangulize && result !== '') {
+    setResult('')
   }
 
   useEffect(() => {
@@ -81,7 +88,10 @@ function App() {
   const prevWord = useRef<string | null>(null)
 
   useEffect(() => {
-    if (prevVersion.current !== version || prevLang.current !== lang || prevWord.current !== word) {
+    if (
+      shouldHangulize &&
+      (prevVersion.current !== version || prevLang.current !== lang || prevWord.current !== word)
+    ) {
       const delay = result ? 50 : 0
       hangulize(lang, word, delay)
     }
@@ -106,7 +116,7 @@ function App() {
       <Prompt specs={specs} lang={lang} word={word} loading={loading} onChange={handleChange} />
       <Examples specs={specs} lang={lang} />
 
-      {word && (loading || result) ? <Result loading={loading}>{result}</Result> : <></>}
+      {shouldHangulize ? <Result loading={loading}>{result}</Result> : <></>}
 
       <Description />
       <Divider />
