@@ -1,20 +1,20 @@
 .result {
   position: relative;
 
-  margin: 0.75rem 0 1rem;
-  min-height: 8rem;
+  margin: 1.5rem 0 2rem;
 
   display: flex;
   text-align: center;
   align-items: center;
   justify-content: center;
 
-  font-size: 5rem;
+  font-size: 7rem;
+  min-height: 8.4rem;
 }
 
 .result p {
   display: inline-block;
-  margin: 1rem 2rem;
+  margin: 0 0.75em;
   line-height: 1.2;
   text-align: left;
 }
@@ -41,18 +41,10 @@
   text-align: right;
 }
 
-.result.loading {
-  animation: result-loading 1.5s ease infinite alternate;
+.result {
+  transition: opacity 0.5s;
 }
 
-@keyframes result-loading {
-  0% {
-    opacity: 1;
-  }
-  95% {
-    opacity: 0.25;
-  }
-  100% {
-    opacity: 0.25;
-  }
+.result.loading {
+  opacity: 0.25;
 }

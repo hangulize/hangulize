@@ -9,21 +9,19 @@ interface ResultProps {
 }
 
 function Result({ children, loading }: ResultProps) {
-  let result = (children || '').trim()
-  if (loading && result === '') {
-    result = '…'
-  }
+  const result = (children || '').trim()
 
-  const minZoom = 0.5
-  const maxZoom = 1
-  const lo = useRef(minZoom)
-  const hi = useRef(maxZoom)
-  const [zoom, setZoom] = useState(maxZoom)
+  const minSize = 3
+  const maxSize = 7
+  const sizePrec = 3
+  const lo = useRef(minSize)
+  const hi = useRef(maxSize)
+  const [size, setSize] = useState(maxSize)
 
   // Start a binary search to find the best zoom.
   const reset = () => {
-    lo.current = minZoom
-    hi.current = maxZoom
+    lo.current = minSize
+    hi.current = maxSize
   }
 
   // Do a binary search before rendering to a user.
@@ -40,14 +38,18 @@ function Result({ children, loading }: ResultProps) {
     range.setEnd(textNode, (textNode.textContent as string).length)
     const lines = range.getClientRects().length
 
+    // Try to size down on two or more lines.
     if (lines > 1) {
-      // Try to size down on two or more lines.
-      hi.current = zoom
-      setZoom(_.floor((zoom - lo.current) / 2 + lo.current, 2))
-    } else if (hi.current - lo.current > 0.011) {
-      // Try to size up if there's still a room.
-      lo.current = zoom
-      setZoom(_.ceil((hi.current - zoom) / 2 + zoom, 2))
+      hi.current = size
+      setSize(_.floor((size - lo.current) / 2 + lo.current, sizePrec))
+      return
+    }
+
+    // Try to size up if there's still a room.
+    const room = Math.pow(0.1, sizePrec) + Math.pow(0.1, sizePrec + 1)
+    if (hi.current - lo.current > room) {
+      lo.current = size
+      setSize(_.ceil((hi.current - size) / 2 + size, sizePrec))
     }
   }
 
