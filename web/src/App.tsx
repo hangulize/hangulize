@@ -69,11 +69,11 @@ function App() {
   }
 
   const hangulize = useHangulize({
-    onInitialize: (version: string, specs: Spec[]) => {
+    onInit: (version: string, specs: Spec[]) => {
       setVersion('v' + version)
       setSpecs(specs)
     },
-    onTranscribe: (result: string) => {
+    onResult: (result: string) => {
       setResult(result)
       setLoading(false)
     },

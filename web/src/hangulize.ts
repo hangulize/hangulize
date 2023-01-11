@@ -1,4 +1,5 @@
-import { useRef } from 'react'
+import { default as _ } from 'lodash'
+import { useMemo, useRef } from 'react'
 
 interface Example {
   word: string
@@ -27,17 +28,17 @@ function findSpec(specs: Spec[], lang: string) {
   return null
 }
 
-interface Data {
+interface MessagePayload {
   method: string
 }
 
-interface InitializedData extends Data {
+interface InitializedPayload extends MessagePayload {
   method: 'initialized'
   version: string
   specs: Spec[]
 }
 
-interface HangulizedData extends Data {
+interface HangulizedPayload extends MessagePayload {
   method: 'hangulized'
   nonce: string
   result: string
@@ -57,7 +58,7 @@ class Hangulizer {
     this.onInitialize = onInitialize
   }
 
-  handleMessage(msg: { data: InitializedData | HangulizedData }) {
+  handleMessage(msg: { data: InitializedPayload | HangulizedPayload }) {
     switch (msg.data.method) {
       case 'initialized':
         this.initialized = true
@@ -85,7 +86,7 @@ class Hangulizer {
       return ''
     }
 
-    const nonce = (Math.random() + 1).toString(36).substring(7)
+    const nonce = _.uniqueId()
     this.worker.postMessage({
       method: 'hangulize',
       lang,
@@ -99,56 +100,59 @@ class Hangulizer {
   }
 }
 
-interface useHangulizeProps {
-  onInitialize: (version: string, specs: Spec[]) => void
-  onTranscribe: (result: string) => void
+interface UseHangulizeProps {
+  onInit: (version: string, specs: Spec[]) => void
+  onResult: (result: string) => void
   onSlow: () => void
 }
 
-function useHangulize({ onInitialize, onTranscribe, onSlow }: useHangulizeProps) {
-  const worker = useRef<Hangulizer | null>(null)
-  const slowTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const cancel = useRef<((reason: Error) => void) | null>(null)
-
-  // Init a worker.
-  if (worker.current === null) {
-    worker.current = new Hangulizer(onInitialize)
-  }
+function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHangulizeProps) {
+  const worker = useMemo(() => new Hangulizer(onInit), [])
+  const lastId = useRef('')
+  const lastJob = useRef<Promise<string> | null>(null)
+  const slow = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // hangulize(lang, word) tries to transcribe after 50 ms. If transcription
   // doesn't finish of can't finish in 500 ms, it calls onSlow().
   const hangulize = async (lang: string, word: string, delay = 50) => {
-    if (worker.current === null) {
-      return
-    }
-
-    if (!worker.current.initialized) {
+    // Trigger onSlow() when it cannot finish in 500ms.
+    if (!worker.initialized) {
       onSlow()
       return
     }
-
-    if (slowTimeout.current === null) {
-      slowTimeout.current = setTimeout(onSlow, 500)
-    }
-    if (cancel.current !== null) {
-      cancel.current(new Error())
+    if (slow.current === null) {
+      slow.current = setTimeout(onSlow, 500)
     }
 
-    try {
-      await new Promise((resolve, reject: (reason: Error) => void) => {
-        cancel.current = reject
-        setTimeout(resolve, delay)
-      })
-    } catch (e) {
-      return
+    // Only the last request is necessary. After any "await", check lastId with
+    // id to decide whether the process should be dropped.
+    const id = _.uniqueId()
+    lastId.current = id
+
+    // Sleep for the given delay to avoid too often job.
+    await new Promise((resolve) => {
+      setTimeout(resolve, delay)
+    })
+    if (lastId.current !== id) return
+
+    // Wait for the currently running job to not make too many jobs which
+    // probably will be dropped.
+    if (lastJob.current !== null) {
+      await lastJob.current
+      if (lastId.current !== id) return
     }
 
-    const result = await worker.current.hangulize(lang, word)
-    onTranscribe(result)
+    // This is the last request. Hangulize it.
+    lastJob.current = worker.hangulize(lang, word)
+    const result = await lastJob.current
+    if (lastId.current !== id) return
 
-    clearTimeout(slowTimeout.current)
-    slowTimeout.current = null
-    cancel.current = null
+    // This is still the last request. Finally, trigger onResult().
+    onResult(result)
+
+    // Don't call onSlow() if it finishes in 500ms.
+    clearTimeout(slow.current)
+    slow.current = null
   }
 
   return hangulize
