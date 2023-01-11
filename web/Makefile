@@ -27,6 +27,9 @@ GEN_FILES = $(ICON_FILES) src/specs.json public/hangulize.wasm
 node_modules: package.json
 	yarn install
 
+.PHONY: gen
+generate: $(GEN_FILES) ## Generate Wasm, JSON, and icon files
+
 .PHONY: lint
 lint: node_modules ## Lint by ESLint
 	yarn lint
