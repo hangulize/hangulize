@@ -11,45 +11,42 @@ interface ResultProps {
 function Result({ children, loading }: ResultProps) {
   const result = (children || '').trim()
 
-  const minSize = 3
-  const maxSize = 7
-  const sizePrec = 3
-  const lo = useRef(minSize)
-  const hi = useRef(maxSize)
-  const [size, setSize] = useState(maxSize)
+  const sizes = ['size-1', 'size-2', 'size-3', 'size-4']
+  const lo = useRef(0)
+  const hi = useRef(sizes.length - 1)
+  const [mid, setMid] = useState(hi.current)
 
   // Start a binary search to find the best zoom.
   const reset = () => {
-    lo.current = minSize
-    hi.current = maxSize
+    lo.current = 0
+    hi.current = sizes.length - 1
   }
 
   // Do a binary search before rendering to a user.
-  const p = useRef<HTMLParagraphElement>(null)
+  const ref = useRef<HTMLDivElement>(null)
   const update = () => {
-    if (!p.current || !p.current.firstChild) {
+    if (!ref.current || !ref.current.firstChild) {
       return
     }
 
-    // Detect the number of rendered lines.
-    const textNode = p.current.firstChild
-    const range = document.createRange()
-    range.setStart(textNode, 0)
-    range.setEnd(textNode, (textNode.textContent as string).length)
-    const lines = range.getClientRects().length
-
-    // Try to size down on two or more lines.
-    if (lines > 1) {
-      hi.current = size
-      setSize(_.floor((size - lo.current) / 2 + lo.current, sizePrec))
+    // Try to size down if the height is expanded.
+    const height = (ref.current.firstChild as HTMLParagraphElement).offsetHeight
+    const capacity = parseInt(getComputedStyle(ref.current).maxHeight)
+    if (height > capacity) {
+      hi.current = mid
+      setMid(_.floor((mid - lo.current) / 2) + lo.current)
       return
     }
 
-    // Try to size up if there's still a room.
-    const room = Math.pow(0.1, sizePrec) + Math.pow(0.1, sizePrec + 1)
-    if (hi.current - lo.current > room) {
-      lo.current = size
-      setSize(_.ceil((hi.current - size) / 2 + size, sizePrec))
+    // The current size is optimal.
+    if (hi.current - lo.current <= 1) {
+      return
+    }
+
+    // Otherwise, try to size up.
+    if (mid !== hi.current) {
+      lo.current = mid
+      setMid(_.ceil((hi.current - mid) / 2) + mid)
     }
   }
 
@@ -66,14 +63,8 @@ function Result({ children, loading }: ResultProps) {
   })
 
   return (
-    <div className={`result ${loading ? 'loading' : ''}`}>
-      {result ? (
-        <p ref={p} style={{ fontSize: `${size}rem` }}>
-          {result}
-        </p>
-      ) : (
-        <></>
-      )}
+    <div className={`result ${sizes[mid]} ${loading ? 'loading' : ''}`} ref={ref}>
+      {result ? <p>{result}</p> : <></>}
     </div>
   )
 }

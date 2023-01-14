@@ -1,22 +1,47 @@
 .result {
   position: relative;
 
-  margin: 1.5rem 0 2rem;
+  margin: 1.5rem 0;
+  height: 8rem;
+  max-height: 8rem;
 
   display: flex;
   text-align: center;
   align-items: center;
   justify-content: center;
+}
 
+.result.size-1 {
+  font-size: 2.75rem;
+  line-height: 1.4;
+
+  height: auto;
+  max-height: none;
+  min-height: 8rem;
+
+  align-items: start;
+}
+.result.size-2 {
+  font-size: 3.25rem;
+  line-height: 1.2;
+  padding-bottom: 0.5rem;
+}
+.result.size-3 {
+  font-size: 5rem;
+  line-height: 1;
+  padding-bottom: 0.75rem;
+}
+.result.size-4 {
   font-size: 7rem;
-  min-height: 8.4rem;
+  line-height: 1;
+  padding-bottom: 1rem;
 }
 
 .result p {
   display: inline-block;
-  margin: 0 0.75em;
-  line-height: 1.2;
   text-align: left;
+  margin: 0 0.75em;
+  line-height: inherit;
 }
 
 .result p::before,
