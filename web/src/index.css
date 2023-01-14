@@ -13,9 +13,6 @@
 
 .version {
   height: 1.25rem;
-}
-
-.version span {
   font-family: Roboto, sans-serif;
 }
 

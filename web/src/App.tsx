@@ -12,7 +12,7 @@ import Result from './Result'
 import staticSpecs from './specs.json'
 
 function App() {
-  const [version, setVersion] = useState('')
+  const [version, setVersion] = useState(staticSpecs.version)
   const [specs, setSpecs] = useState(staticSpecs.specs as Spec[])
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(true)
@@ -70,7 +70,7 @@ function App() {
 
   const hangulize = useHangulize({
     onInit: (version: string, specs: Spec[]) => {
-      setVersion('v' + version)
+      setVersion(version)
       setSpecs(specs)
       hangulize(lang, word, 0)
     },
@@ -97,9 +97,7 @@ function App() {
         <Image src={process.env.PUBLIC_URL + '/logo.svg'} />
         <Header.Content>
           한글라이즈
-          <Header.Subheader className="version">
-            {version ? <span>{version}</span> : '불러오는 중...'}
-          </Header.Subheader>
+          <Header.Subheader className="version">v{version}</Header.Subheader>
         </Header.Content>
       </Header>
 
