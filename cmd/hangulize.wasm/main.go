@@ -37,8 +37,8 @@ func jsSpec(s *hangulize.Spec) js.Value {
 	test := array{}
 	for _, exm := range s.Test {
 		test = append(test, js.ValueOf(object{
-			"word":        exm[0],
-			"transcribed": exm[1],
+			"word":   exm[0],
+			"result": exm[1],
 		}))
 	}
 

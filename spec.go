@@ -149,9 +149,9 @@ func ParseSpec(r io.Reader) (*Spec, error) {
 	if sec, ok := h["test"]; ok {
 		for _, pair := range sec.(*hsl.ListSection).Pairs() {
 			word := pair.Left()
-			transcribed := pair.Right()[0]
+			result := pair.Right()[0]
 
-			exm := [2]string{word, transcribed}
+			exm := [2]string{word, result}
 
 			test = append(test, exm)
 		}

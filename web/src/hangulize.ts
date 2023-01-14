@@ -3,7 +3,7 @@ import { useMemo, useRef } from 'react'
 
 interface Example {
   word: string
-  transcribed: string
+  result: string
 }
 
 interface Spec {

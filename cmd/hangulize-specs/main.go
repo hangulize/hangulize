@@ -13,9 +13,9 @@ type root struct {
 }
 
 type spec struct {
-	Lang   lang     `json:"lang"`
-	Config config   `json:"config"`
-	Test   []sample `json:"test"`
+	Lang   lang      `json:"lang"`
+	Config config    `json:"config"`
+	Test   []example `json:"test"`
 }
 
 type lang struct {
@@ -33,9 +33,9 @@ type config struct {
 	Stage   string   `json:"stage"`
 }
 
-type sample struct {
-	Word        string `json:"word"`
-	Transcribed string `json:"transcribed"`
+type example struct {
+	Word   string `json:"word"`
+	Result string `json:"result"`
 }
 
 // jsonSpec converts a Spec to be encoded as JSON.
@@ -52,9 +52,9 @@ func jsonSpec(s *hangulize.Spec) spec {
 
 	config := config{s.Config.Authors, s.Config.Stage}
 
-	test := make([]sample, 0, len(s.Test))
+	test := make([]example, 0, len(s.Test))
 	for _, exm := range s.Test {
-		test = append(test, sample{exm[0], exm[1]})
+		test = append(test, example{exm[0], exm[1]})
 	}
 
 	return spec{lang, config, test}

@@ -12,9 +12,9 @@ import (
 func TestHangulizeTrace(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("ita")
 	h := hangulize.New(spec)
-	transcribed, traces := h.HangulizeTrace("Cappuccino")
+	result, traces := h.HangulizeTrace("Cappuccino")
 
-	assert.Equal(t, "카푸치노", transcribed)
+	assert.Equal(t, "카푸치노", result)
 	assert.NotEqual(t, 0, len(traces))
 }
 
