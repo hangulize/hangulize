@@ -225,9 +225,6 @@ func ExampleHangulize_nietzsche() {
 }
 
 func ExampleHangulize_shinkaiMakoto() {
-	// import "github.com/hangulize/hangulize/phonemize/furigana"
-	// UsePhonemizer(&furigana.P)
-
 	fmt.Println(hangulize.Hangulize("jpn", "新海誠"))
 	// Output: 신카이 마코토
 }

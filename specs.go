@@ -57,10 +57,16 @@ func LoadSpec(lang string) (*Spec, bool) {
 	}
 
 	spec, err = ParseSpec(strings.NewReader(string(hsl)))
-
-	// Bundled spec must not have any error.
 	if err != nil {
+		// Bundled spec must not have any error.
 		panic(fmt.Errorf("bundled spec '%s': %w", lang, err))
+	}
+
+	if spec.Lang.Phonemizer != "" {
+		if _, ok := GetPhonemizer(spec.Lang.Phonemizer); !ok {
+			// Bundled spec must use a valid phonemizer.
+			panic(fmt.Errorf("bundled spec '%s': no phonemizer %s", lang, spec.Lang.Phonemizer))
+		}
 	}
 
 	// Cache it.

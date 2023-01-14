@@ -1,19 +1,23 @@
 package hangulize
 
+import (
+	"github.com/hangulize/hangulize/phonemize/furigana"
+	"github.com/hangulize/hangulize/phonemize/pinyin"
+)
+
+// Register the built-in phonemizers.
+func init() {
+	if ok := UsePhonemizer(&pinyin.P); !ok {
+		panic("failed to use phonemizer: pinyin")
+	}
+
+	if ok := UsePhonemizer(&furigana.P); !ok {
+		panic("failed to use phonemizer: furigana")
+	}
+}
+
 // Phonemizer is an interface to guess phonograms from a spelling based on
 // lexical analysis.
-//
-// The lexical analysis may require large size of dictionary data. To keep
-// Hangulize lightweight, phonemizers are implemented out of this package.
-//
-// For example, there is a phonemizer for Furigana of Japanese in a separate
-// package.
-//
-//	import "github.com/hangulize/hangulize"
-//	import "github.com/hangulize/hangulize/phonemize/furigana"
-//
-//	hangulize.UsePhonemizer(&furigana.P)
-//	fmt.Println(hangulize.Hangulize("jpn", "日本語"))
 type Phonemizer interface {
 	ID() string
 	Phonemize(string) string
@@ -41,28 +45,25 @@ func unusePhonemizer(id string, phonemizers map[string]Phonemizer) bool {
 }
 
 // getPhonemizer discards a phonemizer from the given registry.
-func getPhonemizer(
-	id string,
-	phonemizers map[string]Phonemizer,
-) (Phonemizer, bool) {
+func getPhonemizer(id string, phonemizers map[string]Phonemizer) (Phonemizer, bool) {
 	p, ok := phonemizers[id]
 	return p, ok
 }
 
-// phonemizerRegistry is the registry holding the imported phonemizerRegistry.
+// phonemizerRegistry is the registry holding the imported phonemizers.
 var phonemizerRegistry = make(map[string]Phonemizer)
 
-// UsePhonemizer keeps a phonemizer for ready to use globally.
+// UsePhonemizer imports a phonemizer for ready to use.
 func UsePhonemizer(p Phonemizer) bool {
 	return usePhonemizer(p, phonemizerRegistry)
 }
 
-// UnusePhonemizer discards a global phonemizer.
+// UnusePhonemizer discards a phonemizer by the ID.
 func UnusePhonemizer(id string) bool {
 	return unusePhonemizer(id, phonemizerRegistry)
 }
 
-// GetPhonemizer returns a global phonemizer by the ID.
+// GetPhonemizer returns a phonemizer by the ID.
 func GetPhonemizer(id string) (Phonemizer, bool) {
 	return getPhonemizer(id, phonemizerRegistry)
 }

@@ -6,8 +6,6 @@ import (
 	"syscall/js"
 
 	"github.com/hangulize/hangulize"
-	"github.com/hangulize/hangulize/phonemize/furigana"
-	"github.com/hangulize/hangulize/phonemize/pinyin"
 )
 
 type object = map[string]interface{}
@@ -60,9 +58,6 @@ var jsHangulize = js.FuncOf(func(this js.Value, args []js.Value) any {
 var version string
 
 func main() {
-	hangulize.UsePhonemizer(&furigana.P)
-	hangulize.UsePhonemizer(&pinyin.P)
-
 	specs := []interface{}{}
 	for _, lang := range hangulize.ListLangs() {
 		spec, _ := hangulize.LoadSpec(lang)
