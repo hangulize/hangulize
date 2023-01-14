@@ -1,5 +1,5 @@
 import { default as _ } from 'lodash'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
@@ -72,6 +72,7 @@ function App() {
     onInit: (version: string, specs: Spec[]) => {
       setVersion('v' + version)
       setSpecs(specs)
+      hangulize(lang, word, 0)
     },
     onResult: (result: string) => {
       setResult(result)
@@ -83,23 +84,12 @@ function App() {
   })
 
   // Transcribe when something has been changed.
-  const prevVersion = useRef<string | null>(null)
-  const prevLang = useRef<string | null>(null)
-  const prevWord = useRef<string | null>(null)
-
   useEffect(() => {
-    if (
-      shouldHangulize &&
-      (prevVersion.current !== version || prevLang.current !== lang || prevWord.current !== word)
-    ) {
+    if (shouldHangulize) {
       const delay = result ? 50 : 0
       hangulize(lang, word, delay)
     }
-
-    prevVersion.current = version
-    prevLang.current = lang
-    prevWord.current = word
-  })
+  }, [lang, word])
 
   return (
     <Container text className="app">
