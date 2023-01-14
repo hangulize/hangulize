@@ -1,6 +1,5 @@
 CONFIG_FILES = $(shell ls *.js *.json)
 SOURCE_FILES = $(shell find src public -type f)
-SPEC_FILES = $(shell find ../specs -name '*.hsl')
 
 .PHONY: help
 help:
@@ -16,8 +15,8 @@ $(ICON_FILES): public/logo.svg real-favicon.json
 	yarn icon
 	mv public/icons/favicon.ico public/favicon.ico
 
-src/specs.json: $(SPEC_FILES)
-	go run ../cmd/hangulize-specs > $@
+src/specs.json: FORCE
+	$(MAKE) -C ../cmd/specs.json OUT=$(CURDIR)/$@
 
 public/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
