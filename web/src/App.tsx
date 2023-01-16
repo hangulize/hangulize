@@ -72,7 +72,6 @@ function App() {
     onInit: (version: string, specs: Spec[]) => {
       setVersion(version)
       setSpecs(specs)
-      hangulize(lang, word, 0)
     },
     onResult: (result: string) => {
       setResult(result)
@@ -82,6 +81,11 @@ function App() {
       setLoading(true)
     },
   })
+
+  // Transcribe when just initialized.
+  useEffect(() => {
+    hangulize(lang, word, 0)
+  }, [specs])
 
   // Transcribe when something has been changed.
   useEffect(() => {
