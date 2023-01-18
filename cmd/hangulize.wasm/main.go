@@ -52,7 +52,22 @@ func jsSpec(s *hangulize.Spec) js.Value {
 var jsHangulize = js.FuncOf(func(this js.Value, args []js.Value) any {
 	lang := args[0].String()
 	word := args[1].String()
-	return hangulize.Hangulize(lang, word)
+
+	promiseClass := js.Global().Get("Promise")
+	errorClass := js.Global().Get("Error")
+	return promiseClass.New(js.FuncOf(func(this js.Value, args []js.Value) any {
+		resolve := args[0]
+		reject := args[1]
+
+		result, err := hangulize.Hangulize(lang, word)
+		if err != nil {
+			reject.Invoke(errorClass.New(err.Error()))
+		} else {
+			resolve.Invoke(result)
+		}
+
+		return nil
+	}))
 })
 
 var version string

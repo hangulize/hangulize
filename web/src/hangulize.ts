@@ -32,14 +32,14 @@ interface MessagePayload {
   method: string
 }
 
-interface InitializedPayload extends MessagePayload {
-  method: 'initialized'
+interface LoadedPayload extends MessagePayload {
+  method: 'loaded'
   version: string
   specs: Spec[]
 }
 
-interface HangulizedPayload extends MessagePayload {
-  method: 'hangulized'
+interface ResultPayload extends MessagePayload {
+  method: 'result'
   nonce: string
   result: string
 }
@@ -47,28 +47,33 @@ interface HangulizedPayload extends MessagePayload {
 class Hangulizer {
   worker: Worker
   resolvers: { [nonce: string]: (result: string) => void }
-  initialized: boolean
-  onInitialize?: (version: string, specs: Spec[]) => void
+  loaded: boolean
+  onLoad: (version: string, specs: Spec[]) => void
+  specs: Spec[]
 
-  constructor(onInitialize?: (version: string, specs: Spec[]) => void) {
+  constructor(onLoad: (version: string, specs: Spec[]) => void) {
     this.worker = new Worker(process.env.PUBLIC_URL + '/hangulize.worker.js')
     this.worker.addEventListener('message', this.handleMessage.bind(this))
     this.resolvers = {}
-    this.initialized = false
-    this.onInitialize = onInitialize
+    this.loaded = false
+    this.onLoad = onLoad
+    this.specs = []
   }
 
-  handleMessage(msg: { data: InitializedPayload | HangulizedPayload }) {
-    switch (msg.data.method) {
-      case 'initialized':
-        this.initialized = true
+  handleMessage(msg: { data: LoadedPayload | ResultPayload }) {
+    console.log(msg.data)
 
-        if (this.onInitialize !== undefined) {
-          this.onInitialize(msg.data.version, msg.data.specs)
+    switch (msg.data.method) {
+      case 'loaded':
+        this.loaded = true
+        this.specs = msg.data.specs
+
+        if (this.onLoad !== undefined) {
+          this.onLoad(msg.data.version, msg.data.specs)
         }
         return
 
-      case 'hangulized':
+      case 'result':
         if (!(msg.data.nonce in this.resolvers)) {
           break
         }
@@ -82,7 +87,7 @@ class Hangulizer {
   }
 
   async hangulize(lang: string, word: string) {
-    if (!word || !this.initialized) {
+    if (!word || !this.loaded) {
       return ''
     }
 
@@ -116,7 +121,7 @@ function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHanguli
   // doesn't finish of can't finish in 500 ms, it calls onSlow().
   const hangulize = async (lang: string, word: string, delay = 50) => {
     // Trigger onSlow() when it cannot finish in 500ms.
-    if (!worker.initialized) {
+    if (!worker.loaded) {
       onSlow()
       return
     }
