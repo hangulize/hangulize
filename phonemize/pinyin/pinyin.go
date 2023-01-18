@@ -24,7 +24,11 @@ func (pinyinPhonemizer) ID() string {
 	return "pinyin"
 }
 
-func (p *pinyinPhonemizer) Phonemize(word string) string {
+func (pinyinPhonemizer) Load() error {
+	return nil
+}
+
+func (p *pinyinPhonemizer) Phonemize(word string) (string, error) {
 	// Normalize into CJK unified ideographs.
 	word = norm.NFC.String(word)
 
@@ -51,5 +55,5 @@ func (p *pinyinPhonemizer) Phonemize(word string) string {
 		chunks = append(chunks, buf.String())
 	}
 
-	return strings.Join(chunks, "\u200b")
+	return strings.Join(chunks, "\u200b"), nil
 }

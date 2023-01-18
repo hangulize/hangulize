@@ -1,69 +1,54 @@
 package hangulize
 
-import (
-	"github.com/hangulize/hangulize/phonemize/furigana"
-	"github.com/hangulize/hangulize/phonemize/pinyin"
-)
-
-// Register the built-in phonemizers.
-func init() {
-	if ok := UsePhonemizer(&pinyin.P); !ok {
-		panic("failed to use phonemizer: pinyin")
-	}
-
-	if ok := UsePhonemizer(&furigana.P); !ok {
-		panic("failed to use phonemizer: furigana")
-	}
-}
-
 // Phonemizer is an interface to guess phonograms from a spelling based on
 // lexical analysis.
 type Phonemizer interface {
 	ID() string
-	Phonemize(string) string
+	Load() error
+	Phonemize(string) (string, error)
 }
 
-// usePhonemizer keeps a phonemizer into the given registry.
-func usePhonemizer(p Phonemizer, phonemizers map[string]Phonemizer) bool {
+// importPhonemizer keeps a phonemizer into the given registry.
+func importPhonemizer(p Phonemizer, registry map[string]Phonemizer) bool {
 	id := p.ID()
 
-	if _, ok := phonemizers[id]; ok {
+	if _, ok := registry[id]; ok {
 		return false
 	}
 
-	phonemizers[id] = p
+	registry[id] = p
 	return true
 }
 
-// unusePhonemizer discards a phonemizer from the given registry.
-func unusePhonemizer(id string, phonemizers map[string]Phonemizer) bool {
-	_, ok := phonemizers[id]
+// unimportPhonemizer discards a phonemizer from the given registry.
+func unimportPhonemizer(id string, registry map[string]Phonemizer) bool {
+	_, ok := registry[id]
 	if ok {
-		delete(phonemizers, id)
+		delete(registry, id)
 	}
 	return ok
 }
 
-// getPhonemizer discards a phonemizer from the given registry.
-func getPhonemizer(id string, phonemizers map[string]Phonemizer) (Phonemizer, bool) {
-	p, ok := phonemizers[id]
+// getPhonemizer finds a phonemizer from the given registry.
+func getPhonemizer(id string, registry map[string]Phonemizer) (Phonemizer, bool) {
+	p, ok := registry[id]
 	return p, ok
 }
 
-// phonemizerRegistry is the registry holding the imported phonemizers.
-var phonemizerRegistry = make(map[string]Phonemizer)
+// defaultPhonemizerRegistry is the registry holding the imported phonemizers.
+var defaultPhonemizerRegistry = make(map[string]Phonemizer)
 
-// UsePhonemizer imports a phonemizer for ready to use.
-func UsePhonemizer(p Phonemizer) bool {
-	return usePhonemizer(p, phonemizerRegistry)
+// ImportPhonemizer imports a phonemizer for ready to use.
+func ImportPhonemizer(p Phonemizer) bool {
+	return importPhonemizer(p, defaultPhonemizerRegistry)
 }
 
-// UnusePhonemizer discards a phonemizer by the ID.
-func UnusePhonemizer(id string) bool {
-	return unusePhonemizer(id, phonemizerRegistry)
+// UnimportPhonemizer discards a phonemizer by the ID.
+func UnimportPhonemizer(id string) bool {
+	return unimportPhonemizer(id, defaultPhonemizerRegistry)
 }
 
-// GetPhonemizer returns a phonemizer by the ID.
-func GetPhonemizer(id string) (Phonemizer, bool) {
-	return getPhonemizer(id, phonemizerRegistry)
+// DefaultPhonemizer returns a phonemizer from the default registry.
+func DefaultPhonemizer(id string) (Phonemizer, bool) {
+	return getPhonemizer(id, defaultPhonemizerRegistry)
 }

@@ -2,6 +2,7 @@ package hangulize
 
 import (
 	"bytes"
+	"fmt"
 	"regexp"
 	"strings"
 	"unicode"
@@ -86,11 +87,14 @@ type pipeline struct {
 }
 
 // forward runs the Hangulize pipeline for a word.
-func (p pipeline) forward(word string) string {
+func (p pipeline) forward(word string) (string, error) {
 	p.input(word)
 
 	// preparing phase
-	word, _ = p.phonemize(word)
+	word, err := p.phonemize(word)
+	if err != nil {
+		return "", err
+	}
 	word = p.normalize(word)
 
 	// transcribing phase
@@ -102,7 +106,7 @@ func (p pipeline) forward(word string) string {
 	word = p.syllabify(subwords)
 	word = p.transliterate(word)
 
-	return word
+	return word, nil
 }
 
 // -----------------------------------------------------------------------------
@@ -118,33 +122,36 @@ func (p pipeline) input(word string) {
 // analysis. Most languages already use phonograms which are sufficient to
 // represent the exact pronunciation. But in some languages, such as American
 // English or Chinese, it's not true.
-func (p pipeline) phonemize(word string) (string, bool) {
+func (p pipeline) phonemize(word string) (string, error) {
 	id := p.h.spec.Lang.Phonemizer
 	if id == "" {
 		// The language doesn't require a phonemizer. It's okay.
-		return word, true
+		return word, nil
 	}
 
-	pron, ok := p.h.GetPhonemizer(id)
+	phonem, ok := p.h.Phonemizer(id)
 	if ok {
 		goto PhonemizerFound
 	}
 
 	// Fallback by the global phonemizer registry.
-	pron, ok = GetPhonemizer(id)
+	phonem, ok = DefaultPhonemizer(id)
 	if ok {
 		goto PhonemizerFound
 	}
 
 	// The language requires a phonemizer but not imported yet.
-	return word, false
+	return word, fmt.Errorf("%w: %s", ErrPhonemizerNotImported, id)
 
 PhonemizerFound:
-	word = pron.Phonemize(word)
+	word, err := phonem.Phonemize(word)
+	if err != nil {
+		return word, err
+	}
 
 	p.tr.Trace(Phonemize, word, id)
 
-	return word, true
+	return word, nil
 }
 
 // 2. Normalize (Word -> Word)

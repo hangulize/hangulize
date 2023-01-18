@@ -12,8 +12,9 @@ import (
 func TestHangulizeTrace(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("ita")
 	h := hangulize.New(spec)
-	result, traces := h.HangulizeTrace("Cappuccino")
+	result, traces, err := h.HangulizeTrace("Cappuccino")
 
+	assert.NoError(t, err)
 	assert.Equal(t, "카푸치노", result)
 	assert.NotEqual(t, 0, len(traces))
 }
@@ -21,7 +22,7 @@ func TestHangulizeTrace(t *testing.T) {
 func TestTraceString(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("ita")
 	h := hangulize.New(spec)
-	_, traces := h.HangulizeTrace("Cappuccino")
+	_, traces, _ := h.HangulizeTrace("Cappuccino")
 
 	assert.Equal(t, `[Input] "Cappuccino"`, traces[0].String())
 	assert.Equal(t, `[Normalize] "cappuccino" | (latin)`, traces[1].String())
@@ -30,7 +31,7 @@ func TestTraceString(t *testing.T) {
 func TestTracesRender(t *testing.T) {
 	spec, _ := hangulize.LoadSpec("ita")
 	h := hangulize.New(spec)
-	_, traces := h.HangulizeTrace("Cappuccino")
+	_, traces, _ := h.HangulizeTrace("Cappuccino")
 
 	var b bytes.Buffer
 	traces.Render(&b)

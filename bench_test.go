@@ -14,7 +14,7 @@ func BenchmarkCappuccino(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		h.Hangulize("Cappuccino")
+		_, _ = h.Hangulize("Cappuccino")
 	}
 }
 
@@ -25,7 +25,7 @@ func BenchmarkCappuccinoTrace(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		h.HangulizeTrace("Cappuccino")
+		_, _, _ = h.HangulizeTrace("Cappuccino")
 	}
 }
 
@@ -36,7 +36,7 @@ func BenchmarkJulianaLouiseEmmaMarieWilhelmina(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		h.Hangulize("Juliana Louise Emma Marie Wilhelmina")
+		_, _ = h.Hangulize("Juliana Louise Emma Marie Wilhelmina")
 	}
 }
 
@@ -51,7 +51,7 @@ func BenchmarkVeryLongWord(b *testing.B) {
 
 		return func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				h.Hangulize(w)
+				_, _ = h.Hangulize(w)
 			}
 		}
 	}
@@ -75,7 +75,7 @@ func BenchmarkVeryLongNegativeLookbehind(b *testing.B) {
 
 		return func(b *testing.B) {
 			for i := 0; i < b.N; i++ {
-				h.Hangulize(w)
+				_, _ = h.Hangulize(w)
 			}
 		}
 	}

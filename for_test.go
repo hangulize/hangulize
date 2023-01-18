@@ -7,8 +7,16 @@ import (
 	"testing"
 
 	"github.com/hangulize/hangulize"
+	"github.com/hangulize/hangulize/phonemize/furigana"
+	"github.com/hangulize/hangulize/phonemize/pinyin"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func init() {
+	hangulize.ImportPhonemizer(&furigana.P)
+	hangulize.ImportPhonemizer(&pinyin.P)
+}
 
 func loadSpec(lang string) *hangulize.Spec {
 	spec, ok := hangulize.LoadSpec(lang)
@@ -26,15 +34,32 @@ func mustParseSpec(hsl string) *hangulize.Spec {
 	return spec
 }
 
+func mustHangulize(t *testing.T, lang, word string) string {
+	result, err := hangulize.Hangulize(lang, word)
+	require.NoError(t, err)
+	return result
+}
+
+func mustHangulizeSpec(t *testing.T, spec *hangulize.Spec, word string) string {
+	h := hangulize.New(spec)
+	result, err := h.Hangulize(word)
+	require.NoError(t, err)
+	return result
+}
+
 func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word string) {
 	h := hangulize.New(spec)
 
-	if h.Hangulize(word) == expected {
+	actual, err := h.Hangulize(word)
+	assert.NoError(t, err)
+
+	if actual == expected {
 		return
 	}
 
 	// Trace only when failed to fast passing for most cases.
-	got, traces := h.HangulizeTrace(word)
+	got, traces, err := h.HangulizeTrace(word)
+	assert.NoError(t, err)
 
 	// Trace result to understand the failure reason.
 	f := bytes.NewBufferString("")

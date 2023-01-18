@@ -23,25 +23,31 @@ func (furiganaPhonemizer) ID() string {
 	return "furigana"
 }
 
-// Kagome caches a Kagome tokenizer because it is expensive.
-func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
+func (p *furiganaPhonemizer) Load() error {
 	if p.kagome == nil {
 		k := kagome.New()
 		p.kagome = &k
 	}
+	return nil
+}
+
+// Kagome caches a Kagome tokenizer because it is expensive.
+func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
 	return p.kagome
 }
 
-func (p *furiganaPhonemizer) Phonemize(word string) string {
+func (p *furiganaPhonemizer) Phonemize(word string) (string, error) {
 	// Normalize into CJK unified ideographs.
 	word = norm.NFC.String(word)
 
 	// Resolve Kana repeatations.
 	word = repeatKana(word)
 
-	tokens := p.Kagome().Tokenize(word)
+	_ = p.Load()
+	tokens := p.kagome.Tokenize(word)
+
 	tw := newTypewriter(tokens)
 	word = tw.Typewrite()
 
-	return word
+	return word, nil
 }

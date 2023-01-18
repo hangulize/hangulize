@@ -13,35 +13,39 @@ func (asisPhonemizer) ID() string {
 	return "asis"
 }
 
-func (asisPhonemizer) Phonemize(word string) string {
-	return word
+func (asisPhonemizer) Load() error {
+	return nil
+}
+
+func (asisPhonemizer) Phonemize(word string) (string, error) {
+	return word, nil
 }
 
 func TestPhonemizerRegistry(t *testing.T) {
 	var ok bool
 
 	// Not exists.
-	_, ok = hangulize.GetPhonemizer("asis")
+	_, ok = hangulize.DefaultPhonemizer("asis")
 	assert.False(t, ok)
 
 	// Successfully registered.
-	ok = hangulize.UsePhonemizer(&asisPhonemizer{})
+	ok = hangulize.ImportPhonemizer(&asisPhonemizer{})
 	assert.True(t, ok)
 
 	// Already exists.
-	ok = hangulize.UsePhonemizer(&asisPhonemizer{})
+	ok = hangulize.ImportPhonemizer(&asisPhonemizer{})
 	assert.False(t, ok)
 
 	// Found.
-	p, ok := hangulize.GetPhonemizer("asis")
+	p, ok := hangulize.DefaultPhonemizer("asis")
 	assert.True(t, ok)
 	assert.IsType(t, &asisPhonemizer{}, p)
 
 	// Successfully deregistered.
-	ok = hangulize.UnusePhonemizer("asis")
+	ok = hangulize.UnimportPhonemizer("asis")
 	assert.True(t, ok)
 
 	// Not exists.
-	ok = hangulize.UnusePhonemizer("asis")
+	ok = hangulize.UnimportPhonemizer("asis")
 	assert.False(t, ok)
 }

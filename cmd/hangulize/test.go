@@ -68,14 +68,20 @@ var testCmd = &cobra.Command{
 				word, expected = exm[0], exm[1]
 
 				if testCover {
-					transcribed, traces = h.HangulizeTrace(word)
+					transcribed, traces, err = h.HangulizeTrace(word)
+					if err != nil {
+						cmd.PrintErr(err)
+					}
 					for _, tr := range traces {
 						if tr.HasRule {
 							cover.Cover(name, tr.Step, tr.Rule.ID)
 						}
 					}
 				} else {
-					transcribed = h.Hangulize(word)
+					transcribed, err = h.Hangulize(word)
+					if err != nil {
+						cmd.PrintErr(err)
+					}
 				}
 
 				if transcribed == expected {

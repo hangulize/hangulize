@@ -7,6 +7,8 @@ import (
 	"strings"
 
 	"github.com/hangulize/hangulize"
+	"github.com/hangulize/hangulize/phonemize/furigana"
+	"github.com/hangulize/hangulize/phonemize/pinyin"
 	"github.com/spf13/cobra"
 )
 
@@ -21,6 +23,8 @@ var verbose bool
 
 func init() {
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false, "verbose output")
+	hangulize.ImportPhonemizer(&furigana.P)
+	hangulize.ImportPhonemizer(&pinyin.P)
 }
 
 var rootCmd = &cobra.Command{
@@ -53,11 +57,17 @@ func hangulizeStream(cmd *cobra.Command, args []string, h *hangulize.Hangulizer)
 		}
 
 		if verbose {
-			transcribed, traces := h.HangulizeTrace(word)
+			transcribed, traces, err := h.HangulizeTrace(word)
+			if err != nil {
+				cmd.PrintErr(err)
+			}
 			traces.Render(cmd.OutOrStderr())
 			fmt.Fprintln(cmd.OutOrStdout(), transcribed)
 		} else {
-			transcribed := h.Hangulize(word)
+			transcribed, err := h.Hangulize(word)
+			if err != nil {
+				cmd.PrintErr(err)
+			}
 			fmt.Fprintln(cmd.OutOrStdout(), transcribed)
 		}
 	}
