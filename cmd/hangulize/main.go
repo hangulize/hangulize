@@ -56,20 +56,26 @@ func hangulizeStream(cmd *cobra.Command, args []string, h *hangulize.Hangulizer)
 			break
 		}
 
+		var (
+			result string
+			traces hangulize.Traces
+			err    error
+		)
+
 		if verbose {
-			transcribed, traces, err := h.HangulizeTrace(word)
-			if err != nil {
-				cmd.PrintErr(err)
-			}
-			traces.Render(cmd.OutOrStderr())
-			fmt.Fprintln(cmd.OutOrStdout(), transcribed)
+			result, traces, err = h.HangulizeTrace(word)
 		} else {
-			transcribed, err := h.Hangulize(word)
-			if err != nil {
-				cmd.PrintErr(err)
-			}
-			fmt.Fprintln(cmd.OutOrStdout(), transcribed)
+			result, err = h.Hangulize(word)
 		}
+
+		if err != nil {
+			cmd.PrintErrln(err)
+			os.Exit(1)
+			return
+		}
+
+		traces.Render(cmd.OutOrStderr())
+		fmt.Fprintln(cmd.OutOrStdout(), result)
 	}
 }
 
