@@ -18,15 +18,7 @@ interface Spec {
   test: Example[]
 }
 
-function findSpec(specs: Spec[], lang: string) {
-  for (let i = 0; i < specs.length; i++) {
-    const spec = specs[i]
-    if (spec.lang.id === lang) {
-      return spec
-    }
-  }
-  return null
-}
+type Specs = { [lang: string]: Spec }
 
 interface MessagePayload {
   method: string
@@ -35,7 +27,7 @@ interface MessagePayload {
 interface LoadedPayload extends MessagePayload {
   method: 'loaded'
   version: string
-  specs: Spec[]
+  specs: Specs
 }
 
 interface ResultPayload extends MessagePayload {
@@ -48,16 +40,16 @@ class Hangulizer {
   worker: Worker
   resolvers: { [nonce: string]: (result: string) => void }
   loaded: boolean
-  onLoad: (version: string, specs: Spec[]) => void
-  specs: Spec[]
+  onLoad: (version: string, specs: Specs) => void
+  specs: Specs
 
-  constructor(onLoad: (version: string, specs: Spec[]) => void) {
+  constructor(onLoad: (version: string, specs: Specs) => void) {
     this.worker = new Worker(process.env.PUBLIC_URL + '/hangulize.worker.js')
     this.worker.addEventListener('message', this.handleMessage.bind(this))
     this.resolvers = {}
     this.loaded = false
     this.onLoad = onLoad
-    this.specs = []
+    this.specs = {}
   }
 
   handleMessage(msg: { data: LoadedPayload | ResultPayload }) {
@@ -99,14 +91,20 @@ class Hangulizer {
       nonce,
     })
 
-    return await new Promise((resolve: (result: string) => void) => {
+    const resultOrError = await new Promise((resolve) => {
       this.resolvers[nonce] = resolve
     })
+
+    if (resultOrError instanceof Error) {
+      throw resultOrError as Error
+    } else {
+      return resultOrError as string
+    }
   }
 }
 
 interface UseHangulizeProps {
-  onInit: (version: string, specs: Spec[]) => void
+  onInit: (version: string, specs: Specs) => void
   onResult: (result: string) => void
   onSlow: () => void
 }
@@ -163,5 +161,5 @@ function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHanguli
   return hangulize
 }
 
-export { findSpec, Hangulizer, useHangulize }
-export type { Example, Spec }
+export { Hangulizer, useHangulize }
+export type { Example, Spec, Specs }

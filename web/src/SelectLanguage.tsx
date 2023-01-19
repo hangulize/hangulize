@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Dropdown, DropdownItemProps } from 'semantic-ui-react'
 
 import Flags from './flags.json'
-import { Spec } from './hangulize'
+import { Specs } from './hangulize'
 
 interface Option extends DropdownItemProps {
   key: string
@@ -35,7 +35,7 @@ interface Option extends DropdownItemProps {
 }
 
 interface SelectLanguageProps {
-  specs: Spec[]
+  specs: Specs
   value: string
   onChange: (lang: string) => void
 }

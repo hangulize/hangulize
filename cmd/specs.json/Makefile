@@ -4,4 +4,4 @@ SPEC_FILES = $(shell find ../../specs -name '*.hsl')
 OUT ?= specs.json
 
 $(OUT): $(GO_FILES) $(SPEC_FILES)
-	go run -ldflags="-X 'main.version=$(VERSION)'" . > $(OUT)
+	go run -ldflags="-X 'main.version=$(VERSION)'" . > $@

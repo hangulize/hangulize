@@ -6,28 +6,28 @@ import { Container, Divider, Header, Image } from 'semantic-ui-react'
 import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
-import { Example, findSpec, Spec, useHangulize } from './hangulize'
+import { Example, Specs, useHangulize } from './hangulize'
 import Prompt from './Prompt'
 import Result from './Result'
 import staticSpecs from './specs.json'
 
 function App() {
   const [version, setVersion] = useState(staticSpecs.version)
-  const [specs, setSpecs] = useState(staticSpecs.specs as Spec[])
+  const [specs, setSpecs] = useState(staticSpecs.specs as Specs)
   const [result, setResult] = useState('')
   const [loading, setLoading] = useState(true)
 
-  if (specs.length === 0) {
+  if (Object.keys(specs).length === 0) {
     throw new Error('no specs')
   }
 
   // Sync lang and word with search parameters.
   const [searchParams, setSearchParams] = useSearchParams()
-  const lang = searchParams.get('lang') || (_.sample(specs) as Spec).lang.id
+  const lang = searchParams.get('lang') || (_.sample(Object.keys(specs)) as string)
   const word = searchParams.get('word') || ''
 
-  const spec = findSpec(specs, lang)
-  if (spec === null) {
+  const spec = specs[lang]
+  if (spec === undefined) {
     throw new Error(`unknown lang: ${lang}`)
   }
 
@@ -69,7 +69,7 @@ function App() {
   }
 
   const hangulize = useHangulize({
-    onInit: (version: string, specs: Spec[]) => {
+    onInit: (version: string, specs: Specs) => {
       setVersion(version)
       setSpecs(specs)
     },

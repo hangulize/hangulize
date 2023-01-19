@@ -3,10 +3,10 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
 
-import { Example, findSpec, Spec } from './hangulize'
+import { Example, Specs } from './hangulize'
 
 interface ExamplesProps {
-  specs: Spec[]
+  specs: Specs
   lang: string
 }
 
@@ -14,8 +14,8 @@ function Examples({ specs, lang }: ExamplesProps) {
   const [examples, setExamples] = useState<Example[]>([])
 
   const shuffle = () => {
-    const spec = findSpec(specs, lang)
-    if (spec !== null) {
+    const spec = specs[lang]
+    if (spec !== undefined) {
       setExamples(_.sampleSize(spec.test, 5))
     }
   }

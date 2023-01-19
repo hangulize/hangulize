@@ -8,8 +8,8 @@ import (
 )
 
 type root struct {
-	Version string `json:"version"`
-	Specs   []spec `json:"specs"`
+	Version string          `json:"version"`
+	Specs   map[string]spec `json:"specs"`
 }
 
 type spec struct {
@@ -63,14 +63,15 @@ func jsonSpec(s *hangulize.Spec) spec {
 var version string
 
 func main() {
-	root := root{version, make([]spec, 0)}
+	langs := hangulize.ListLangs()
+	specs := make(map[string]spec, len(langs))
 
-	for _, lang := range hangulize.ListLangs() {
+	for _, lang := range langs {
 		spec, _ := hangulize.LoadSpec(lang)
-		root.Specs = append(root.Specs, jsonSpec(spec))
+		specs[lang] = jsonSpec(spec)
 	}
 
-	b, err := json.Marshal(root)
+	b, err := json.Marshal(root{version, specs})
 	if err != nil {
 		panic(err)
 	}

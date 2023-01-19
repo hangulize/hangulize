@@ -47,3 +47,13 @@ func jsSpec(s *hangulize.Spec) js.Value {
 		"source": s.Source,
 	})
 }
+
+// jsSpecs creates an object of specs indexed by the language ID.
+func jsSpecs(langs []string) js.Value {
+	specs := make(map[string]interface{}, len(langs))
+	for _, lang := range langs {
+		spec, _ := hangulize.LoadSpec(lang)
+		specs[lang] = jsSpec(spec)
+	}
+	return js.ValueOf(specs)
+}

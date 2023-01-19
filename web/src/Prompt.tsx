@@ -1,10 +1,10 @@
 import { Input } from 'semantic-ui-react'
 
-import { Spec } from './hangulize'
+import { Specs } from './hangulize'
 import SelectLanguage from './SelectLanguage'
 
 interface PromptProps {
-  specs: Spec[]
+  specs: Specs
   lang: string
   word: string
   loading: boolean
