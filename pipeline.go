@@ -171,11 +171,11 @@ func (p pipeline) normalize(word string) string {
 
 	var buf bytes.Buffer
 
-	for _, ch := range word {
-		if except.Has(ch) || !script.Is(ch) {
-			buf.WriteRune(ch)
+	for _, let := range word {
+		if except[let] || !script.Is(let) {
+			buf.WriteRune(let)
 		} else {
-			buf.WriteRune(script.Normalize(ch))
+			buf.WriteRune(script.Normalize(let))
 		}
 	}
 
@@ -197,16 +197,16 @@ func (p pipeline) normalize(word string) string {
 func (p pipeline) group(word string) []subword.Subword {
 	rep := subword.NewReplacer(word, 0, 1)
 
-	for i, ch := range word {
-		chStr := string(ch)
+	for i, let := range word {
+		letStr := string(let)
 
 		switch {
-		case p.h.spec.script.Is(ch):
+		case p.h.spec.script.Is(let):
 			fallthrough
-		case p.h.spec.puncts.Has(ch):
+		case p.h.spec.puncts[let]:
 			fallthrough
-		case isSpace(chStr):
-			rep.Replace(i, i+len(chStr), chStr)
+		case isSpace(letStr):
+			rep.Replace(i, i+len(letStr), letStr)
 		}
 	}
 

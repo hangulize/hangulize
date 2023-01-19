@@ -3,8 +3,8 @@ package hre
 import (
 	"bytes"
 	"fmt"
+	"sort"
 
-	"github.com/hangulize/hangulize/internal/runeset"
 	"github.com/pkg/errors"
 )
 
@@ -22,7 +22,7 @@ type RPattern struct {
 	parts []rPart
 
 	// Letters used in the regexp.
-	letters runeset.Set
+	letters map[rune]bool
 }
 
 func (rp *RPattern) String() string {
@@ -86,7 +86,10 @@ func NewRPattern(
 	}
 
 	// Collect letters in the regexp.
-	letters := runeset.Of(splitLetters(regexpLetters(expr))...)
+	letters := make(map[rune]bool)
+	for _, let := range splitLetters(regexpLetters(expr)) {
+		letters[let] = true
+	}
 
 	return &RPattern{expr, parts, letters}
 }
@@ -134,5 +137,12 @@ func (rp *RPattern) Interpolate(
 // Letters returns the set of natural letters used in the expression in
 // ascending order.
 func (rp *RPattern) Letters() []rune {
-	return rp.letters.Slice()
+	letters := make([]rune, 0, len(rp.letters))
+	for let := range rp.letters {
+		letters = append(letters, let)
+	}
+	sort.Slice(letters, func(i, j int) bool {
+		return letters[i] < letters[j]
+	})
+	return letters
 }

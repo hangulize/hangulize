@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
+	"sort"
 
 	"github.com/pkg/errors"
-
-	"github.com/hangulize/hangulize/internal/runeset"
 )
 
 // Pattern represents an HRE (Hangulize-specific Regular Expression) pattern.
@@ -46,7 +45,7 @@ type Pattern struct {
 	negBWidth int // max width of nagative lookbehind
 
 	// Letters used in the positive/negative regexps.
-	letters runeset.Set
+	letters map[rune]bool
 
 	// References to expanded vars.
 	usedVars [][]string
@@ -86,7 +85,10 @@ func NewPattern(
 
 	// Collect letters in the regexps.
 	combinedExpr := reExpr + negAExpr + negBExpr
-	letters := runeset.Of(splitLetters(regexpLetters(combinedExpr))...)
+	letters := make(map[rune]bool)
+	for _, let := range splitLetters(regexpLetters(combinedExpr)) {
+		letters[let] = true
+	}
 
 	// Compile regexp.
 	re, err := regexp.Compile(reExpr)
@@ -123,7 +125,14 @@ func NewPattern(
 // Letters returns the set of natural letters used in the expression in
 // ascending order.
 func (p *Pattern) Letters() []rune {
-	return p.letters.Slice()
+	letters := make([]rune, 0, len(p.letters))
+	for let := range p.letters {
+		letters = append(letters, let)
+	}
+	sort.Slice(letters, func(i, j int) bool {
+		return letters[i] < letters[j]
+	})
+	return letters
 }
 
 // Explain shows the HRE expression with

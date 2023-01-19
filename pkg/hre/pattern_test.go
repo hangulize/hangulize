@@ -427,7 +427,7 @@ func BenchmarkLookaround(b *testing.B) {
 func ExamplePattern_Letters() {
 	p, _ := NewPattern("^hello{,}", nil, nil)
 	fmt.Println(p.Letters())
-	// Output: [108 101 104 111 44]
+	// Output: [44 101 104 108 111]
 }
 
 func ExamplePattern_Find() {
