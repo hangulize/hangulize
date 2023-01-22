@@ -21,7 +21,10 @@ src/specs.json: FORCE
 public/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
 
-GEN_FILES = $(ICON_FILES) src/specs.json public/hangulize.wasm
+public/phonemize.wasm: FORCE
+	$(MAKE) -C ../cmd/phonemize.wasm OUT=$(CURDIR)/$@
+
+GEN_FILES = $(ICON_FILES) src/specs.json public/hangulize.wasm public/phonemize.wasm
 
 node_modules: package.json
 	yarn install

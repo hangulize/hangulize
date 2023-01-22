@@ -11,8 +11,10 @@ interface Spec {
     id: string
     code2: string
     code3: string
-    korean: string
     english: string
+    korean: string
+    script: string
+    phonemizer: string
   }
 
   test: Example[]
