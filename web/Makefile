@@ -18,13 +18,13 @@ $(ICON_FILES): public/logo.svg real-favicon.json
 src/specs.json: FORCE
 	$(MAKE) -C ../cmd/specs.json OUT=$(CURDIR)/$@
 
-public/hangulize.wasm: FORCE
+src/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
 
-public/phonemize.wasm: FORCE
+src/phonemize.wasm: FORCE
 	$(MAKE) -C ../cmd/phonemize.wasm OUT=$(CURDIR)/$@
 
-GEN_FILES = $(ICON_FILES) src/specs.json public/hangulize.wasm public/phonemize.wasm
+GEN_FILES = $(ICON_FILES) src/specs.json src/hangulize.wasm src/phonemize.wasm
 
 node_modules: package.json
 	yarn install

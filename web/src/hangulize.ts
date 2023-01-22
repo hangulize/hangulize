@@ -52,7 +52,7 @@ class Hangulizer {
   specs: Specs
 
   constructor(onLoad: (version: string, specs: Specs) => void) {
-    this.worker = new Worker(process.env.PUBLIC_URL + '/hangulize.worker.js')
+    this.worker = new Worker(new URL('hangulize.worker.ts', import.meta.url))
     this.worker.addEventListener('message', this.handleMessage.bind(this))
     this.resolvers = {}
     this.loaded = false

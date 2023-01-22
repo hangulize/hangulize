@@ -34,3 +34,6 @@ rules:
   react/react-in-jsx-scope: off
   simple-import-sort/imports: error
   simple-import-sort/exports: error
+
+ignorePatterns:
+  - wasm_exec.js
