@@ -14,7 +14,21 @@ WebAssembly.instantiateStreaming(fetch('hangulize.wasm'), go.importObject).then(
 self.onmessage = async (msg) => {
   switch (msg.data.method) {
     case 'hangulize':
-      const result = await hangulize(msg.data.lang, msg.data.word)
+      let result
+
+      try {
+        result = await hangulize(msg.data.lang, msg.data.word)
+      } catch (e) {
+        self.postMessage({
+          method: 'error',
+          error: e,
+          lang: msg.data.lang,
+          word: msg.data.word,
+          nonce: msg.data.nonce,
+        })
+        return
+      }
+
       self.postMessage({
         method: 'result',
         result: result,

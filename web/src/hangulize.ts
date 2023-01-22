@@ -36,9 +36,15 @@ interface ResultPayload extends MessagePayload {
   result: string
 }
 
+interface ErrorPayload extends MessagePayload {
+  method: 'error'
+  nonce: string
+  error: Error
+}
+
 class Hangulizer {
   worker: Worker
-  resolvers: { [nonce: string]: (result: string) => void }
+  resolvers: { [nonce: string]: (resultOrError: string | Error) => void }
   loaded: boolean
   onLoad: (version: string, specs: Specs) => void
   specs: Specs
@@ -52,7 +58,7 @@ class Hangulizer {
     this.specs = {}
   }
 
-  handleMessage(msg: { data: LoadedPayload | ResultPayload }) {
+  handleMessage(msg: { data: LoadedPayload | ResultPayload | ErrorPayload }) {
     console.log(msg.data)
 
     switch (msg.data.method) {
@@ -72,6 +78,16 @@ class Hangulizer {
 
         this.resolvers[msg.data.nonce](msg.data.result)
         delete this.resolvers[msg.data.nonce]
+        return
+
+      case 'error':
+        if (!(msg.data.nonce in this.resolvers)) {
+          break
+        }
+
+        this.resolvers[msg.data.nonce](msg.data.error)
+        delete this.resolvers[msg.data.nonce]
+
         return
     }
 
@@ -146,7 +162,15 @@ function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHanguli
     }
 
     // This is the last request. Hangulize it.
-    lastJob.current = worker.hangulize(lang, word)
+    lastJob.current = (async () => {
+      try {
+        return await worker.hangulize(lang, word)
+      } catch (e) {
+        console.error(e)
+        return ''
+      }
+    })()
+
     const result = await lastJob.current
     if (lastId.current !== id) return
 
