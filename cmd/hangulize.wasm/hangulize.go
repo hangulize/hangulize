@@ -3,7 +3,6 @@
 package main
 
 import (
-	"fmt"
 	"syscall/js"
 
 	"github.com/hangulize/hangulize"
@@ -25,10 +24,8 @@ var jsHangulize = js.FuncOf(func(this js.Value, args []js.Value) any {
 		go func() {
 			result, err := hangulize.Hangulize(lang, word)
 			if err != nil {
-				fmt.Println("error", err)
 				reject.Invoke(js.Global().Get("Error").New(err.Error()))
 			} else {
-				fmt.Println(result)
 				resolve.Invoke(result)
 			}
 		}()

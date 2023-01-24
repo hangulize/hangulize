@@ -1,5 +1,8 @@
+import * as Comlink from 'comlink'
 import { default as _ } from 'lodash'
-import { useMemo, useRef } from 'react'
+import { useMemo, useRef, useState } from 'react'
+
+import type { HangulizeEndpoint } from './hangulize.worker'
 
 interface Example {
   word: string
@@ -22,105 +25,6 @@ interface Spec {
 
 type Specs = { [lang: string]: Spec }
 
-interface MessagePayload {
-  method: string
-}
-
-interface LoadedPayload extends MessagePayload {
-  method: 'loaded'
-  version: string
-  specs: Specs
-}
-
-interface ResultPayload extends MessagePayload {
-  method: 'result'
-  nonce: string
-  result: string
-}
-
-interface ErrorPayload extends MessagePayload {
-  method: 'error'
-  nonce: string
-  error: Error
-}
-
-class Hangulizer {
-  worker: Worker
-  resolvers: { [nonce: string]: (resultOrError: string | Error) => void }
-  loaded: boolean
-  onLoad: (version: string, specs: Specs) => void
-  specs: Specs
-
-  constructor(onLoad: (version: string, specs: Specs) => void) {
-    this.worker = new Worker(new URL('hangulize.worker.ts', import.meta.url))
-    this.worker.addEventListener('message', this.handleMessage.bind(this))
-    this.resolvers = {}
-    this.loaded = false
-    this.onLoad = onLoad
-    this.specs = {}
-  }
-
-  handleMessage(msg: { data: LoadedPayload | ResultPayload | ErrorPayload }) {
-    console.log(msg.data)
-
-    switch (msg.data.method) {
-      case 'loaded':
-        this.loaded = true
-        this.specs = msg.data.specs
-
-        if (this.onLoad !== undefined) {
-          this.onLoad(msg.data.version, msg.data.specs)
-        }
-        return
-
-      case 'result':
-        if (!(msg.data.nonce in this.resolvers)) {
-          break
-        }
-
-        this.resolvers[msg.data.nonce](msg.data.result)
-        delete this.resolvers[msg.data.nonce]
-        return
-
-      case 'error':
-        if (!(msg.data.nonce in this.resolvers)) {
-          break
-        }
-
-        this.resolvers[msg.data.nonce](msg.data.error)
-        delete this.resolvers[msg.data.nonce]
-
-        return
-    }
-
-    throw new Error(`unexpected method from worker: ${msg.data.method}`)
-  }
-
-  async hangulize(lang: string, word: string) {
-    if (!word || !this.loaded) {
-      return ''
-    }
-
-    const nonce = _.uniqueId()
-    this.worker.postMessage({
-      method: 'hangulize',
-      lang,
-      word,
-      nonce,
-    })
-
-    const resultOrError = await new Promise((resolve) => {
-      this.resolvers[nonce] = resolve
-    })
-
-    if (resultOrError instanceof Error) {
-      throw resultOrError as Error
-    } else {
-      return resultOrError as string
-    }
-  }
-}
-
 interface UseHangulizeProps {
   onInit: (version: string, specs: Specs) => void
   onResult: (result: string) => void
@@ -128,16 +32,32 @@ interface UseHangulizeProps {
 }
 
 function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHangulizeProps) {
-  const worker = useMemo(() => new Hangulizer(onInit), [])
+  const [loaded, setLoaded] = useState(false)
+
+  const hangulize = useMemo(() => {
+    const worker = new Worker(new URL('hangulize.worker', import.meta.url))
+    const hangulize = Comlink.wrap<HangulizeEndpoint>(worker)
+
+    const waitInit = async () => {
+      const version = await hangulize.getVersion()
+      const specs = await hangulize.getSpecs()
+      setLoaded(true)
+      onInit(version, specs)
+    }
+    waitInit()
+
+    return hangulize
+  }, [])
+
   const lastId = useRef('')
   const lastJob = useRef<Promise<string> | null>(null)
   const slow = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // hangulize(lang, word) tries to transcribe after 50 ms. If transcription
   // doesn't finish of can't finish in 500 ms, it calls onSlow().
-  const hangulize = async (lang: string, word: string, delay = 50) => {
+  return async (lang: string, word: string, delay = 50) => {
     // Trigger onSlow() when it cannot finish in 500ms.
-    if (!worker.loaded) {
+    if (!loaded) {
       onSlow()
       return
     }
@@ -166,7 +86,7 @@ function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHanguli
     // This is the last request. Hangulize it.
     lastJob.current = (async () => {
       try {
-        return await worker.hangulize(lang, word)
+        return await hangulize.hangulize(lang, word)
       } catch (e) {
         console.error(e)
         return ''
@@ -183,9 +103,7 @@ function useHangulize({ onInit: onInit, onResult: onResult, onSlow }: UseHanguli
     clearTimeout(slow.current)
     slow.current = null
   }
-
-  return hangulize
 }
 
-export { Hangulizer, useHangulize }
+export { useHangulize }
 export type { Example, Spec, Specs }

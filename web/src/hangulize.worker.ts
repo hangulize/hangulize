@@ -1,16 +1,14 @@
 import './wasm_exec'
 
-import { Spec } from './hangulize'
+import * as Comlink from 'comlink'
 
-declare class Go {
-  run(instance: WebAssembly.Instance): Promise<void>
-  importObject: WebAssembly.Imports
-}
+import { Specs } from './hangulize'
 
 interface Hangulize {
   (lang: string, word: string): string
   version: string
-  specs: { [lang: string]: Spec }
+  specs: Specs
+  importPhonemizer: (id: string, fn: (word: string) => Promise<string>) => void
 }
 
 declare global {
@@ -18,46 +16,54 @@ declare global {
 }
 
 const go = new Go()
-WebAssembly.instantiateStreaming(
-  fetch(new URL('hangulize.wasm', import.meta.url)),
-  go.importObject
-).then((wasm) => {
-  go.run(wasm.instance)
+const wasmURL = new URL('hangulize.wasm', import.meta.url)
 
-  self.postMessage({
-    method: 'loaded',
-    version: hangulize.version,
-    specs: hangulize.specs,
-  })
+let initialized: (value?: any) => void
+const initialization = new Promise((resolve) => {
+  initialized = resolve
 })
 
-self.onmessage = async (msg: {
-  data: { method: string; lang: string; word: string; nonce: string }
-}) => {
-  let result
+const phonemize = Comlink.wrap<(id: string, word: string) => string>(
+  new Worker(new URL('phonemize.worker', import.meta.url))
+)
 
-  switch (msg.data.method) {
-    case 'hangulize':
-      try {
-        result = await hangulize(msg.data.lang, msg.data.word)
-      } catch (e) {
-        self.postMessage({
-          method: 'error',
-          error: e,
-          lang: msg.data.lang,
-          word: msg.data.word,
-          nonce: msg.data.nonce,
-        })
-        return
-      }
+WebAssembly.instantiateStreaming(fetch(wasmURL), go.importObject).then((wasm) => {
+  go.run(wasm.instance)
 
-      self.postMessage({
-        method: 'result',
-        result: result,
-        lang: msg.data.lang,
-        word: msg.data.word,
-        nonce: msg.data.nonce,
+  for (const lang in hangulize.specs) {
+    const spec = hangulize.specs[lang]
+    if (spec.lang.phonemizer) {
+      const id = spec.lang.phonemizer
+      hangulize.importPhonemizer(id, async (word) => {
+        return await phonemize(id, word)
       })
-      break
+    }
   }
+
+  initialized()
+})
+
+interface HangulizeEndpoint {
+  hangulize: (lang: string, word: string) => string
+  getVersion: () => string
+  getSpecs: () => Specs
 }
+
+Comlink.expose({
+  async hangulize(lang: string, word: string) {
+    await initialization
+    return await hangulize(lang, word)
+  },
+
+  async getVersion() {
+    await initialization
+    return hangulize.version
+  },
+
+  async getSpecs() {
+    await initialization
+    return hangulize.specs
+  },
+})
+
+export type { HangulizeEndpoint }
