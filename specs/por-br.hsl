@@ -239,3 +239,11 @@ test:
     "Alegrete"   -> "알레그레치"
     "de"         -> "지"
     "Chifre"     -> "시프리"
+
+    # Football players
+    "Neymar Júnior"  -> "네이마르 주니오르"
+    "Ronaldo"        -> "호나우두"
+    "Ronaldinho"     -> "호나우지뉴"
+    "Roberto Carlos" -> "호베르투 카를루스"
+    "Rivaldo"        -> "히바우두"
+    "Pelé"           -> "펠레"

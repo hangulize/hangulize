@@ -182,3 +182,9 @@ test:
     "liquidez"             -> "리키데스"
     "reloj"                -> "렐로"
 
+    # Football players
+    "Gabriel Batistuta"   -> "가브리엘 바티스투타"
+    "Diego Maradona"      -> "디에고 마라도나"
+    "Diego Simeone"       -> "디에고 시메오네"
+    "Mario Kempes"        -> "마리오 켐페스"
+    "Mauricio Pochettino" -> "마우리시오 포체티노"
