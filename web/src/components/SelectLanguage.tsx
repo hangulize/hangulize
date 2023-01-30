@@ -4,8 +4,8 @@ import _ from 'lodash'
 import { useEffect, useRef, useState } from 'react'
 import { Dropdown, DropdownItemProps } from 'semantic-ui-react'
 
+import type { Specs } from '../hangulize/spec'
 import Flags from './flags.json'
-import { Specs } from './hangulize'
 
 interface Option extends DropdownItemProps {
   key: string
@@ -40,7 +40,7 @@ interface SelectLanguageProps {
   onChange: (lang: string) => void
 }
 
-function SelectLanguage({ specs, value, onChange }: SelectLanguageProps) {
+export default function SelectLanguage({ specs, value, onChange }: SelectLanguageProps) {
   const [options, setOptions] = useState<Option[]>([])
   const fuse = useRef<Fuse<Option> | null>(null)
 
@@ -111,4 +111,3 @@ function SelectLanguage({ specs, value, onChange }: SelectLanguageProps) {
     />
   )
 }
-export default SelectLanguage

@@ -3,14 +3,14 @@ import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { Container, Icon, Label } from 'semantic-ui-react'
 
-import { Example, Specs } from './hangulize'
+import type { Example, Specs } from '../hangulize/spec'
 
 interface ExamplesProps {
   specs: Specs
   lang: string
 }
 
-function Examples({ specs, lang }: ExamplesProps) {
+export default function Examples({ specs, lang }: ExamplesProps) {
   const [examples, setExamples] = useState<Example[]>([])
 
   const shuffle = () => {
@@ -42,5 +42,3 @@ function Examples({ specs, lang }: ExamplesProps) {
     </Container>
   )
 }
-
-export default Examples

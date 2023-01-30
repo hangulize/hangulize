@@ -7,9 +7,10 @@ import (
 	"github.com/hangulize/hangulize"
 )
 
-type root struct {
-	Version string          `json:"version"`
-	Specs   map[string]spec `json:"specs"`
+type manifest struct {
+	Version     string          `json:"version"`
+	Specs       map[string]spec `json:"specs"`
+	Phonemizers []string        `json:"phonemizers"`
 }
 
 type spec struct {
@@ -65,13 +66,23 @@ var version string
 func main() {
 	langs := hangulize.ListLangs()
 	specs := make(map[string]spec, len(langs))
+	phonemizerSet := make(map[string]bool)
 
 	for _, lang := range langs {
 		spec, _ := hangulize.LoadSpec(lang)
 		specs[lang] = jsonSpec(spec)
+
+		if spec.Lang.Phonemizer != "" {
+			phonemizerSet[spec.Lang.Phonemizer] = true
+		}
 	}
 
-	b, err := json.Marshal(root{version, specs})
+	phonemizers := make([]string, 0, len(phonemizerSet))
+	for id := range phonemizerSet {
+		phonemizers = append(phonemizers, id)
+	}
+
+	b, err := json.Marshal(manifest{version, specs, phonemizers})
 	if err != nil {
 		panic(err)
 	}

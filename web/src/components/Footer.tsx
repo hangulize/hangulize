@@ -4,7 +4,7 @@ interface FooterProps {
   year?: number
 }
 
-function Footer({ year }: FooterProps) {
+export default function Footer({ year }: FooterProps) {
   if (year === undefined) {
     year = new Date().getFullYear()
   }
@@ -33,5 +33,3 @@ function Footer({ year }: FooterProps) {
     </Grid>
   )
 }
-
-export default Footer

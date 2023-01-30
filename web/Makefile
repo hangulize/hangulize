@@ -15,16 +15,24 @@ $(ICON_FILES): public/logo.svg real-favicon.json
 	yarn icon
 	mv public/icons/favicon.ico public/favicon.ico
 
-src/specs.json: FORCE
-	$(MAKE) -C ../cmd/specs.json OUT=$(CURDIR)/$@
+src/hangulize/manifest.json: FORCE
+	$(MAKE) -C ../cmd/manifest.json OUT=$(CURDIR)/$@
 
-src/hangulize.wasm: FORCE
+src/hangulize/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
 
-src/phonemize.wasm: FORCE
-	$(MAKE) -C ../cmd/phonemize.wasm OUT=$(CURDIR)/$@
+src/hangulize/furigana.phonemize.wasm: FORCE
+	$(MAKE) -C ../cmd/furigana.phonemize.wasm OUT=$(CURDIR)/$@
 
-GEN_FILES = $(ICON_FILES) src/specs.json src/hangulize.wasm src/phonemize.wasm
+src/hangulize/pinyin.phonemize.wasm: FORCE
+	$(MAKE) -C ../cmd/pinyin.phonemize.wasm OUT=$(CURDIR)/$@
+
+GEN_FILES = \
+	$(ICON_FILES) \
+	src/hangulize/manifest.json \
+	src/hangulize/hangulize.wasm \
+	src/hangulize/furigana.phonemize.wasm \
+	src/hangulize/pinyin.phonemize.wasm
 
 node_modules: package.json
 	yarn install
@@ -51,9 +59,7 @@ start: node_modules $(GEN_FILES) ## Start a web app for development
 
 .PHONY: clean
 clean: ## Clean generated files and directories
-	rm -f ./public/hangulize.wasm
-	rm -f ./src/specs.json
-	rm -f $(ICON_FILES)
+	rm -f $(GEN_FILES)
 	rm -rf ./node_modules
 	rm -rf ./build
 

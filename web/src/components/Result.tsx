@@ -8,10 +8,10 @@ interface ResultProps {
   loading: boolean
 }
 
-function Result({ children, loading }: ResultProps) {
+export default function Result({ children, loading }: ResultProps) {
   const result = (children || '').trim()
 
-  const sizes = ['size-1', 'size-2', 'size-3', 'size-4']
+  const sizes = ['size-1', 'size-2', 'size-3', 'size-4', 'size-5']
   const lo = useRef(0)
   const hi = useRef(sizes.length - 1)
   const [mid, setMid] = useState(hi.current)
@@ -62,11 +62,13 @@ function Result({ children, loading }: ResultProps) {
     return () => window.removeEventListener('resize', resetAndUpdate)
   })
 
+  if (!result) {
+    return <></>
+  }
+
   return (
     <div className={`result ${sizes[mid]} ${loading ? 'loading' : ''}`} ref={ref}>
-      {result ? <p>{result}</p> : <></>}
+      <p>{result}</p>
     </div>
   )
 }
-
-export default Result

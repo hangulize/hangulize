@@ -1,6 +1,6 @@
 import { Input } from 'semantic-ui-react'
 
-import { Specs } from './hangulize'
+import type { Specs } from '../hangulize/spec'
 import SelectLanguage from './SelectLanguage'
 
 interface PromptProps {
@@ -11,7 +11,7 @@ interface PromptProps {
   onChange: (lang: string, word: string) => void
 }
 
-function Prompt({ specs, lang, word, loading, onChange }: PromptProps) {
+export default function Prompt({ specs, lang, word, loading, onChange }: PromptProps) {
   return (
     <Input
       className="word"
@@ -36,5 +36,3 @@ function Prompt({ specs, lang, word, loading, onChange }: PromptProps) {
     />
   )
 }
-
-export default Prompt

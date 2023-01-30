@@ -1,4 +1,4 @@
-function Description() {
+export default function Description() {
   return (
     <p className="description">
       한글라이즈는{' '}
@@ -20,5 +20,3 @@ function Description() {
     </p>
   )
 }
-
-export default Description

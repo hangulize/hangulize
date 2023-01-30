@@ -6,7 +6,7 @@ parser: '@typescript-eslint/parser'
 
 parserOptions:
   ecmaVersion: latest
-  ecmaFeatures: {jsx: true}
+  ecmaFeatures: { jsx: true }
   sourceType: module
 
 extends:
