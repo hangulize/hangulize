@@ -1,9 +1,10 @@
 lang:
-    id      = "rus"
-    codes   = "ru", "rus"
-    english = "Russian"
-    korean  = "러시아어"
-    script  = "cyrillic"
+    id       = "rus"
+    codes    = "ru", "rus"
+    english  = "Russian"
+    korean   = "러시아어"
+    script   = "cyrillic"
+    translit = "cyrillic[ru]"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"
@@ -282,3 +283,6 @@ test:
     "Находка"      -> "나홋카"
     "Бенедиктов"   -> "베네딕토프"
     "Алекса́ндр"    -> "알렉산드르"
+
+    # Politicians
+    "Влади́мир Пу́тин" -> "블라디미르 푸틴"

@@ -1,10 +1,10 @@
 lang:
-    id         = "jpn"
-    codes      = "ja", "jpn"
-    english    = "Japanese"
-    korean     = "일본어"
-    script     = "kana"
-    phonemizer = "furigana"
+    id       = "jpn"
+    codes    = "ja", "jpn"
+    english  = "Japanese"
+    korean   = "일본어"
+    script   = "kana"
+    translit = "furigana"
 
 config:
     author = "Heungsub Lee <sub@subl.ee>"
