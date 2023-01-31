@@ -1,49 +1,47 @@
 /*
-Package furigana implements the hangulize.Phonemizer interface for Japanese
+Package furigana implements the hangulize.Translit interface for Japanese
 Kanji. Kanji has very broad characters so they need a dictionary to be
-converted to Kana. This phonemizer uses IPADIC in Kagome to analyze Kanji.
+converted to Kana. This Translit uses IPADIC in Kagome to analyze Kanji.
 */
 package furigana
 
 import (
+	"github.com/hangulize/hangulize"
 	kagome "github.com/ikawaha/kagome.ipadic/tokenizer"
 	"golang.org/x/text/unicode/norm"
 )
 
-// P is the Furigana phonemizer.
-var P furiganaPhonemizer
+// T is a hangulize.Translit for Furigana.
+var T hangulize.Translit = &furigana{}
 
 // ----------------------------------------------------------------------------
 
-type furiganaPhonemizer struct {
+type furigana struct {
 	kagome *kagome.Tokenizer
 }
 
-func (furiganaPhonemizer) ID() string {
+func (furigana) Method() string {
 	return "furigana"
 }
 
-func (p *furiganaPhonemizer) Load() error {
-	if p.kagome == nil {
-		k := kagome.New()
-		p.kagome = &k
-	}
-	return nil
-}
-
 // Kagome caches a Kagome tokenizer because it is expensive.
-func (p *furiganaPhonemizer) Kagome() *kagome.Tokenizer {
+func (p *furigana) Kagome() *kagome.Tokenizer {
 	return p.kagome
 }
 
-func (p *furiganaPhonemizer) Phonemize(word string) (string, error) {
+func (p *furigana) Transliterate(word string) (string, error) {
 	// Normalize into CJK unified ideographs.
 	word = norm.NFC.String(word)
 
 	// Resolve Kana repeatations.
 	word = repeatKana(word)
 
-	_ = p.Load()
+	if p.kagome == nil {
+		// It may take a while.
+		k := kagome.New()
+		p.kagome = &k
+	}
+
 	tokens := p.kagome.Tokenize(word)
 
 	tw := newTypewriter(tokens)
