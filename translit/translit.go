@@ -2,6 +2,7 @@ package translit
 
 import (
 	"github.com/hangulize/hangulize"
+	"github.com/hangulize/hangulize/translit/cyrillic"
 	"github.com/hangulize/hangulize/translit/furigana"
 	"github.com/hangulize/hangulize/translit/pinyin"
 )
@@ -9,6 +10,7 @@ import (
 // Translits returns the standard Translits.
 func Translits() []hangulize.Translit {
 	ts := []hangulize.Translit{furigana.T, pinyin.T}
+	ts = append(ts, cyrillic.Ts...)
 	return ts
 }
 

@@ -1,7 +1,7 @@
 # Translit
 
 Here are packages that implement the `hangulize.Translit` interface for
-specific methods. Each package provides `T` as the singleton value.
+specific methods. Each package provides `T` or `Ts` as the singleton value.
 
 Install all of the standard Translits:
 
