@@ -176,33 +176,43 @@ func TestUnknownLang(t *testing.T) {
 	assert.Equal(t, "hello", result)
 }
 
-type stubFurigana struct{}
+type stubTranslit struct{}
 
-func (p *stubFurigana) ID() string {
-	return "furigana"
+func (p *stubTranslit) Method() string {
+	return "stub"
 }
 
-func (p *stubFurigana) Load() error {
+func (p *stubTranslit) Load() error {
 	return nil
 }
 
-func (p *stubFurigana) Phonemize(word string) (string, error) {
-	return "スタブ", nil
+func (p *stubTranslit) Transliterate(word string) (string, error) {
+	return "stub", nil
 }
 
-func TestInstancePhonemizers(t *testing.T) {
-	spec, _ := hangulize.LoadSpec("jpn")
+func TestInstanceTranslit(t *testing.T) {
+	spec := mustParseSpec(`
+	lang:
+		id       = "test"
+		codes    = "xx", "xxx"
+		translit = "stub"
+
+	transcribe:
+		"stub" -> "스텁"
+	`)
 	h := hangulize.New(spec)
 
-	h.ImportPhonemizer(&stubFurigana{})
 	result, err := h.Hangulize("1234")
-	assert.NoError(t, err)
-	assert.Equal(t, "스타부", result)
+	assert.ErrorIs(t, err, hangulize.ErrTranslitNotImported)
 
-	h.UnimportPhonemizer("furigana")
+	h.UseTranslit(&stubTranslit{})
 	result, err = h.Hangulize("1234")
 	assert.NoError(t, err)
-	assert.Equal(t, "1234", result)
+	assert.Equal(t, "스텁", result)
+
+	h.UnuseTranslit("stub")
+	result, err = h.Hangulize("1234")
+	assert.ErrorIs(t, err, hangulize.ErrTranslitNotImported)
 }
 
 // -----------------------------------------------------------------------------

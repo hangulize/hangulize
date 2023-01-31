@@ -32,8 +32,8 @@ const (
 	// Input step just records the beginning.
 	Input
 
-	// Phonemize step converts the spelling to the phonograms.
-	Phonemize
+	// Transliterate step converts the spelling to the phonograms.
+	Transliterate
 
 	// Normalize step eliminates letter case to make the next steps work easier.
 	Normalize
@@ -50,39 +50,39 @@ const (
 	// Syllabify step composes Jamo phonemes into Hangul syllabic blocks.
 	Syllabify
 
-	// Transliterate step converts foreign punctuations to fit in Korean.
-	Transliterate
+	// Localize step converts foreign punctuations to fit in Korean.
+	Localize
 )
 
 // AllSteps is the array of all steps.
 var AllSteps = []Step{
 	Input,
-	Phonemize,
+	Transliterate,
 	Normalize,
 	Group,
 	Rewrite,
 	Transcribe,
 	Syllabify,
-	Transliterate,
+	Localize,
 }
 
 func (s Step) String() string {
 	return map[Step]string{
 		Input:         "Input",
-		Phonemize:     "Phonemize",
+		Transliterate: "Transliterate",
 		Normalize:     "Normalize",
 		Group:         "Group",
 		Rewrite:       "Rewrite",
 		Transcribe:    "Transcribe",
 		Syllabify:     "Syllabify",
-		Transliterate: "Transliterate",
+		Localize:      "Localize",
 	}[s]
 }
 
 // -----------------------------------------------------------------------------
 
 type pipeline struct {
-	h  *Hangulizer
+	h  Hangulizer
 	tr *tracer
 }
 
@@ -91,7 +91,7 @@ func (p pipeline) forward(word string) (string, error) {
 	p.input(word)
 
 	// preparing phase
-	word, err := p.phonemize(word)
+	word, err := p.transliterate(word)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +104,7 @@ func (p pipeline) forward(word string) (string, error) {
 
 	// finalizing phase
 	word = p.syllabify(subwords)
-	word = p.transliterate(word)
+	word = p.localize(word)
 
 	return word, nil
 }
@@ -116,40 +116,30 @@ func (p pipeline) input(word string) {
 	p.tr.Trace(Input, word, "")
 }
 
-// 1. Phonemize (Word -> Word)
+// 1. Transliterate (Word -> Word)
 //
-// This step converts the spelling to the phonograms, usually based on lexical
-// analysis. Most languages already use phonograms which are sufficient to
-// represent the exact pronunciation. But in some languages, such as American
-// English or Chinese, it's not true.
-func (p pipeline) phonemize(word string) (string, error) {
-	id := p.h.spec.Lang.Phonemizer
-	if id == "" {
-		// The language doesn't require a phonemizer. It's okay.
-		return word, nil
+// This step converts a word from one script to another script or to the
+// phonograms, usually based on lexical analysis. Most languages already use
+// phonograms which are sufficient to represent the exact pronunciation. But in
+// some languages, such as American English or Chinese, it's not true.
+func (p pipeline) transliterate(word string) (string, error) {
+	spec := p.h.Spec()
+	translits := p.h.Translits()
+
+	for _, method := range spec.Lang.Translit {
+		t, ok := translits[method]
+		if !ok {
+			return word, fmt.Errorf("%w: %s", ErrTranslitNotImported, method)
+		}
+
+		var err error
+		word, err = t.Transliterate(word)
+		if err != nil {
+			return word, fmt.Errorf("%w: %s", ErrTranslit, method)
+		}
+
+		p.tr.Trace(Transliterate, word, t.Method())
 	}
-
-	phonem, ok := p.h.Phonemizer(id)
-	if ok {
-		goto PhonemizerFound
-	}
-
-	// Fallback by the global phonemizer registry.
-	phonem, ok = DefaultPhonemizer(id)
-	if ok {
-		goto PhonemizerFound
-	}
-
-	// The language requires a phonemizer but not imported yet.
-	return word, fmt.Errorf("%w: %s", ErrPhonemizerNotImported, id)
-
-PhonemizerFound:
-	word, err := phonem.Phonemize(word)
-	if err != nil {
-		return word, err
-	}
-
-	p.tr.Trace(Phonemize, word, id)
 
 	return word, nil
 }
@@ -160,14 +150,16 @@ PhonemizerFound:
 //
 // For example, "Hello" in Latin script will be normalized to "hello".
 func (p pipeline) normalize(word string) string {
+	spec := p.h.Spec()
+
 	// Per-spec normalization.
-	word = p.h.spec.normReplacer.Replace(word)
+	word = spec.normReplacer.Replace(word)
 
 	p.tr.Trace(Normalize, word, "")
 
 	// Per-script normalization.
-	script := p.h.spec.script
-	except := p.h.spec.normLetters
+	script := spec.script
+	except := spec.normLetters
 
 	var buf bytes.Buffer
 
@@ -181,7 +173,7 @@ func (p pipeline) normalize(word string) string {
 
 	word = buf.String()
 
-	p.tr.Trace(Normalize, word, p.h.spec.Lang.Script)
+	p.tr.Trace(Normalize, word, spec.Lang.Script)
 
 	return word
 }
@@ -195,15 +187,17 @@ func (p pipeline) normalize(word string) string {
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
 func (p pipeline) group(word string) []subword.Subword {
+	spec := p.h.Spec()
+
 	rep := subword.NewReplacer(word, 0, 1)
 
 	for i, let := range word {
 		letStr := string(let)
 
 		switch {
-		case p.h.spec.script.Is(let):
+		case spec.script.Is(let):
 			fallthrough
-		case p.h.spec.puncts[let]:
+		case spec.puncts[let]:
 			fallthrough
 		case isSpace(letStr):
 			rep.Replace(i, i+len(letStr), letStr)
@@ -223,6 +217,8 @@ func (p pipeline) group(word string) []subword.Subword {
 //
 // For example, "hello" can be rewritten to "heˈlō".
 func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
+	spec := p.h.Spec()
+
 	var swBuf subword.Builder
 
 	swtr := p.tr.SubwordsTracer(Rewrite, subwords)
@@ -233,7 +229,7 @@ func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
 
 		rep := subword.NewReplacer(word, level, 1)
 
-		for _, rule := range p.h.spec.Rewrite {
+		for _, rule := range spec.Rewrite {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 			word = rep.String()
@@ -261,6 +257,8 @@ func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
 func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
+	spec := p.h.Spec()
+
 	var swBuf subword.Builder
 
 	swtr := p.tr.SubwordsTracer(Transcribe, subwords)
@@ -281,7 +279,7 @@ func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
 		// with NULL characters.
 		dummy := subword.NewReplacer(word, 0, 0)
 
-		for _, rule := range p.h.spec.Transcribe {
+		for _, rule := range spec.Transcribe {
 			repls := rule.replacements(word)
 			rep.ReplaceBy(repls...)
 
@@ -358,8 +356,9 @@ func (p pipeline) syllabify(subwords []subword.Subword) string {
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
 // For example, "「...」" will be "'...'".
-func (p pipeline) transliterate(word string) string {
-	script := p.h.spec.script
+func (p pipeline) localize(word string) string {
+	spec := p.h.Spec()
+	script := spec.script
 
 	chars := []rune(word)
 	last := len(chars) - 1
@@ -387,7 +386,7 @@ func (p pipeline) transliterate(word string) string {
 			continue
 		}
 
-		punct := script.TransliteratePunct(ch)
+		punct := script.LocalizePunct(ch)
 
 		// Trim left after punct or space.
 		l := i - 1
@@ -406,7 +405,7 @@ func (p pipeline) transliterate(word string) string {
 
 	word = buf.String()
 
-	p.tr.Trace(Transliterate, word, p.h.spec.Lang.Script)
+	p.tr.Trace(Localize, word, spec.Lang.Script)
 
 	return word
 }

@@ -7,15 +7,13 @@ import (
 	"testing"
 
 	"github.com/hangulize/hangulize"
-	"github.com/hangulize/hangulize/phonemize/furigana"
-	"github.com/hangulize/hangulize/phonemize/pinyin"
+	"github.com/hangulize/hangulize/translit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func init() {
-	hangulize.ImportPhonemizer(&furigana.P)
-	hangulize.ImportPhonemizer(&pinyin.P)
+	translit.Install()
 }
 
 func loadSpec(lang string) *hangulize.Spec {
@@ -49,6 +47,7 @@ func mustHangulizeSpec(t *testing.T, spec *hangulize.Spec, word string) string {
 
 func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word string) {
 	h := hangulize.New(spec)
+	translit.Install(h)
 
 	actual, err := h.Hangulize(word)
 	assert.NoError(t, err)

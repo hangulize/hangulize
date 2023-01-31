@@ -28,8 +28,8 @@ func (Kana) Normalize(ch rune) rune {
 	return ch
 }
 
-// TransliteratePunct converts a Japanese punctuation to fit in Korean.
-func (Kana) TransliteratePunct(punct rune) string {
+// LocalizePunct converts a Japanese punctuation to fit in Korean.
+func (Kana) LocalizePunct(punct rune) string {
 	switch punct {
 	case '。':
 		return ". "

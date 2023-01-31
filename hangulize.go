@@ -16,54 +16,62 @@ func Hangulize(lang string, word string) (string, error) {
 		return word, fmt.Errorf("%w: %s", ErrSpecNotFound, lang)
 	}
 
-	h := New(spec)
+	h := &hangulizer{spec, defaultTranslitRegistry}
 	return h.Hangulize(word)
 }
 
-// Hangulizer provides the transcription logic for the underlying spec.
-type Hangulizer struct {
-	spec               *Spec
-	phonemizerRegistry map[string]Phonemizer
+// Hangulizer is dedicated for a specific language. transcribes a provides the transcription logic for the underlying spec.
+type Hangulizer interface {
+	Spec() *Spec
+
+	Translits() map[string]Translit
+	UseTranslit(Translit) bool
+	UnuseTranslit(method string) bool
+
+	Hangulize(word string) (string, error)
+	HangulizeTrace(word string) (string, Traces, error)
 }
 
-// New creates a Hangulizer for a spec.
-func New(spec *Spec) *Hangulizer {
-	return &Hangulizer{spec, make(map[string]Phonemizer)}
+// hangulizer provides the transcription logic for the underlying spec.
+type hangulizer struct {
+	spec             *Spec
+	translitRegistry translitRegistry
 }
 
-// NewHangulizer has been deprecated. Use New instead.
-var NewHangulizer = New
+// New creates a hangulizer for a Spec.
+func New(spec *Spec) *hangulizer {
+	return &hangulizer{spec, make(map[string]Translit)}
+}
 
-// Spec returns the underlying spec.
-func (h *Hangulizer) Spec() *Spec {
+// Spec returns the underlying Spec.
+func (h *hangulizer) Spec() *Spec {
 	return h.spec
 }
 
-// ImportPhonemizer keeps a phonemizer for ready to use.
-func (h *Hangulizer) ImportPhonemizer(p Phonemizer) bool {
-	return importPhonemizer(p, h.phonemizerRegistry)
+// Translits returns the registered Translits.
+func (h *hangulizer) Translits() map[string]Translit {
+	return h.translitRegistry.Detach()
 }
 
-// UnimportPhonemizer discards a phonemizer.
-func (h *Hangulizer) UnimportPhonemizer(id string) bool {
-	return unimportPhonemizer(id, h.phonemizerRegistry)
+// UseTranslit imports a Translit.
+func (h *hangulizer) UseTranslit(t Translit) bool {
+	return h.translitRegistry.Add(t)
 }
 
-// Phonemizer returns a phonemizer by the ID.
-func (h *Hangulizer) Phonemizer(id string) (Phonemizer, bool) {
-	p, ok := h.phonemizerRegistry[id]
-	return p, ok
+// UnuseTranslit removes an imported Translit.
+func (h *hangulizer) UnuseTranslit(method string) bool {
+	return h.translitRegistry.Remove(method)
 }
 
 // Hangulize transcribes a loanword into Hangul.
-func (h *Hangulizer) Hangulize(word string) (string, error) {
+func (h *hangulizer) Hangulize(word string) (string, error) {
 	p := pipeline{h, nil}
 	return p.forward(word)
 }
 
 // HangulizeTrace transcribes a loanword into Hangul
 // and returns the traced internal events too.
-func (h *Hangulizer) HangulizeTrace(word string) (string, Traces, error) {
+func (h *hangulizer) HangulizeTrace(word string) (string, Traces, error) {
 	var tr tracer
 	p := pipeline{h, &tr}
 

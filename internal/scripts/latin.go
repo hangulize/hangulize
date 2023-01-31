@@ -28,7 +28,7 @@ func (Latin) Normalize(ch rune) rune {
 	return unicode.ToLower(ch)
 }
 
-// TransliteratePunct does nothing.
-func (Latin) TransliteratePunct(punct rune) string {
+// LocalizePunct does nothing.
+func (Latin) LocalizePunct(punct rune) string {
 	return string(punct)
 }

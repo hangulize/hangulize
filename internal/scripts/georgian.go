@@ -18,7 +18,7 @@ func (Georgian) Normalize(ch rune) rune {
 	return ch
 }
 
-// TransliteratePunct does nothing.
-func (Georgian) TransliteratePunct(punct rune) string {
+// LocalizePunct does nothing.
+func (Georgian) LocalizePunct(punct rune) string {
 	return string(punct)
 }

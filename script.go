@@ -8,7 +8,7 @@ import (
 type script interface {
 	Is(rune) bool
 	Normalize(rune) rune
-	TransliteratePunct(rune) string
+	LocalizePunct(rune) string
 }
 
 // getScript chooses a script by the script name.

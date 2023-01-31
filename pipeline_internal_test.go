@@ -8,25 +8,25 @@ import (
 	"github.com/hangulize/hangulize/internal/scripts"
 )
 
-func TestTransliterate(t *testing.T) {
+func TestLocalize(t *testing.T) {
 	s := Spec{}
 	h := New(&s)
 	p := pipeline{h, nil}
 
 	s.script = scripts.Kana{}
 
-	assert.Equal(t, "foo.", p.transliterate("foo。"))
-	assert.Equal(t, ", foo, bar", p.transliterate("、foo、bar"))
-	assert.Equal(t, "foo, bar,", p.transliterate("foo、 bar、"))
-	assert.Equal(t, "'foo' bar", p.transliterate("「foo」bar"))
-	assert.Equal(t, "foo: bar!", p.transliterate("foo：bar！"))
-	assert.Equal(t, "foo!?", p.transliterate("foo！？"))
+	assert.Equal(t, "foo.", p.localize("foo。"))
+	assert.Equal(t, ", foo, bar", p.localize("、foo、bar"))
+	assert.Equal(t, "foo, bar,", p.localize("foo、 bar、"))
+	assert.Equal(t, "'foo' bar", p.localize("「foo」bar"))
+	assert.Equal(t, "foo: bar!", p.localize("foo：bar！"))
+	assert.Equal(t, "foo!?", p.localize("foo！？"))
 }
 
-func TestTransliterateZWSP(t *testing.T) {
+func TestLocalizeZWSP(t *testing.T) {
 	s := Spec{}
 	h := New(&s)
 	p := pipeline{h, nil}
 
-	assert.Equal(t, "foo", p.transliterate("f\u200Bo\u200Bo"))
+	assert.Equal(t, "foo", p.localize("f\u200Bo\u200Bo"))
 }
