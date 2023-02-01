@@ -202,16 +202,16 @@ func TestInstanceTranslit(t *testing.T) {
 	`)
 	h := hangulize.New(spec)
 
-	result, err := h.Hangulize("1234")
+	_, err := h.Hangulize("1234")
 	assert.ErrorIs(t, err, hangulize.ErrTranslitNotImported)
 
 	h.UseTranslit(&stubTranslit{})
-	result, err = h.Hangulize("1234")
+	result, err := h.Hangulize("1234")
 	assert.NoError(t, err)
 	assert.Equal(t, "스텁", result)
 
 	h.UnuseTranslit("stub")
-	result, err = h.Hangulize("1234")
+	_, err = h.Hangulize("1234")
 	assert.ErrorIs(t, err, hangulize.ErrTranslitNotImported)
 }
 

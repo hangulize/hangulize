@@ -39,7 +39,7 @@ type hangulizer struct {
 }
 
 // New creates a hangulizer for a Spec.
-func New(spec *Spec) *hangulizer {
+func New(spec *Spec) Hangulizer {
 	return &hangulizer{spec, make(map[string]Translit)}
 }
 
