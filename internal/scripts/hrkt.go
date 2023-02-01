@@ -2,20 +2,20 @@ package scripts
 
 import "unicode"
 
-// Kana represents the Kana script including Hiragana and Katakana.
+// Hrkt represents the Japanese syllabaries including Hiragana and Katakana.
 //
 //	ひらがな カタカナ
-type Kana struct{}
+type Hrkt struct{}
 
 // Is checks whether the character is either Hiragana or Katakana.
-func (Kana) Is(ch rune) bool {
+func (Hrkt) Is(ch rune) bool {
 	return (ch == 'ー' ||
 		unicode.Is(unicode.Hiragana, ch) ||
 		unicode.Is(unicode.Katakana, ch))
 }
 
 // Normalize converts Hiragana to Katakana.
-func (Kana) Normalize(ch rune) rune {
+func (Hrkt) Normalize(ch rune) rune {
 	const (
 		hiraganaMin = rune(0x3040)
 		hiraganaMax = rune(0x309f)
@@ -29,7 +29,7 @@ func (Kana) Normalize(ch rune) rune {
 }
 
 // LocalizePunct converts a Japanese punctuation to fit in Korean.
-func (Kana) LocalizePunct(punct rune) string {
+func (Hrkt) LocalizePunct(punct rune) string {
 	switch punct {
 	case '。':
 		return ". "

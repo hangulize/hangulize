@@ -3,11 +3,11 @@ lang:
     codes    = "ja", "jpn"
     english  = "Japanese"
     korean   = "일본어"
-    script   = "kana"
+    script   = "Hrkt"
     translit = "furigana"
 
 config:
-    author = "Heungsub Lee <sub@subl.ee>"
+    author = "Heungsub Lee <heungsub@subl.ee>"
     stage  = "draft"
 
 rewrite:

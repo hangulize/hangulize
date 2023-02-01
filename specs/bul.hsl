@@ -3,7 +3,7 @@ lang:
     codes    = "bg", "bul"
     english  = "Bulgarian"
     korean   = "불가리아어"
-    script   = "cyrillic"
+    script   = "Cyrl"
     translit = "cyrillic[bg]"
 
 config:

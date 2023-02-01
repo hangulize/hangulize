@@ -3,7 +3,7 @@ lang:
     codes   = "el", "ell"
     english = "Greek"
     korean  = "그리스어"
-    script  = "greek"
+    script  = "Grek"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

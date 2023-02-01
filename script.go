@@ -21,13 +21,13 @@ func getScript(name string) (script, bool) {
 var scriptRegistry map[string]script
 
 func init() {
+	latn := scripts.Latn{}
 	scriptRegistry = map[string]script{
-		"":         scripts.Latin{},
-		"cyrillic": scripts.Cyrillic{},
-		"georgian": scripts.Georgian{},
-		"greek":    scripts.Greek{},
-		"kana":     scripts.Kana{},
-		"latin":    scripts.Latin{},
-		"pinyin":   scripts.Pinyin{},
+		"":     latn,
+		"Latn": latn,
+		"Cyrl": scripts.Cyrl{},
+		"Geor": scripts.Geor{},
+		"Grek": scripts.Grek{},
+		"Hrkt": scripts.Hrkt{},
 	}
 }

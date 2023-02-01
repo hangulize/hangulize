@@ -3,17 +3,20 @@ lang:
     codes    = "zh", "chi"
     english  = "Chinese"
     korean   = "중국어"
-    script   = "pinyin"
+    script   = "Latn"
     translit = "pinyin"
 
 config:
-    author = "Heungsub Lee <sub@subl.ee>"
+    author = "Heungsub Lee <heungsub@subl.ee>"
     stage  = "draft"
 
 vars:
     jqx   = "j", "q", "x"
     nojqx = "b", "p", "m", "f", "d", "t", "n", "l", "g", "k", "h", "r", "z", "c", "s"
     J     = "j", "q", "zh", "ch", "c"
+
+normalize:
+    "v" = "ü", "Ü"
 
 rewrite:
     # "v" means "ü" in unofficial Pinyin.

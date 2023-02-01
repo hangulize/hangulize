@@ -3,7 +3,7 @@ lang:
     codes   = "nl", "nld"
     english = "Dutch"
     korean  = "네덜란드어"
-    script  = "latin"
+    script  = "Latn"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

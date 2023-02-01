@@ -25,7 +25,7 @@ func TestTraceString(t *testing.T) {
 	_, traces, _ := h.HangulizeTrace("Cappuccino")
 
 	assert.Equal(t, `[Input] "Cappuccino"`, traces[0].String())
-	assert.Equal(t, `[Normalize] "cappuccino" | (latin)`, traces[1].String())
+	assert.Equal(t, `[Normalize] "cappuccino" | (Latn)`, traces[1].String())
 }
 
 func TestTracesRender(t *testing.T) {

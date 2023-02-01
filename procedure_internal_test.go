@@ -13,7 +13,7 @@ func TestLocalize(t *testing.T) {
 	h := New(&s)
 	p := procedure{h, nil}
 
-	s.script = scripts.Kana{}
+	s.script = scripts.Hrkt{}
 
 	assert.Equal(t, "foo.", p.localize("foo。"))
 	assert.Equal(t, ", foo, bar", p.localize("、foo、bar"))

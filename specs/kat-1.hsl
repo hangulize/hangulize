@@ -3,7 +3,7 @@ lang:
     codes   = "ka", "kat"
     english = "Georgian (1st scheme)"
     korean  = "조지아어(제1안)"
-    script  = "georgian"
+    script  = "Geor"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

@@ -3,7 +3,7 @@ lang:
     codes   = "vi", "vie"
     english = "Vietnamese"
     korean  = "베트남어"
-    script  = "latin"
+    script  = "Latn"
 
 config:
     author = "Brian Jongseong Park <iceager@gmail.com>"

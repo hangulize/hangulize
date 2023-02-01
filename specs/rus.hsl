@@ -3,7 +3,7 @@ lang:
     codes    = "ru", "rus"
     english  = "Russian"
     korean   = "러시아어"
-    script   = "cyrillic"
+    script   = "Cyrl"
     translit = "cyrillic[ru]"
 
 config:
