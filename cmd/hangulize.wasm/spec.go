@@ -13,14 +13,19 @@ type array = []interface{}
 
 // jsSpec converts a Spec as a JavaScript value.
 func jsSpec(s *hangulize.Spec) js.Value {
+	translit := array{}
+	for _, m := range s.Lang.Translit {
+		translit = append(translit, m)
+	}
+
 	lang := js.ValueOf(object{
-		"id":         s.Lang.ID,
-		"code2":      s.Lang.Codes[0],
-		"code3":      s.Lang.Codes[1],
-		"english":    s.Lang.English,
-		"korean":     s.Lang.Korean,
-		"script":     s.Lang.Script,
-		"phonemizer": s.Lang.Phonemizer,
+		"id":       s.Lang.ID,
+		"code2":    s.Lang.Codes[0],
+		"code3":    s.Lang.Codes[1],
+		"english":  s.Lang.English,
+		"korean":   s.Lang.Korean,
+		"script":   s.Lang.Script,
+		"translit": translit,
 	})
 
 	authors := array{}

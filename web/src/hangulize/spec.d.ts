@@ -11,7 +11,7 @@ interface Spec {
     english: string
     korean: string
     script: string
-    phonemizer: string
+    translit: string[]
   }
 
   test: Example[]

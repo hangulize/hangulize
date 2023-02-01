@@ -21,18 +21,22 @@ src/hangulize/manifest.json: FORCE
 src/hangulize/hangulize.wasm: FORCE
 	$(MAKE) -C ../cmd/hangulize.wasm OUT=$(CURDIR)/$@
 
-src/hangulize/furigana.phonemize.wasm: FORCE
-	$(MAKE) -C ../cmd/furigana.phonemize.wasm OUT=$(CURDIR)/$@
+src/hangulize/cyrillic.translit.wasm: FORCE
+	$(MAKE) -C ../cmd/cyrillic.translit.wasm OUT=$(CURDIR)/$@
 
-src/hangulize/pinyin.phonemize.wasm: FORCE
-	$(MAKE) -C ../cmd/pinyin.phonemize.wasm OUT=$(CURDIR)/$@
+src/hangulize/furigana.translit.wasm: FORCE
+	$(MAKE) -C ../cmd/furigana.translit.wasm OUT=$(CURDIR)/$@
+
+src/hangulize/pinyin.translit.wasm: FORCE
+	$(MAKE) -C ../cmd/pinyin.translit.wasm OUT=$(CURDIR)/$@
 
 GEN_FILES = \
 	$(ICON_FILES) \
 	src/hangulize/manifest.json \
 	src/hangulize/hangulize.wasm \
-	src/hangulize/furigana.phonemize.wasm \
-	src/hangulize/pinyin.phonemize.wasm
+	src/hangulize/cyrillic.translit.wasm \
+	src/hangulize/furigana.translit.wasm \
+	src/hangulize/pinyin.translit.wasm
 
 node_modules: package.json
 	yarn install

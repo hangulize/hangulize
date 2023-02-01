@@ -14,7 +14,7 @@ func main() {
 	js.Global().Set("hangulize", jsHangulize)
 	js.Global().Get("hangulize").Set("version", version)
 	js.Global().Get("hangulize").Set("specs", jsSpecs(hangulize.ListLangs()))
-	js.Global().Get("hangulize").Set("importPhonemizer", jsImportPhonemizer)
+	js.Global().Get("hangulize").Set("useTranslit", jsUseTranslit)
 
 	<-make(chan struct{}, 0)
 }

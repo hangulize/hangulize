@@ -24,8 +24,13 @@ func (furigana) Method() string {
 	return "furigana"
 }
 
-// Kagome caches a Kagome tokenizer because it is expensive.
-func (p *furigana) Kagome() *kagome.Tokenizer {
+// ensureKagome caches a Kagome tokenizer because it is expensive.
+func (p *furigana) ensureKagome() *kagome.Tokenizer {
+	if p.kagome == nil {
+		// It may take a while.
+		k := kagome.New()
+		p.kagome = &k
+	}
 	return p.kagome
 }
 
@@ -36,13 +41,8 @@ func (p *furigana) Transliterate(word string) (string, error) {
 	// Resolve Kana repeatations.
 	word = repeatKana(word)
 
-	if p.kagome == nil {
-		// It may take a while.
-		k := kagome.New()
-		p.kagome = &k
-	}
-
-	tokens := p.kagome.Tokenize(word)
+	k := p.ensureKagome()
+	tokens := k.Tokenize(word)
 
 	tw := newTypewriter(tokens)
 	word = tw.Typewrite()

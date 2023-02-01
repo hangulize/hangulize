@@ -9,7 +9,7 @@ interface WasmHangulize {
   (lang: string, word: string): Promise<string>
   version: string
   specs: Specs
-  importPhonemizer: (id: string, fn: (word: string) => Promise<string>) => void
+  useTranslit: (method: string, fn: (word: string) => Promise<string>) => void
 }
 
 declare global {
@@ -22,7 +22,7 @@ export interface HangulizeEndpoint {
   hangulize: (lang: string, word: string) => Promise<string>
   getVersion: () => Promise<string>
   getSpecs: () => Promise<Specs>
-  importPhonemizer: (id: string, fn: (word: string) => Promise<string>) => Promise<void>
+  useTranslit: (method: string, fn: (word: string) => Promise<string>) => Promise<void>
 }
 
 const endpoint: HangulizeEndpoint = {
@@ -41,9 +41,9 @@ const endpoint: HangulizeEndpoint = {
     return hangulize.specs
   },
 
-  async importPhonemizer(id: string, fn: (word: string) => Promise<string>) {
+  async useTranslit(method: string, fn: (word: string) => Promise<string>) {
     await ready
-    hangulize.importPhonemizer(id, fn)
+    hangulize.useTranslit(method, fn)
   },
 }
 

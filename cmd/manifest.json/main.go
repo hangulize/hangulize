@@ -8,9 +8,9 @@ import (
 )
 
 type manifest struct {
-	Version     string          `json:"version"`
-	Specs       map[string]spec `json:"specs"`
-	Phonemizers []string        `json:"phonemizers"`
+	Version   string          `json:"version"`
+	Specs     map[string]spec `json:"specs"`
+	Translits []string        `json:"translits"`
 }
 
 type spec struct {
@@ -20,13 +20,13 @@ type spec struct {
 }
 
 type lang struct {
-	ID         string `json:"id"`
-	Code2      string `json:"code2"`
-	Code3      string `json:"code3"`
-	English    string `json:"english"`
-	Korean     string `json:"korean"`
-	Script     string `json:"script"`
-	Phonemizer string `json:"phonemizer"`
+	ID       string   `json:"id"`
+	Code2    string   `json:"code2"`
+	Code3    string   `json:"code3"`
+	English  string   `json:"english"`
+	Korean   string   `json:"korean"`
+	Script   string   `json:"script"`
+	Translit []string `json:"translit"`
 }
 
 type config struct {
@@ -48,7 +48,7 @@ func jsonSpec(s *hangulize.Spec) spec {
 		s.Lang.English,
 		s.Lang.Korean,
 		s.Lang.Script,
-		s.Lang.Phonemizer,
+		s.Lang.Translit,
 	}
 
 	config := config{s.Config.Authors, s.Config.Stage}
@@ -66,23 +66,23 @@ var version string
 func main() {
 	langs := hangulize.ListLangs()
 	specs := make(map[string]spec, len(langs))
-	phonemizerSet := make(map[string]bool)
+	translitSet := make(map[string]bool)
 
 	for _, lang := range langs {
 		spec, _ := hangulize.LoadSpec(lang)
 		specs[lang] = jsonSpec(spec)
 
-		if spec.Lang.Phonemizer != "" {
-			phonemizerSet[spec.Lang.Phonemizer] = true
+		for _, m := range spec.Lang.Translit {
+			translitSet[m] = true
 		}
 	}
 
-	phonemizers := make([]string, 0, len(phonemizerSet))
-	for id := range phonemizerSet {
-		phonemizers = append(phonemizers, id)
+	translits := make([]string, 0, len(translitSet))
+	for id := range translitSet {
+		translits = append(translits, id)
 	}
 
-	b, err := json.Marshal(manifest{version, specs, phonemizers})
+	b, err := json.Marshal(manifest{version, specs, translits})
 	if err != nil {
 		panic(err)
 	}

@@ -3,8 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import type { HangulizeEndpoint } from './hangulize.worker'
 import manifest from './manifest.json'
-import type { PhonemizeEndpoint } from './phonemize.worker'
 import type { Specs } from './spec'
+import type { TranslitEndpoint } from './translit.worker'
+import { normalizeMethod } from './translit.worker'
 
 export const enum HangulizeState {
   INITIALIZING,
@@ -62,26 +63,30 @@ interface HangulizeInput {
 
 function spawnWorkers(): [
   Comlink.Remote<HangulizeEndpoint>,
-  { [id: string]: Comlink.Remote<PhonemizeEndpoint> }
+  { [method: string]: Comlink.Remote<TranslitEndpoint> }
 ] {
   const worker = Comlink.wrap<HangulizeEndpoint>(
     new Worker(new URL('hangulize.worker', import.meta.url))
   )
 
-  const phonemizeWorkers: { [id: string]: Comlink.Remote<PhonemizeEndpoint> } = {}
-  manifest.phonemizers.forEach((id) => {
-    phonemizeWorkers[id] = Comlink.wrap<PhonemizeEndpoint>(
-      new Worker(new URL('phonemize.worker', import.meta.url))
-    )
-    phonemizeWorkers[id].load(id)
+  const translitWorkers: { [method: string]: Comlink.Remote<TranslitEndpoint> } = {}
+  manifest.translits.forEach((method) => {
+    const normalMethod = normalizeMethod(method)
 
-    const phonemizer = Comlink.proxy(async (word: string) => {
-      return await phonemizeWorkers[id].phonemize(id, word)
+    if (!(normalMethod in translitWorkers)) {
+      translitWorkers[normalMethod] = Comlink.wrap<TranslitEndpoint>(
+        new Worker(new URL('translit.worker', import.meta.url))
+      )
+      translitWorkers[normalMethod].load(method)
+    }
+
+    const translit = Comlink.proxy(async (word: string) => {
+      return await translitWorkers[normalMethod].transliterate(method, word)
     })
-    worker.importPhonemizer(id, phonemizer)
+    worker.useTranslit(method, translit)
   })
 
-  return [worker, phonemizeWorkers]
+  return [worker, translitWorkers]
 }
 
 export function useHangulize(): [Hangulize, SetHangulizeInput] {

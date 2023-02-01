@@ -247,8 +247,8 @@ func ExampleHangulize_nietzsche() {
 }
 
 func ExampleHangulize_shinkaiMakoto() {
-	// import "github.com/hangulize/hangulize/phonemize/furigana"
-	// hangulize.ImportPhonemizer(&furigana.P)
+	// import "github.com/hangulize/hangulize/translit"
+	// translit.Install()
 
 	shinkai, _ := hangulize.Hangulize("jpn", "新海誠")
 	fmt.Println(shinkai)

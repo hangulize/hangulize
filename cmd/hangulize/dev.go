@@ -31,7 +31,7 @@ var devCmd = &cobra.Command{
 		}
 
 		// Test the spec.
-		h := hangulize.NewHangulizer(spec)
+		h := hangulize.New(spec)
 		hangulizeStream(cmd, args, h)
 		return nil
 	},

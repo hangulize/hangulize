@@ -9,22 +9,22 @@ import (
 	"github.com/hangulize/hangulize"
 )
 
-// promisePhonemizer is a wrapper of an async JavaScript function to implement
-// hangulize.Phonemizer.
-type promisePhonemizer struct {
-	id string
-	fn js.Value
+// promiseTranslit is a wrapper of an async JavaScript function to implement
+// hangulize.Translit.
+type promiseTranslit struct {
+	scheme string
+	fn     js.Value
 }
 
-func (p promisePhonemizer) ID() string {
-	return p.id
+func (t promiseTranslit) Scheme() string {
+	return t.scheme
 }
 
-func (p promisePhonemizer) Load() error {
+func (t promiseTranslit) Load() error {
 	return nil
 }
 
-func (p promisePhonemizer) Phonemize(word string) (string, error) {
+func (p promiseTranslit) Transliterate(word string) (string, error) {
 	thenCh := make(chan string)
 	defer close(thenCh)
 
@@ -53,9 +53,8 @@ func (p promisePhonemizer) Phonemize(word string) (string, error) {
 	}
 }
 
-// jsImportPhonemizer
-var jsImportPhonemizer = js.FuncOf(func(this js.Value, args []js.Value) any {
+var jsUseTranslit = js.FuncOf(func(this js.Value, args []js.Value) any {
 	id := args[0].String()
 	fn := args[1]
-	return hangulize.ImportPhonemizer(promisePhonemizer{id, fn})
+	return hangulize.UseTranslit(promiseTranslit{id, fn})
 })

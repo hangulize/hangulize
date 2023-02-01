@@ -61,7 +61,7 @@ var testCmd = &cobra.Command{
 				transcribed string
 				traces      []hangulize.Trace
 			)
-			h := hangulize.NewHangulizer(spec)
+			h := hangulize.New(spec)
 
 			// Run test.
 			for _, exm := range spec.Test {
