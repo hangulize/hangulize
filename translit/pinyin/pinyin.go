@@ -21,7 +21,7 @@ var T hangulize.Translit = &pinyin{}
 
 type pinyin struct{}
 
-func (pinyin) Method() string {
+func (pinyin) Scheme() string {
 	return "pinyin"
 }
 

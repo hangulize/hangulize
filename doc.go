@@ -11,7 +11,7 @@ on https://hangulize.org/, it has been of great help for Korean translators.
 
 This Go re-implementation is a reboot of Hangulize with feature improvements.
 
-# Pipeline
+# Procedure
 
 Basically, Hangulize transcribes with 5 steps. These steps include "Normalize",
 "Group", "Rewrite", "Transcribe", and "Syllabify". To clarify these concepts,
@@ -41,15 +41,15 @@ groups.
 
 	"ㅎㅔ-ㄹㄹㅗ", "!" -> "헬로!"
 
-# Extended Pipeline
+# Extended Procedure
 
-Some languages, such as Japanese, may require 2 more steps: "Phonemize" and
-"Transliterate". The prior is before the Normalize step, and the latter is
-after the Syllabify step.
+Some languages, such as Japanese, may require 2 more steps: "Transliterate" and
+"Localize". The prior is before the Normalize step, and the latter is after the
+Syllabify step.
 
 Japanese uses Kanji which is an ideogram. There is the Kanji-to-Kana mapping
 called Furigana. To get Furigana from Kanji, we need a lexical analysis based
-on several dictionaries. The Phonemize step guesses the phonograms from a
+on several dictionaries. The Transliterate step guesses the phonograms from a
 spelling based on lexical analysis.
 
 	"日本語" -> "ニホンゴ"
@@ -57,7 +57,7 @@ spelling based on lexical analysis.
 Furthermore, Japanese uses the full-width characters for puctuations while
 Korean and European languages use the half-width. The full-width puctuations
 need to be replaced with the half-width and a space to generate a comfortable
-Korean word. The Transliterate step replaces them.
+Korean word. The Localize step replaces them.
 
 	"이마、아이니유키마스" -> "이마, 아이니유키마스"
 

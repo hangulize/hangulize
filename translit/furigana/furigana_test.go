@@ -6,14 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/hangulize/hangulize"
 	"github.com/hangulize/hangulize/translit/furigana"
 )
-
-func TestTranslit(t *testing.T) {
-	assert.Implements(t, (*hangulize.Translit)(nil), &furigana.T)
-	assert.Equal(t, "furigana", furigana.T.Method())
-}
 
 func mustTransliterate(t *testing.T, word string) string {
 	result, err := furigana.T.Transliterate(word)

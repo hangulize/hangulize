@@ -12,10 +12,10 @@ import (
 var translits = map[string]hangulize.Translit{}
 
 var jsTransliterate = js.FuncOf(func(this js.Value, args []js.Value) any {
-	method := args[0].String()
+	scheme := args[0].String()
 	word := args[1].String()
 
-	result, err := translits[method].Transliterate(word)
+	result, err := translits[scheme].Transliterate(word)
 	if err != nil {
 		return js.Global().Get("Error").New(err.Error())
 	}
@@ -26,7 +26,7 @@ var version string
 
 func main() {
 	for _, t := range cyrillic.Ts {
-		translits[t.Method()] = t
+		translits[t.Scheme()] = t
 	}
 
 	js.Global().Set("translit", jsTransliterate)

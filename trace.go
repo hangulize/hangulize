@@ -12,7 +12,7 @@ import (
 )
 
 // Trace is emitted when a replacement occurs. It is used for tracing of
-// Hangulize pipeline internal.
+// the Hangulize procedure internal.
 type Trace struct {
 	Step Step
 	Word string

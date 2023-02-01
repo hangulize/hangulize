@@ -26,11 +26,11 @@ func TestInstallInstance(t *testing.T) {
 }
 
 type fakeTranslit struct {
-	method string
+	scheme string
 }
 
-func (t fakeTranslit) Method() string {
-	return t.method
+func (t fakeTranslit) Scheme() string {
+	return t.scheme
 }
 
 func (t fakeTranslit) Load() error {

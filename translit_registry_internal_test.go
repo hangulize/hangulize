@@ -8,12 +8,8 @@ import (
 
 type asisTranslit struct{}
 
-func (asisTranslit) Method() string {
+func (asisTranslit) Scheme() string {
 	return "asis"
-}
-
-func (asisTranslit) Load() error {
-	return nil
 }
 
 func (asisTranslit) Transliterate(word string) (string, error) {

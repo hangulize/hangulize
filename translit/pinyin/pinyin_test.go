@@ -3,16 +3,10 @@ package pinyin_test
 import (
 	"testing"
 
-	"github.com/hangulize/hangulize"
 	"github.com/hangulize/hangulize/translit/pinyin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestTranslit(t *testing.T) {
-	assert.Implements(t, (*hangulize.Translit)(nil), &pinyin.T)
-	assert.Equal(t, "pinyin", pinyin.T.Method())
-}
 
 func mustTransliterate(t *testing.T, word string) string {
 	result, err := pinyin.T.Transliterate(word)

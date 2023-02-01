@@ -23,7 +23,7 @@ func hasSpace(word string) bool {
 
 // -----------------------------------------------------------------------------
 
-// Step is an identifier for the each pipeline step.
+// Step is an identifier for the each step in the Hangulize procedure.
 type Step int
 
 const (
@@ -81,13 +81,13 @@ func (s Step) String() string {
 
 // -----------------------------------------------------------------------------
 
-type pipeline struct {
+type procedure struct {
 	h  Hangulizer
 	tr *tracer
 }
 
-// forward runs the Hangulize pipeline for a word.
-func (p pipeline) forward(word string) (string, error) {
+// forward runs the Hangulize procedure for a word.
+func (p procedure) forward(word string) (string, error) {
 	p.input(word)
 
 	// preparing phase
@@ -112,7 +112,7 @@ func (p pipeline) forward(word string) (string, error) {
 // -----------------------------------------------------------------------------
 
 // 0. Just recording beginning (Word)
-func (p pipeline) input(word string) {
+func (p procedure) input(word string) {
 	p.tr.Trace(Input, word, "")
 }
 
@@ -122,23 +122,23 @@ func (p pipeline) input(word string) {
 // phonograms, usually based on lexical analysis. Most languages already use
 // phonograms which are sufficient to represent the exact pronunciation. But in
 // some languages, such as American English or Chinese, it's not true.
-func (p pipeline) transliterate(word string) (string, error) {
+func (p procedure) transliterate(word string) (string, error) {
 	spec := p.h.Spec()
 	translits := p.h.Translits()
 
-	for _, method := range spec.Lang.Translit {
-		t, ok := translits[method]
+	for _, scheme := range spec.Lang.Translit {
+		t, ok := translits[scheme]
 		if !ok {
-			return word, fmt.Errorf("%w: %s", ErrTranslitNotImported, method)
+			return word, fmt.Errorf("%w: %s", ErrTranslitNotImported, scheme)
 		}
 
 		var err error
 		word, err = t.Transliterate(word)
 		if err != nil {
-			return word, fmt.Errorf("%w: %s", ErrTranslit, method)
+			return word, fmt.Errorf("%w: %s", ErrTranslit, scheme)
 		}
 
-		p.tr.Trace(Transliterate, word, t.Method())
+		p.tr.Trace(Transliterate, word, t.Scheme())
 	}
 
 	return word, nil
@@ -149,7 +149,7 @@ func (p pipeline) transliterate(word string) (string, error) {
 // This step eliminates letter case to make the next steps work easier.
 //
 // For example, "Hello" in Latin script will be normalized to "hello".
-func (p pipeline) normalize(word string) string {
+func (p procedure) normalize(word string) string {
 	spec := p.h.Spec()
 
 	// Per-spec normalization.
@@ -186,7 +186,7 @@ func (p pipeline) normalize(word string) string {
 //
 // For example, "hello, world!" will be grouped into
 // [{"hello",1}, {", ",0}, {"world",1}, {"!",0}].
-func (p pipeline) group(word string) []subword.Subword {
+func (p procedure) group(word string) []subword.Subword {
 	spec := p.h.Spec()
 
 	rep := subword.NewReplacer(word, 0, 1)
@@ -216,7 +216,7 @@ func (p pipeline) group(word string) []subword.Subword {
 // called "rewrite".
 //
 // For example, "hello" can be rewritten to "heˈlō".
-func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
+func (p procedure) rewrite(subwords []subword.Subword) []subword.Subword {
 	spec := p.h.Spec()
 
 	var swBuf subword.Builder
@@ -256,7 +256,7 @@ func (p pipeline) rewrite(subwords []subword.Subword) []subword.Subword {
 // ("-ㄴ") means that it is a Jongseong (tail).
 //
 // For example, "heˈlō" can be transcribed as "ㅎㅔ-ㄹㄹㅗ".
-func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
+func (p procedure) transcribe(subwords []subword.Subword) []subword.Subword {
 	spec := p.h.Spec()
 
 	var swBuf subword.Builder
@@ -322,13 +322,13 @@ func (p pipeline) transcribe(subwords []subword.Subword) []subword.Subword {
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
 // For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
-func (p pipeline) syllabify(subwords []subword.Subword) string {
+func (p procedure) syllabify(subwords []subword.Subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
 
 	for _, sw := range subwords {
 		// Don't touch level=0 subwords. They just have passed through the
-		// pipeline, because they are meaningless.
+		// procedure, because they are meaningless.
 		if sw.Level == 0 {
 			buf.WriteString(jamo.ComposeHangul(jamoBuf.String()))
 			jamoBuf.Reset()
@@ -356,7 +356,7 @@ func (p pipeline) syllabify(subwords []subword.Subword) string {
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
 // For example, "「...」" will be "'...'".
-func (p pipeline) localize(word string) string {
+func (p procedure) localize(word string) string {
 	spec := p.h.Spec()
 	script := spec.script
 

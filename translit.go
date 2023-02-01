@@ -4,8 +4,8 @@ package hangulize
 // one script to another script. It also may guess phonograms from the spelling
 // based on lexical analysis.
 type Translit interface {
-	// Method returns the identifier string of a Translit.
-	Method() string
+	// Scheme returns the identifier string of a Translit.
+	Scheme() string
 
 	// Transliterate transliterates the given word.
 	Transliterate(string) (string, error)
@@ -25,22 +25,22 @@ func (r translitRegistry) Detach() map[string]Translit {
 
 // Add registers a Translit into the registry.
 func (r translitRegistry) Add(t Translit) bool {
-	method := t.Method()
+	scheme := t.Scheme()
 
-	if _, ok := r[method]; ok {
+	if _, ok := r[scheme]; ok {
 		// already exists
 		return false
 	}
 
-	r[method] = t
+	r[scheme] = t
 	return true
 }
 
 // Remove deregisters a Translit from the registry.
-func (r translitRegistry) Remove(method string) bool {
-	_, ok := r[method]
+func (r translitRegistry) Remove(scheme string) bool {
+	_, ok := r[scheme]
 	if ok {
-		delete(r, method)
+		delete(r, scheme)
 	}
 	return ok
 }
@@ -59,6 +59,6 @@ func UseTranslit(t Translit) bool {
 }
 
 // UnuseTranslit removes an imported Translit from the default registry.
-func UnuseTranslit(method string) bool {
-	return defaultTranslitRegistry.Remove(method)
+func UnuseTranslit(scheme string) bool {
+	return defaultTranslitRegistry.Remove(scheme)
 }

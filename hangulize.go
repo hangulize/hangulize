@@ -26,7 +26,7 @@ type Hangulizer interface {
 
 	Translits() map[string]Translit
 	UseTranslit(Translit) bool
-	UnuseTranslit(method string) bool
+	UnuseTranslit(scheme string) bool
 
 	Hangulize(word string) (string, error)
 	HangulizeTrace(word string) (string, Traces, error)
@@ -59,13 +59,13 @@ func (h *hangulizer) UseTranslit(t Translit) bool {
 }
 
 // UnuseTranslit removes an imported Translit.
-func (h *hangulizer) UnuseTranslit(method string) bool {
-	return h.translitRegistry.Remove(method)
+func (h *hangulizer) UnuseTranslit(scheme string) bool {
+	return h.translitRegistry.Remove(scheme)
 }
 
 // Hangulize transcribes a loanword into Hangul.
 func (h *hangulizer) Hangulize(word string) (string, error) {
-	p := pipeline{h, nil}
+	p := procedure{h, nil}
 	return p.forward(word)
 }
 
@@ -73,7 +73,7 @@ func (h *hangulizer) Hangulize(word string) (string, error) {
 // and returns the traced internal events too.
 func (h *hangulizer) HangulizeTrace(word string) (string, Traces, error) {
 	var tr tracer
-	p := pipeline{h, &tr}
+	p := procedure{h, &tr}
 
 	word, err := p.forward(word)
 

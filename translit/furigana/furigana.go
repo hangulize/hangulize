@@ -20,7 +20,7 @@ type furigana struct {
 	kagome *kagome.Tokenizer
 }
 
-func (furigana) Method() string {
+func (furigana) Scheme() string {
 	return "furigana"
 }
 

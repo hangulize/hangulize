@@ -31,7 +31,7 @@ func Install(h ...hangulize.Hangulizer) bool {
 	for i, t := range ts {
 		if ok := useTranslit(t); !ok {
 			for j := 0; j < i; j++ {
-				unuseTranslit(ts[j].Method())
+				unuseTranslit(ts[j].Scheme())
 			}
 			return false
 		}

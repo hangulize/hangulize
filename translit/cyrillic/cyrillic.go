@@ -39,7 +39,7 @@ type cyrillic struct {
 	repl    *strings.Replacer
 }
 
-func (c *cyrillic) Method() string {
+func (c *cyrillic) Scheme() string {
 	return fmt.Sprintf("cyrillic[%s]", c.country)
 }
 

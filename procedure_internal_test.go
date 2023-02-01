@@ -11,7 +11,7 @@ import (
 func TestLocalize(t *testing.T) {
 	s := Spec{}
 	h := New(&s)
-	p := pipeline{h, nil}
+	p := procedure{h, nil}
 
 	s.script = scripts.Kana{}
 
@@ -26,7 +26,7 @@ func TestLocalize(t *testing.T) {
 func TestLocalizeZWSP(t *testing.T) {
 	s := Spec{}
 	h := New(&s)
-	p := pipeline{h, nil}
+	p := procedure{h, nil}
 
 	assert.Equal(t, "foo", p.localize("f\u200Bo\u200Bo"))
 }

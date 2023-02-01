@@ -178,7 +178,7 @@ func TestUnknownLang(t *testing.T) {
 
 type stubTranslit struct{}
 
-func (p *stubTranslit) Method() string {
+func (p *stubTranslit) Scheme() string {
 	return "stub"
 }
 
