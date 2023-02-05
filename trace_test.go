@@ -16,12 +16,12 @@ func TestHangulizeTrace(t *testing.T) {
 		traces = append(traces, t)
 	})
 
-	h.Hangulize("Cappuccino")
+	_, _ = h.Hangulize("Cappuccino")
 	assert.NotEmpty(t, traces)
 
 	prevLength := len(traces)
 	h.Trace(nil)
 
-	h.Hangulize("Cappuccino")
+	_, _ = h.Hangulize("Cappuccino")
 	assert.Equal(t, prevLength, len(traces))
 }

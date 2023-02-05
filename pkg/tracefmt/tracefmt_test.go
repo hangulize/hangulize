@@ -19,7 +19,7 @@ func TestFprintTraces(t *testing.T) {
 		traces = append(traces, t)
 	})
 
-	h.Hangulize("Cappuccino")
+	_, _ = h.Hangulize("Cappuccino")
 
 	var b bytes.Buffer
 	tracefmt.FprintTraces(&b, traces)
