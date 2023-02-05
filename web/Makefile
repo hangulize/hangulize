@@ -1,5 +1,4 @@
-CONFIG_FILES = $(shell ls *.js *.json)
-SOURCE_FILES = $(shell find src public -type f)
+SRC_FILES := $(shell find src public -type f)
 
 .PHONY: help
 help:
@@ -41,7 +40,7 @@ GEN_FILES = \
 node_modules: package.json
 	yarn install
 
-.PHONY: gen
+.PHONY: generate
 generate: $(GEN_FILES) ## Generate Wasm, JSON, and icon files
 
 .PHONY: lint
@@ -53,7 +52,7 @@ fmt: node_modules ## Format code by ESLint and Prettier
 	yarn lint:fix
 	yarn prettier
 
-build: node_modules $(GEN_FILES) ## Build a web app in ./build/
+build: node_modules $(SRC_FILES) $(GEN_FILES) ## Build a web app in ./build/
 	yarn build
 	cp CNAME build/CNAME
 
