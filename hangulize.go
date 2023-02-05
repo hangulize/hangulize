@@ -16,7 +16,7 @@ func Hangulize(lang string, word string) (string, error) {
 		return word, fmt.Errorf("%w: %s", ErrSpecNotFound, lang)
 	}
 
-	h := &hangulizer{spec, defaultTranslitRegistry}
+	h := &hangulizer{spec, defaultTranslitRegistry, nil}
 	return h.Hangulize(word)
 }
 
@@ -28,19 +28,21 @@ type Hangulizer interface {
 	UseTranslit(Translit) bool
 	UnuseTranslit(scheme string) bool
 
+	Trace(func(Trace))
+
 	Hangulize(word string) (string, error)
-	HangulizeTrace(word string) (string, Traces, error)
 }
 
 // hangulizer provides the transcription logic for the underlying spec.
 type hangulizer struct {
 	spec             *Spec
 	translitRegistry translitRegistry
+	traceFunc        func(Trace)
 }
 
 // New creates a hangulizer for a Spec.
 func New(spec *Spec) Hangulizer {
-	return &hangulizer{spec, make(map[string]Translit)}
+	return &hangulizer{spec, make(translitRegistry), nil}
 }
 
 // Spec returns the underlying Spec.
@@ -63,19 +65,13 @@ func (h *hangulizer) UnuseTranslit(scheme string) bool {
 	return h.translitRegistry.Remove(scheme)
 }
 
-// Hangulize transcribes a loanword into Hangul.
-func (h *hangulizer) Hangulize(word string) (string, error) {
-	p := procedure{h, nil}
-	return p.forward(word)
+// Spec returns the underlying Spec.
+func (h *hangulizer) Trace(fn func(Trace)) {
+	h.traceFunc = fn
 }
 
-// HangulizeTrace transcribes a loanword into Hangul
-// and returns the traced internal events too.
-func (h *hangulizer) HangulizeTrace(word string) (string, Traces, error) {
-	var tr tracer
-	p := procedure{h, &tr}
-
-	word, err := p.forward(word)
-
-	return word, tr.Traces(), err
+// Hangulize transcribes a loanword into Hangul.
+func (h *hangulizer) Hangulize(word string) (string, error) {
+	p := newProcedure(h.Spec(), h.Translits(), h.traceFunc)
+	return p.forward(word)
 }

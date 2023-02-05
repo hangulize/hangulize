@@ -22,10 +22,12 @@ func BenchmarkCappuccinoTrace(b *testing.B) {
 	spec, _ := hangulize.LoadSpec("ita")
 	h := hangulize.New(spec)
 
+	h.Trace(func(hangulize.Trace) {})
+
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		_, _, _ = h.HangulizeTrace("Cappuccino")
+		_, _ = h.Hangulize("Cappuccino")
 	}
 }
 

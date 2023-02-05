@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/hangulize/hangulize"
+	"github.com/hangulize/hangulize/pkg/tracefmt"
 	"github.com/hangulize/hangulize/translit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -57,7 +58,12 @@ func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word s
 	}
 
 	// Trace only when failed to fast passing for most cases.
-	got, traces, err := h.HangulizeTrace(word)
+	traces := make([]hangulize.Trace, 0)
+	h.Trace(func(t hangulize.Trace) {
+		traces = append(traces, t)
+	})
+
+	got, err := h.Hangulize(word)
 	assert.NoError(t, err)
 
 	// Trace result to understand the failure reason.
@@ -71,7 +77,7 @@ func assertHangulize(t *testing.T, spec *hangulize.Spec, expected string, word s
 	fmt.Fprintf(f, `word: %#v`, word)
 	fmt.Fprintln(f)
 	fmt.Fprintln(f, hr)
-	traces.Render(f)
+	tracefmt.FprintTraces(f, traces)
 	fmt.Fprintln(f, hr)
 
 	assert.Equal(t, expected, got, f.String())

@@ -1,206 +1,125 @@
 package hangulize
 
 import (
-	"bytes"
-	"fmt"
-	"io"
 	"strings"
-
-	runewidth "github.com/mattn/go-runewidth"
 
 	"github.com/hangulize/hangulize/internal/subword"
 )
 
-// Trace is emitted when a replacement occurs. It is used for tracing of
-// the Hangulize procedure internal.
 type Trace struct {
-	Step Step
+	Step string
 	Word string
-
-	Why string
-
-	Rule    Rule
-	HasRule bool
+	Why  string
+	Rule *Rule
 }
 
-func newTrace(step Step, word string, why string, rule *Rule) Trace {
-	// It can hold either why or rule.
-	var _rule Rule
-	var hasRule bool
-
-	if rule != nil {
-		_rule = *rule
-		hasRule = true
-	}
-
-	return Trace{step, word, why, _rule, hasRule}
-}
-
-func (t Trace) String() string {
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "[%s] %#v", t.Step, t.Word)
-
-	if t.HasRule {
-		fmt.Fprintf(&buf, " | %s", t.Rule)
-	} else if t.Why != "" {
-		fmt.Fprintf(&buf, " | (%s)", t.Why)
-	}
-
-	return buf.String()
-}
-
-// -----------------------------------------------------------------------------
-
-// Traces is an array of Trace.
-type Traces []Trace
-
-// Render generates a report text.
-func (ts Traces) Render(w io.Writer) {
-	// Detect the max rune width of the words.
-	var width, maxWidth int
-	widths := make([]int, len(ts))
-
-	for i, t := range ts {
-		width = runewidth.StringWidth(t.Word)
-		widths[i] = width
-
-		if maxWidth < width {
-			maxWidth = width
-		}
-	}
-
-	// Render the report.
-	var step Step
-
-	for i, t := range ts {
-		if step != t.Step {
-			step = t.Step
-			fmt.Fprintf(w, "[%s]\n", step)
-		}
-
-		fmt.Fprintf(w, "  %s", t.Word)
-		fmt.Fprint(w, strings.Repeat(" ", maxWidth-widths[i]))
-
-		if t.HasRule {
-			fmt.Fprintf(w, " | %s", t.Rule)
-		} else if t.Why != "" {
-			fmt.Fprintf(w, " | (%s)", t.Why)
-		}
-
-		fmt.Fprintf(w, "\n")
-	}
-}
-
-// -----------------------------------------------------------------------------
-
-// tracer collects tracing logs.
-//
-// HangulizeTrace uses it.
 type tracer struct {
-	traces   Traces
-	lastWord string
+	fn       func(Trace)
+	prevWord string
 }
 
-// Traces returns the collected tracing logs.
-func (tr *tracer) Traces() Traces {
-	return tr.traces
-}
-
-// trace records a tracing log.
-//
-// Public tracing methods are implemented by this method.
-func (tr *tracer) trace(step Step, word string, why string, rule *Rule) {
-	if tr == nil {
-		return
-	}
-
-	if word == tr.lastWord {
-		// No changes.
-		return
-	}
-
-	trace := newTrace(step, word, why, rule)
-	tr.traces = append(tr.traces, trace)
-	tr.lastWord = word
-}
-
-// Trace records a tracing log with word and why.
-func (tr *tracer) Trace(step Step, word, why string) {
-	tr.trace(step, word, why, nil)
-}
-
-// -----------------------------------------------------------------------------
-
-// subwordsTracer collects tracing logs for the specific subwords.
-type subwordsTracer struct {
-	tr        *tracer
-	step      Step
-	subwords  []subword.Subword
-	trap      map[int][]*string
-	rules     map[int]Rule
-	maxRuleID int
-}
-
-// SubwordsTracer creates a subwordsTracer under the tracer.
-func (tr *tracer) SubwordsTracer(
-	step Step,
-	subwords []subword.Subword,
-) *subwordsTracer {
-	if tr == nil {
+func newTracer(fn func(Trace)) *tracer {
+	if fn == nil {
 		return nil
 	}
-	return &subwordsTracer{
-		tr,
-		step,
-		subwords,
-		make(map[int][]*string),
-		make(map[int]Rule),
-		-1,
-	}
+	return &tracer{fn, ""}
 }
 
-// Trace records a tracing log for a subword.
-//
-// It buffers the tracing logs. Call Commit to flush them.
-func (swtr *subwordsTracer) Trace(swIndex int, word string, rule Rule) {
-	if swtr == nil {
+// Trace emits a tracing event if it is necessary.
+func (r *tracer) trace(t Trace) {
+	if r == nil {
 		return
 	}
 
-	if swtr.trap[rule.ID] == nil {
-		swtr.trap[rule.ID] = make([]*string, len(swtr.subwords))
+	if r.prevWord == t.Word {
+		return
 	}
-
-	swtr.trap[rule.ID][swIndex] = &word
-	swtr.rules[rule.ID] = rule
-	swtr.maxRuleID = rule.ID
+	r.prevWord = t.Word
+	r.fn(t)
 }
 
-// Commit flushes the buffered tracing logs.
-func (swtr *subwordsTracer) Commit() {
-	if swtr == nil {
+func (r *tracer) traceSubwords(step string, subwords []subword.Subword) *subwordsTracer {
+	if r == nil {
+		return nil
+	}
+	return &subwordsTracer{step: step, tracer: r, subwords: subwords}
+}
+
+func (r *tracer) Input(word string) {
+	r.trace(Trace{Step: "Input", Word: word})
+}
+
+func (r *tracer) Transliterate(word, scheme string) {
+	r.trace(Trace{Step: "Transliterate", Word: word, Why: scheme})
+}
+
+func (r *tracer) Normalize(word, script string) {
+	r.trace(Trace{Step: "Normalize", Word: word, Why: script})
+}
+
+func (r *tracer) Rewrite(subwords []subword.Subword) (func(int, string, Rule), func()) {
+	st := r.traceSubwords("Rewrite", subwords)
+	return st.RecordSubword, st.Commit
+}
+
+func (r *tracer) Transcribe(subwords []subword.Subword) (func(int, string, Rule), func()) {
+	st := r.traceSubwords("Transcribe", subwords)
+	return st.RecordSubword, st.Commit
+}
+
+func (r *tracer) Syllabify(word string) {
+	r.trace(Trace{Step: "Syllabify", Word: word})
+}
+
+func (r *tracer) Localize(word, script string) {
+	r.trace(Trace{Step: "Localize", Word: word, Why: script})
+}
+
+type subwordsTracer struct {
+	step     string
+	tracer   *tracer
+	subwords []subword.Subword
+	records  []*subwordsTracerRecord
+}
+
+type subwordsTracerRecord struct {
+	rule     Rule
+	subwords []*string // [i] is the changed i-th subword. nil means that this subword has not been changed.
+}
+
+func growUp[T any](slice []T, size int) []T {
+	return append(slice, make([]T, size-len(slice))...)
+}
+
+func (r *subwordsTracer) RecordSubword(i int, word string, rule Rule) {
+	if r == nil {
 		return
 	}
 
-	subwords := make([]subword.Subword, len(swtr.subwords))
-	copy(subwords, swtr.subwords)
+	r.records = growUp(r.records, rule.ID+1)
+	if r.records[rule.ID] == nil {
+		r.records[rule.ID] = &subwordsTracerRecord{rule, nil}
+	}
+	r.records[rule.ID].subwords = growUp(r.records[rule.ID].subwords, i+1)
 
-	var (
-		dirty bool
-		rule  Rule
-		words []*string
-	)
+	r.records[rule.ID].subwords[i] = &word
+}
 
-	for ruleID := 0; ruleID <= swtr.maxRuleID; ruleID++ {
-		dirty = false
-		rule = swtr.rules[ruleID]
-		words = swtr.trap[ruleID]
+func (r *subwordsTracer) Commit() {
+	if r == nil {
+		return
+	}
 
-		for swIndex, word := range words {
+	subwords := append([]subword.Subword{}, r.subwords...)
+
+	for _, rec := range r.records {
+		dirty := false
+
+		for i, word := range rec.subwords {
 			if word == nil {
 				continue
 			}
-			subwords[swIndex] = subword.New(*word, 0)
+			subwords[i] = subword.New(*word, 0)
 			dirty = true
 		}
 
@@ -209,7 +128,7 @@ func (swtr *subwordsTracer) Commit() {
 			word := b.String()
 			word = strings.Replace(word, "\x00", ".", -1)
 
-			swtr.tr.trace(swtr.step, word, "", &rule)
+			r.tracer.trace(Trace{Step: r.step, Word: word, Rule: &rec.rule})
 		}
 	}
 }

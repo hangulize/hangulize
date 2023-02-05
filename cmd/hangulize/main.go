@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/hangulize/hangulize"
+	"github.com/hangulize/hangulize/pkg/tracefmt"
 	"github.com/hangulize/hangulize/translit"
 	"github.com/spf13/cobra"
 )
@@ -56,23 +57,24 @@ func hangulizeStream(cmd *cobra.Command, args []string, h hangulize.Hangulizer) 
 
 		var (
 			result string
-			traces hangulize.Traces
+			traces []hangulize.Trace
 			err    error
 		)
 
 		if verbose {
-			result, traces, err = h.HangulizeTrace(word)
-		} else {
-			result, err = h.Hangulize(word)
+			h.Trace(func(t hangulize.Trace) {
+				traces = append(traces, t)
+			})
 		}
 
+		result, err = h.Hangulize(word)
 		if err != nil {
 			cmd.PrintErrln(err)
 			os.Exit(1)
 			return
 		}
 
-		traces.Render(cmd.OutOrStderr())
+		tracefmt.FprintTraces(cmd.OutOrStderr(), traces)
 		fmt.Fprintln(cmd.OutOrStdout(), result)
 	}
 }

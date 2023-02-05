@@ -12,7 +12,7 @@ import (
 
 type cov struct {
 	name   string
-	step   hangulize.Step
+	step   string
 	ruleID int
 }
 
@@ -37,7 +37,7 @@ func (c *cover) Visit(name string) {
 }
 
 // Cover marks a covered rule.
-func (c *cover) Cover(name string, step hangulize.Step, ruleID int) {
+func (c *cover) Cover(name, step string, ruleID int) {
 	if c == nil {
 		return
 	}
@@ -47,7 +47,7 @@ func (c *cover) Cover(name string, step hangulize.Step, ruleID int) {
 }
 
 // Covered returns true if the rule has been covered within a test.
-func (c *cover) Covered(name string, step hangulize.Step, ruleID int) bool {
+func (c *cover) Covered(name, step string, ruleID int) bool {
 	if c == nil {
 		return false
 	}
@@ -132,7 +132,7 @@ func (c *cover) WriteProfile(w io.Writer) error {
 		for _, rule := range spec.Rewrite {
 			line := rewritePairs[rule.ID].Line()
 			col := cols[line-1]
-			covered := btoi(c.Covered(name, hangulize.Rewrite, rule.ID))
+			covered := btoi(c.Covered(name, "Rewrite", rule.ID))
 			fmt.Fprintf(w, template, name, line, line, col, covered)
 		}
 
@@ -140,7 +140,7 @@ func (c *cover) WriteProfile(w io.Writer) error {
 		for _, rule := range spec.Transcribe {
 			line := transcribePairs[rule.ID].Line()
 			col := cols[line-1]
-			covered := btoi(c.Covered(name, hangulize.Transcribe, rule.ID))
+			covered := btoi(c.Covered(name, "Transcribe", rule.ID))
 			fmt.Fprintf(w, template, name, line, line, col, covered)
 		}
 	}

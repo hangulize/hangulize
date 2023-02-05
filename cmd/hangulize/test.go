@@ -56,10 +56,10 @@ var testCmd = &cobra.Command{
 			cover.Visit(name)
 
 			var (
-				word        string
-				expected    string
-				transcribed string
-				traces      []hangulize.Trace
+				word     string
+				expected string
+				result   string
+				traces   []hangulize.Trace
 			)
 			h := hangulize.New(spec)
 
@@ -68,29 +68,33 @@ var testCmd = &cobra.Command{
 				word, expected = exm[0], exm[1]
 
 				if testCover {
-					transcribed, traces, err = h.HangulizeTrace(word)
+					h.Trace(func(t hangulize.Trace) {
+						traces = append(traces, t)
+					})
+
+					result, err = h.Hangulize(word)
 					if err != nil {
 						cmd.PrintErr(err)
 					}
 					for _, tr := range traces {
-						if tr.HasRule {
+						if tr.Rule != nil {
 							cover.Cover(name, tr.Step, tr.Rule.ID)
 						}
 					}
 				} else {
-					transcribed, err = h.Hangulize(word)
+					result, err = h.Hangulize(word)
 					if err != nil {
 						cmd.PrintErr(err)
 					}
 				}
 
-				if transcribed == expected {
+				if result == expected {
 					continue
 				}
 
 				// Test failed.
 				cmd.Printf("%s: ", name)
-				cmd.Printf(`"%s" -> "%s"`, word, transcribed)
+				cmd.Printf(`"%s" -> "%s"`, word, result)
 				cmd.Printf(`, expected: "%s"`, expected)
 				cmd.Println()
 				failedAtLeastOnce = true

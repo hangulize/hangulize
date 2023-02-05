@@ -9,11 +9,9 @@ import (
 )
 
 func TestLocalize(t *testing.T) {
-	s := Spec{}
-	h := New(&s)
-	p := procedure{h, nil}
-
+	s := &Spec{}
 	s.script = scripts.Hrkt{}
+	p := newProcedure(s, nil, nil)
 
 	assert.Equal(t, "foo.", p.localize("foo。"))
 	assert.Equal(t, ", foo, bar", p.localize("、foo、bar"))
@@ -24,9 +22,6 @@ func TestLocalize(t *testing.T) {
 }
 
 func TestLocalizeZWSP(t *testing.T) {
-	s := Spec{}
-	h := New(&s)
-	p := procedure{h, nil}
-
+	p := newProcedure(&Spec{}, nil, nil)
 	assert.Equal(t, "foo", p.localize("f\u200Bo\u200Bo"))
 }
