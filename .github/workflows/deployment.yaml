@@ -21,8 +21,32 @@ jobs:
     - name: Test
       run: go test ./...
 
+  test-wasm:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Setup Go
+      uses: actions/setup-go@v3
+      with: {go-version: 1.19.5}
+
+    - name: Setup Node
+      uses: actions/setup-node@v3
+      with: {node-version: 18.12.1}
+
+    - name: Test
+      env:
+        GOOS: js
+        GOARCH: wasm
+      run: |
+        for d in cmd/*.wasm; do
+          go test -exec $(go env GOROOT)/misc/wasm/go_js_wasm_exec "./$d/..."
+        done
+
   deploy:
-    needs: [test]
+    needs: [test, test-wasm]
     if: github.ref == 'refs/heads/main'
 
     runs-on: ubuntu-22.04
