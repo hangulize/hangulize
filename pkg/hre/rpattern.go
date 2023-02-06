@@ -2,7 +2,6 @@ package hre
 
 import (
 	"bytes"
-	"fmt"
 	"sort"
 
 	"github.com/pkg/errors"
@@ -26,7 +25,7 @@ type RPattern struct {
 }
 
 func (rp *RPattern) String() string {
-	return fmt.Sprintf(`"%s"`, rp.expr)
+	return rp.expr
 }
 
 // -----------------------------------------------------------------------------

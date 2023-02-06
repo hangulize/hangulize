@@ -52,7 +52,7 @@ type Pattern struct {
 }
 
 func (p *Pattern) String() string {
-	return fmt.Sprintf(`"%s"`, p.expr)
+	return p.expr
 }
 
 // -----------------------------------------------------------------------------

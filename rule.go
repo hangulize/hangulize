@@ -15,7 +15,7 @@ type Rule struct {
 }
 
 func (r Rule) String() string {
-	return fmt.Sprintf("%s -> %s", r.From, r.To)
+	return fmt.Sprintf(`"%s" -> "%s"`, r.From, r.To)
 }
 
 // Replace matches the word with the Pattern and replaces with the RPattern.
