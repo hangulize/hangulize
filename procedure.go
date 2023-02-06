@@ -3,25 +3,12 @@ package hangulize
 import (
 	"bytes"
 	"fmt"
-	"regexp"
 	"strings"
 	"unicode"
 
 	"github.com/hangulize/hangulize/internal/jamo"
 	"github.com/hangulize/hangulize/internal/subword"
 )
-
-var reSpace = regexp.MustCompile(`\s`)
-
-func isSpace(word string) bool {
-	return strings.TrimSpace(word) == ""
-}
-
-func hasSpace(word string) bool {
-	return reSpace.MatchString(word)
-}
-
-// -----------------------------------------------------------------------------
 
 type procedure struct {
 	spec      *Spec
@@ -132,7 +119,7 @@ func (p procedure) partition(word string) []subword.Subword {
 			fallthrough
 		case p.spec.puncts[let]:
 			fallthrough
-		case isSpace(letStr):
+		case hasSpaceOnly(letStr):
 			rep.Replace(i, i+len(letStr), letStr)
 		}
 	}
