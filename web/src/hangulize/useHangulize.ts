@@ -133,6 +133,11 @@ export function useHangulize(): [Hangulize, SetHangulizeInput] {
         return
       }
 
+      // Ignore the same target.
+      if (target.current === input) {
+        return
+      }
+
       // Set the latest target.
       target.current = input
 
