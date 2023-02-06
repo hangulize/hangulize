@@ -5,3 +5,7 @@ OUT ?= hangulize.wasm
 
 $(OUT): $(GO_FILES) $(SPEC_FILES)
 	GOOS=js GOARCH=wasm go build -ldflags="-X 'main.version=$(VERSION)'" -o $@
+
+.PHONY: test
+test:
+	GOOS=js GOARCH=wasm go test -exec $$(go env GOROOT)/misc/wasm/go_js_wasm_exec .

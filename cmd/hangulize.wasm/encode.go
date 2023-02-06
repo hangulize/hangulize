@@ -62,3 +62,23 @@ func jsSpecs(langs []string) js.Value {
 	}
 	return js.ValueOf(specs)
 }
+
+// jsTrace converts a Trace as a JavaScript value.
+func jsTrace(t hangulize.Trace) js.Value {
+	rule := js.Null()
+
+	if t.Rule != nil {
+		rule = js.ValueOf(object{
+			"id":   t.Rule.ID,
+			"from": t.Rule.From.String(),
+			"to":   t.Rule.To.String(),
+		})
+	}
+
+	return js.ValueOf(object{
+		"step": t.Step,
+		"word": t.Word,
+		"why":  t.Why,
+		"rule": rule,
+	})
+}

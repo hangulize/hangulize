@@ -53,8 +53,19 @@ func (p promiseTranslit) Transliterate(word string) (string, error) {
 	}
 }
 
+// jsUseTranslit wraps hangulize.UseTranslit in JavaScript.
+//
+//	useTranslit(scheme: string, fn: (word: string) => Promise<string>) => boolean
 var jsUseTranslit = js.FuncOf(func(this js.Value, args []js.Value) any {
-	id := args[0].String()
+	scheme := args[0].String()
 	fn := args[1]
-	return hangulize.UseTranslit(promiseTranslit{id, fn})
+	return hangulize.UseTranslit(promiseTranslit{scheme, fn})
+})
+
+// jsUnuseTranslit wraps hangulize.UnuseTranslit in JavaScript.
+//
+//	unuseTranslit(scheme: string) => boolean
+var jsUnuseTranslit = js.FuncOf(func(this js.Value, args []js.Value) any {
+	scheme := args[0].String()
+	return hangulize.UnuseTranslit(scheme)
 })
