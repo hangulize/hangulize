@@ -10,6 +10,7 @@ import (
 	"github.com/hangulize/hangulize/internal/subword"
 )
 
+// procedure implements the Hangulize procedure.
 type procedure struct {
 	spec      *Spec
 	translits map[string]Translit
@@ -43,8 +44,6 @@ func (p procedure) forward(word string) (string, error) {
 
 	return word, nil
 }
-
-// -----------------------------------------------------------------------------
 
 // 1. Transliterate (Word -> Word)
 //
@@ -231,7 +230,7 @@ func (p procedure) transcribe(subwords []subword.Subword) []subword.Subword {
 //
 // This step converts decomposed Jamo phonemes to composed Hangul syllables.
 //
-// For example, "ㅎㅔ-ㄹㄹㅗ" will be "헬로".
+// For example, "ㅎㅔ-ㄹㄹㅗ" becomes "헬로".
 func (p procedure) syllabify(subwords []subword.Subword) string {
 	var buf bytes.Buffer
 	var jamoBuf bytes.Buffer
@@ -263,7 +262,7 @@ func (p procedure) syllabify(subwords []subword.Subword) string {
 // the world. But a few languages, such as Japanese or Chinese, use different
 // punctuations with Korean. This step will reduce that kind of culture gap.
 //
-// For example, "「...」" will be "'...'".
+// For example, "「...」" becomes "'...'".
 func (p procedure) localize(word string) string {
 	script := p.spec.script
 
