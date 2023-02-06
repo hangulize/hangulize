@@ -11,9 +11,8 @@ import (
 // TestLang generates subtests for bundled lang specs.
 func TestLang(t *testing.T) {
 	for _, lang := range hangulize.ListLangs() {
-		spec, ok := hangulize.LoadSpec(lang)
-
-		assert.Truef(t, ok, `failed to load "%s" spec`, lang)
+		spec, err := hangulize.LoadSpec(lang)
+		assert.NoErrorf(t, err, `failed to load "%s" spec`, lang)
 
 		for _, exm := range spec.Test {
 			word := exm[0]

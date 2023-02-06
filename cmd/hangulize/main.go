@@ -33,8 +33,8 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		lang := args[0]
 
-		spec, ok := hangulize.LoadSpec(lang)
-		if !ok {
+		spec, err := hangulize.LoadSpec(lang)
+		if err != nil {
 			cmd.Println("Lang not supported:", lang)
 			os.Exit(1)
 		}

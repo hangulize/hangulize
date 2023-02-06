@@ -18,9 +18,9 @@ func init() {
 }
 
 func loadSpec(lang string) *hangulize.Spec {
-	spec, ok := hangulize.LoadSpec(lang)
-	if !ok {
-		panic("failed to laod spec")
+	spec, err := hangulize.LoadSpec(lang)
+	if err != nil {
+		panic(err)
 	}
 	return spec
 }

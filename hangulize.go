@@ -1,7 +1,5 @@
 package hangulize
 
-import "fmt"
-
 // Hangulize transcribes a non-Korean word into Hangul, which is the Korean
 // alphabet.
 //
@@ -9,10 +7,9 @@ import "fmt"
 //
 // Also, this function is the most simple and useful API in this package.
 func Hangulize(lang string, word string) (string, error) {
-	spec, ok := LoadSpec(lang)
-	if !ok {
-		// spec not found
-		return word, fmt.Errorf("%w: %s", ErrSpecNotFound, lang)
+	spec, err := LoadSpec(lang)
+	if err != nil {
+		return word, err
 	}
 
 	h := &hangulizer{spec, defaultTranslitRegistry, nil}

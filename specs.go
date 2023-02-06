@@ -39,13 +39,13 @@ var specs = make(map[string]*Spec)
 
 // LoadSpec finds a bundled spec by the given language name.
 // Once it loads a spec, it will cache the spec.
-func LoadSpec(lang string) (*Spec, bool) {
+func LoadSpec(lang string) (*Spec, error) {
 	var spec *Spec
 
 	spec, ok := specs[lang]
 	if ok {
 		// already loaded
-		return spec, true
+		return spec, nil
 	}
 
 	filename := "specs/" + lang + ext
@@ -53,7 +53,7 @@ func LoadSpec(lang string) (*Spec, bool) {
 
 	if errors.Is(err, fs.ErrNotExist) {
 		// not found
-		return nil, false
+		return nil, fmt.Errorf("%w: %s", ErrSpecNotFound, lang)
 	}
 
 	spec, err = ParseSpec(strings.NewReader(string(hsl)))
@@ -64,7 +64,7 @@ func LoadSpec(lang string) (*Spec, bool) {
 
 	// Cache it.
 	specs[lang] = spec
-	return spec, true
+	return spec, nil
 }
 
 // UnloadSpec flushes a cached spec to get free memory.
