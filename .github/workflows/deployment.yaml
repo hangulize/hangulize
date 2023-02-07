@@ -19,7 +19,12 @@ jobs:
       with: {version: v1.50.1}
 
     - name: Test
-      run: go test ./...
+      run: go test -coverprofile=profile.cov ./...
+
+    - name: Coveralls
+      uses: shogo82148/actions-goveralls@v1
+      with:
+        path-to-profile: profile.cov
 
   test-wasm:
     runs-on: ubuntu-22.04
