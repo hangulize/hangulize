@@ -26,7 +26,7 @@ Keys in a dictionary section must be unique, and the section won't keep their
 order. While a pair list section works in an inversed way. A pair list
 section just keeps described pairs in therir order.
 
-The media type of HSL files: text/vnd.hsl
+The media type of HSL files: application/vnd.hsl
 */
 package hsl
 

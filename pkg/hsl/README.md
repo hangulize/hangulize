@@ -1,9 +1,9 @@
 # HSL
 
 HSL(Hangulize Spec Language)은 한글라이즈에서 언어 별 전사 규칙을 표현하기 위한
-설정 문법이다. HSL 파일의 미디어타입은 [`text/vnd.hsl`][media-type]이다.
+설정 문법이다. HSL 파일의 미디어타입은 [`application/vnd.hsl`][media-type]이다.
 
-[media-type]: https://www.iana.org/assignments/media-types/text/vnd.hsl
+[media-type]: https://www.iana.org/assignments/media-types/application/vnd.hsl
 
 
 ## 문법
