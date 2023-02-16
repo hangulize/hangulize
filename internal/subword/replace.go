@@ -49,7 +49,7 @@ func NewReplacer(word string, prevLevel, nextLevel int) *Replacer {
 
 // Replace buffers a replacement.
 func (r *Replacer) Replace(start, stop int, word string) {
-	r.ReplaceBy(Replacement{start, stop, word})
+	r.ReplaceBy(NewReplacement(start, stop, word))
 }
 
 // ReplaceBy buffers multiple replacements.
