@@ -50,7 +50,7 @@ export default function SelectLanguage({ specs, value, onChange }: SelectLanguag
         return {
           key: s.lang.id,
           value: s.lang.id,
-          flag: Flags[s.lang.code3 as keyof typeof Flags],
+          flag: Flags[s.lang.id as keyof typeof Flags],
           text: s.lang.korean,
 
           search: {
