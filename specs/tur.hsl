@@ -2,7 +2,7 @@ lang:
     id      = "tur"
     codes   = "tr", "tur"
     english = "Turkish"
-    korean  = "터키어"
+    korean  = "튀르키예어"
     script  = "Latn"
 
 config:

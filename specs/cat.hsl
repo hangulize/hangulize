@@ -2,7 +2,7 @@ lang:
     id      = "cat"
     codes   = "ca", "cat"
     english = "Catalan"
-    korean  = "카탈로니아어"
+    korean  = "카탈루냐어"
     script  = "Latn"
 
 config:
