@@ -1,4 +1,4 @@
-name: hangulize.org
+name: CI/CD
 
 on: push
 
