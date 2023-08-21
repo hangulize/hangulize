@@ -1,4 +1,4 @@
-name: Deployment
+name: hangulize.org
 
 on: push
 
@@ -50,35 +50,41 @@ jobs:
           go test -exec $(go env GOROOT)/misc/wasm/go_js_wasm_exec "./$d/..."
         done
 
-  deploy:
-    needs: [test, test-wasm]
+  build:
     if: github.ref == 'refs/heads/main'
-
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+    - uses: actions/checkout@v3
       with: {fetch-depth: 0} # fetch tags
 
-    - name: Setup Go
-      uses: actions/setup-go@v3
+    - uses: actions/setup-go@v3
       with: {go-version: 1.19.5}
 
-    - name: Setup Node
-      uses: actions/setup-node@v3
+    - uses: actions/setup-node@v3
       with: {node-version: 18.12.1}
 
     - name: Setup Yarn
       run: npm i -g yarn@1.22.19
 
-    - name: Build
+    - name: Build web
       working-directory: web
-      run: make build
+      run: make build && mv build ../_site
 
-    - name: GitHub Pages
-      if: success()
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: web/build
+    - uses: actions/upload-pages-artifact@v2
+
+  github-pages:
+    needs: [test, test-wasm, build]
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    runs-on: ubuntu-22.04
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v2
