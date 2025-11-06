@@ -45,11 +45,11 @@ rewrite:
     "{g|q}ü{a|e|i}" -> "W"
     "ü"             -> "u"
     "{g|q}u{e|i}"   -> ""
-    "{g|q}ua"       -> "Wa"
     "q"             -> "k"
+    "{g|k}ua"       -> "Wa"
     "ww"            -> "w"
     "^w{@}"         -> "W"
-    "{@}w{@}"       -> "W"
+    "{@|g|k}w{@}"   -> "W"
     "w"             -> "XW"
     "xx"            -> "x"
     "^x{@}"         -> "s"
@@ -114,6 +114,7 @@ transcribe:
     "i"              -> "ㅣ"
     "o"              -> "ㅗ"
     "u"              -> "ㅜ"
+    "X"              -> "ㅡ"
 
 test:
     "quisquilla"           -> "키스키야"
@@ -181,6 +182,10 @@ test:
     "biz"                  -> "비스"
     "liquidez"             -> "리키데스"
     "reloj"                -> "렐로"
+    "Ecuador"              -> "에콰도르"
+    "Pascual"              -> "파스콸"
+    "Edwin"                -> "에드윈"
+    "adequado"             -> "아데콰도" // adecuado의 구식 철자
 
     # Football players
     "Gabriel Batistuta"   -> "가브리엘 바티스투타"
