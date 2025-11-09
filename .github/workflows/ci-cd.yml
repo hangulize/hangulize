@@ -71,7 +71,7 @@ jobs:
       working-directory: web
       run: make build && mv build ../_site
 
-    - uses: actions/upload-pages-artifact@v2
+    - uses: actions/upload-pages-artifact@v4
 
   github-pages:
     needs: [test, test-wasm, build]
@@ -87,4 +87,4 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
     - id: deployment
-      uses: actions/deploy-pages@v2
+      uses: actions/deploy-pages@v4
