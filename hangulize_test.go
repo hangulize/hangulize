@@ -185,7 +185,7 @@ func (p *stubTranslit) Load() error {
 	return nil
 }
 
-func (p *stubTranslit) Transliterate(word string) (string, error) {
+func (p *stubTranslit) Transliterate(_ string) (string, error) {
 	return "stub", nil
 }
 

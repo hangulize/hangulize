@@ -1,6 +1,13 @@
+version: "2"
 linters:
   enable:
-  - revive
-  - goimports
-  - errorlint
-  - misspell
+    - errorlint
+    - misspell
+    - revive
+  exclusions:
+    presets:
+      - comments
+      - std-error-handling
+formatters:
+  enable:
+    - goimports

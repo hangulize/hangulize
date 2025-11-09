@@ -45,7 +45,7 @@ func captured(s string, m []int, n int) string {
 
 // noCapture removes capturing groups in a regexp string.
 func noCapture(expr string) string {
-	return strings.Replace(expr, "(", "(?:", -1)
+	return strings.ReplaceAll(expr, "(", "(?:")
 }
 
 // -----------------------------------------------------------------------------

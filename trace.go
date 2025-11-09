@@ -157,7 +157,7 @@ func (r *subwordsTracer) Commit() {
 		if dirty {
 			b := subword.NewBuilder(subwords)
 			word := b.String()
-			word = strings.Replace(word, "\x00", ".", -1)
+			word = strings.ReplaceAll(word, "\x00", ".")
 
 			r.tracer.trace(Trace{Step: r.step, Word: word, Rule: &rec.rule})
 		}

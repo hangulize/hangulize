@@ -13,7 +13,7 @@ func init() {
 var versionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "Print the version of Hangulize",
-	Run: func(cmd *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, _ []string) {
 		cmd.Printf("hangulize %s", version)
 		cmd.Println()
 	},
