@@ -185,7 +185,7 @@ test:
     "Ecuador"              -> "에콰도르"
     "Pascual"              -> "파스콸"
     "Edwin"                -> "에드윈"
-    "adequado"             -> "아데콰도" // adecuado의 구식 철자
+    "adequado"             -> "아데콰도" # adecuado의 구식 철자
 
     # Football players
     "Gabriel Batistuta"   -> "가브리엘 바티스투타"
