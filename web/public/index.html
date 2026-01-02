@@ -27,6 +27,7 @@
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
 
+    <link rel="stylesheet" type="text/css" href="%PUBLIC_URL%/style.css">
     <link rel="icon" type="image/x-icon" href="%PUBLIC_URL%/favicon.ico">
     <link rel="icon" type="image/png" sizes="32x32" href="%PUBLIC_URL%/icons/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="%PUBLIC_URL%/icons/favicon-16x16.png">
@@ -36,6 +37,19 @@
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root">
+      <p>한글라이즈는 <a href="https://kornorms.korean.go.kr/regltn/regltnView.do?regltn_code=0003&regltn_no=425" rel="noreferrer"> 외래어 표기법</a>을 바탕으로 외국어 단어를 한글로 <a href="https://ko.wikipedia.org/wiki/%EC%A0%84%EC%82%AC_(%EC%96%B8%EC%96%B4%ED%95%99)" rel="noreferrer">전사</a>하는 도구입니다. 낯선 외국 인명, 지명, 혹은 브랜드명을 한글로 어떻게 적어야 할지 고민될 때 한글라이즈를 참고하세요.</p>
+
+      <p>같은 알파벳을 사용하더라도 언어마다 발음과 표기 규칙은 천차만별입니다. 예를 들어 똑같은 'Julia'라는 이름도 <a href="?lang=deu&amp;word=Julia">독일어로는 '율리아'</a>가 되지만, <a href="?lang=spa&amp;word=Julia">스페인어로는 '훌리아'</a>로 표기해야 합니다. 한글라이즈는 이러한 언어별 특수성을 고려해 입력 단어를 자동으로 전사합니다. 입력된 단어의 철자를 해당 언어의 발음으로 분석한 뒤 외래어 표기법 규칙에 맞게 재조합하는 정교한 알고리즘을 사용합니다. 이를 통해 사전에 없는 신조어나 고유명사까지도 일관성 있는 한글 표기로 변환할 수 있습니다. 복잡한 표기 규정을 일일이 찾아볼 필요 없이, <strong>번역, 뉴스 기사 작성, 글로벌 서비스 개발, 스포츠 선수 덕질 등 외래어 표기가 필요한 모든 순간</strong>에 활용해 보세요.</p>
+
+      <p>현재 한글라이즈는 40가지 언어를 지원합니다.</p>
+      <ul>
+        <li><strong>유럽 및 인접지역</strong>: 그리스어, 네덜란드어, 독일어, 라트비아어, 러시아어, 루마니아어, 리투아니아어, 마케도니아어, 벨라루스어, 불가리아어, 브라질 포르투갈어, 세르보크로아트어, 스웨덴어, 스페인어, 슬로바키아어, 슬로베니아어, 아이슬란드어, 아제르바이잔어, 알바니아어, 에스토니아어, 웨일스어, 우크라이나어, 이탈리아어, 조지아어, 체코어, 카탈로니아어, 터키어, 포르투갈어, 폴란드어, 핀란드어, 헝가리어</li>
+        <li><strong>아시아</strong>: 베트남어, 일본어, 중국어</li>
+        <li><strong>고전 및 인공어</strong>: 고대 그리스어, 라틴어, 에스페란토어, 중세 웨일스어</li>
+      </ul>
+
+      <p>아쉽게도 철자와 발음의 기계적인 대응이 불가능한 영어와 프랑스어는 지원하지 않습니다. 하지만 한글라이즈는 집단 지성으로 운영되는 <a href="https://github.com/hangulize" rel="noreferrer">오픈소스 프로젝트</a>입니다. 새로운 언어에 대한 규칙 추가나 개선 제안은 언제나 환영합니다. 정확한 외래어 표기, 한글라이즈와 함께하세요.</p>
+    </div>
   </body>
 </html>

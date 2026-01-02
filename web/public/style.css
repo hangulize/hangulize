@@ -5,6 +5,9 @@
   padding: 3rem 1rem;
 }
 
+#root * { opacity: 0; }
+#root .app, #root .app * { opacity: 1; }
+
 @media only screen and (max-width: 600px) {
   #root {
     padding: 2rem 0;
@@ -33,7 +36,7 @@
   margin-bottom: 0.25rem;
 }
 
-.description {
+.intro {
   margin-top: 1rem;
 }
 
@@ -42,7 +45,7 @@
   font-size: 1rem;
 }
 
-.description a:hover,
+.intro a:hover,
 .copyright a:hover {
   text-decoration: underline;
 }
