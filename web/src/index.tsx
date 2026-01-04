@@ -7,7 +7,7 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import App from './components/App'
 
 const rootElem = document.getElementById('root') as HTMLElement
-const introHTML = rootElem.innerHTML
+const introHTML = rootElem.getElementsByClassName('intro')[0].innerHTML
 const root = ReactDOM.createRoot(rootElem)
 root.render(
   <BrowserRouter>
