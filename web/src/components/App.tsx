@@ -1,10 +1,11 @@
 import { default as _ } from 'lodash'
-import { useCallback, useEffect } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
 import type { Example } from '../hangulize/spec'
 import { Hangulize, HangulizeState, useHangulize } from '../hangulize/useHangulize'
+import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
 import Prompt from './Prompt'
@@ -31,12 +32,37 @@ function determineLoadingResult(
 }
 
 export default function App({ introHTML }: { introHTML: string }) {
+  const location = useLocation()
   const [hangulize, setHangulizeInput] = useHangulize()
+  const navigate = useNavigate()
+  const { lang: pathLang, word: pathWord } = useParams<{ lang?: string; word?: string }>()
+  const [searchParams] = useSearchParams()
+  const [userClearedInput, setUserClearedInput] = useState(false)
 
-  // Sync lang and word with search parameters.
-  const [searchParams, setSearchParams] = useSearchParams()
-  const lang = searchParams.get('lang') || (_.sample(Object.keys(hangulize.specs)) as string)
-  const word = searchParams.get('word') || ''
+  // Check for legacy querystring parameters and redirect
+  const queryLang = searchParams.get('lang')
+  const queryWord = searchParams.get('word')
+
+  // Determine lang and word from path parameters
+  const lang = pathLang || (_.sample(Object.keys(hangulize.specs)) as string)
+  const word = pathWord || ''
+
+  // Handle redirects in useEffect to ensure consistent hook calls
+  useEffect(() => {
+    // Handle legacy querystring redirect
+    if (queryLang || queryWord) {
+      const redirectLang =
+        queryLang || pathLang || (_.sample(Object.keys(hangulize.specs)) as string)
+      const redirectWord = queryWord || ''
+      navigate(`/${redirectLang}${redirectWord ? '/' + redirectWord : ''}`, { replace: true })
+      return
+    }
+
+    // Set defaults if no lang provided in path
+    if (!pathLang) {
+      navigate(`/${lang}`, { replace: true })
+    }
+  }, [queryLang, queryWord, pathLang, lang, navigate, pathLang, hangulize.specs])
 
   const spec = hangulize.specs[lang]
   if (spec === undefined) {
@@ -44,20 +70,11 @@ export default function App({ introHTML }: { introHTML: string }) {
   }
 
   useEffect(() => {
-    let redirect = false
-    if (!searchParams.has('lang')) {
-      searchParams.set('lang', lang)
-      redirect = true
-    }
-    if (!searchParams.has('word')) {
-      if (spec.test.length !== 0) {
-        const randomWord = (_.sample(spec.test) as Example).word
-        searchParams.set('word', randomWord)
-        redirect = true
-      }
-    }
-    if (redirect) {
-      setSearchParams(searchParams, { replace: true })
+    // Set random word if none provided
+    if (!word && spec.test.length !== 0 && !userClearedInput) {
+      const randomWord = (_.sample(spec.test) as Example).word
+      navigate(`/${lang}/${randomWord}`, { replace: true })
+      return
     }
 
     if (word) {
@@ -65,17 +82,42 @@ export default function App({ introHTML }: { introHTML: string }) {
     } else {
       document.title = '한글라이즈'
     }
-  })
-
-  const handleChange = useCallback(async (lang: string, word: string) => {
-    searchParams.set('lang', lang)
-    searchParams.set('word', word)
-    setSearchParams(searchParams, { replace: true })
-  }, [])
+  }, [lang, word, spec.test, navigate, userClearedInput])
 
   useEffect(() => {
     setHangulizeInput(lang, word)
   }, [lang, word])
+
+  // Handle data-nav links
+  useEffect(() => {
+    const handleNavClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement
+      const link = target.closest('a[data-nav="true"]')
+      if (link) {
+        e.preventDefault()
+        const href = link.getAttribute('href')
+        if (href) {
+          navigate(href)
+        }
+      }
+    }
+
+    document.addEventListener('click', handleNavClick)
+    return () => document.removeEventListener('click', handleNavClick)
+  }, [navigate])
+
+  const handleChange = useCallback(
+    async (newLang: string, newWord: string) => {
+      // Track if user explicitly cleared the input
+      if (word && !newWord) {
+        setUserClearedInput(true)
+      } else if (newWord) {
+        setUserClearedInput(false)
+      }
+      navigate(`/${newLang}${newWord ? '/' + newWord : ''}`, { replace: true })
+    },
+    [navigate, word]
+  )
 
   const [loading, result] = determineLoadingResult(hangulize, lang, word)
 
@@ -99,6 +141,8 @@ export default function App({ introHTML }: { introHTML: string }) {
       <Examples specs={hangulize.specs} lang={lang} />
       <Result loading={loading}>{result}</Result>
 
+      <Description lang={lang} />
+      <Divider />
       <section className="intro" dangerouslySetInnerHTML={{ __html: introHTML }} />
 
       <Divider />
