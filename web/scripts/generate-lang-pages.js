@@ -9,8 +9,8 @@ const descriptionsPath = path.join(__dirname, '../src/descriptions.yaml')
 const yaml = require('js-yaml')
 const descriptions = yaml.load(fs.readFileSync(descriptionsPath, 'utf8'))
 
-// Read base template from public/index.html
-const templatePath = path.join(__dirname, '../public/index.html')
+// Read base template from build/index.html
+const templatePath = path.join(__dirname, '../build/index.html')
 const template = fs.readFileSync(templatePath, 'utf8')
 
 Object.keys(descriptions).forEach((lang) => {

@@ -1,6 +1,6 @@
 import { default as _ } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
 import type { Example } from '../hangulize/spec'
@@ -32,6 +32,7 @@ function determineLoadingResult(
 }
 
 export default function App({ introHTML }: { introHTML: string }) {
+  const location = useLocation()
   const [hangulize, setHangulizeInput] = useHangulize()
   const navigate = useNavigate()
   const { lang: pathLang, word: pathWord } = useParams<{ lang?: string; word?: string }>()
@@ -42,23 +43,26 @@ export default function App({ introHTML }: { introHTML: string }) {
   const queryLang = searchParams.get('lang')
   const queryWord = searchParams.get('word')
 
-  // Handle legacy querystring redirect
-  if (queryLang || queryWord) {
-    const redirectLang = queryLang || pathLang || (_.sample(Object.keys(hangulize.specs)) as string)
-    const redirectWord = queryWord || ''
-    navigate(`/${redirectLang}${redirectWord ? '/' + redirectWord : ''}`, { replace: true })
-    return null
-  }
-
   // Determine lang and word from path parameters
   const lang = pathLang || (_.sample(Object.keys(hangulize.specs)) as string)
   const word = pathWord || ''
 
-  // Set defaults if no lang provided in path
-  if (!pathLang) {
-    navigate(`/${lang}`, { replace: true })
-    return null
-  }
+  // Handle redirects in useEffect to ensure consistent hook calls
+  useEffect(() => {
+    // Handle legacy querystring redirect
+    if (queryLang || queryWord) {
+      const redirectLang =
+        queryLang || pathLang || (_.sample(Object.keys(hangulize.specs)) as string)
+      const redirectWord = queryWord || ''
+      navigate(`/${redirectLang}${redirectWord ? '/' + redirectWord : ''}`, { replace: true })
+      return
+    }
+
+    // Set defaults if no lang provided in path
+    if (!pathLang) {
+      navigate(`/${lang}`, { replace: true })
+    }
+  }, [queryLang, queryWord, pathLang, lang, navigate, pathLang, hangulize.specs])
 
   const spec = hangulize.specs[lang]
   if (spec === undefined) {
