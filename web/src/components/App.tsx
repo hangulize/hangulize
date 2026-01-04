@@ -5,6 +5,7 @@ import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
 import type { Example } from '../hangulize/spec'
 import { Hangulize, HangulizeState, useHangulize } from '../hangulize/useHangulize'
+import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
 import Prompt from './Prompt'
@@ -99,6 +100,8 @@ export default function App({ introHTML }: { introHTML: string }) {
       <Examples specs={hangulize.specs} lang={lang} />
       <Result loading={loading}>{result}</Result>
 
+      <Description lang={lang} />
+      <Divider />
       <section className="intro" dangerouslySetInnerHTML={{ __html: introHTML }} />
 
       <Divider />
