@@ -54,8 +54,6 @@ fmt: node_modules ## Format code by ESLint and Prettier
 
 build: node_modules $(SRC_FILES) $(GEN_FILES) ## Build a web app in ./build/
 	yarn build
-	node scripts/generate-lang-pages.js
-	cp build/index.html build/404.html
 	cp CNAME build/CNAME
 
 .PHONY: start
