@@ -1,6 +1,6 @@
 import { default as _ } from 'lodash'
 import { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
 import type { Example } from '../hangulize/spec'
@@ -32,6 +32,7 @@ function determineLoadingResult(
 }
 
 export default function App({ introHTML }: { introHTML: string }) {
+  const location = useLocation()
   const [hangulize, setHangulizeInput] = useHangulize()
   const navigate = useNavigate()
   const { lang: pathLang, word: pathWord } = useParams<{ lang?: string; word?: string }>()
