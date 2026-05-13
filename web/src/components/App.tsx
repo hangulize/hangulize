@@ -5,6 +5,7 @@ import { Container, Divider, Header, Image } from 'semantic-ui-react'
 
 import type { Example } from '../hangulize/spec'
 import { Hangulize, HangulizeState, useHangulize } from '../hangulize/useHangulize'
+import Description from './Description'
 import Examples from './Examples'
 import Footer from './Footer'
 import Prompt from './Prompt'
@@ -30,7 +31,7 @@ function determineLoadingResult(
   return [false, hangulize.result]
 }
 
-export default function App({ introHTML }: { introHTML: string }) {
+export default function App() {
   const [hangulize, setHangulizeInput] = useHangulize()
 
   // Sync lang and word with search parameters.
@@ -99,8 +100,7 @@ export default function App({ introHTML }: { introHTML: string }) {
       <Examples specs={hangulize.specs} lang={lang} />
       <Result loading={loading}>{result}</Result>
 
-      <section className="intro" dangerouslySetInnerHTML={{ __html: introHTML }} />
-
+      <Description />
       <Divider />
       <Footer />
     </Container>
