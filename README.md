@@ -19,7 +19,7 @@
 > 권장 표기를 표시해야 한다. 프로그래머들과 언어학자들이 손잡고 연구한다면 이게
 > 공상으로만 그치지 않을 것이다.
 >
-> Brian Jongseong Park (http://iceager.egloos.com/2610028)
+> Brian Jongseong Park [http://iceager.egloos.com/2610028](https://web.archive.org/web/20230616001454/http://iceager.egloos.com/2610028)
 
 한글라이즈는 외래어를 한글로 변환하는 도구입니다.
 
